@@ -153,7 +153,7 @@ $(function() {
 	$('.project').on('click', function(e) {
 		var self = $(this);
 		
-		$.getJSON('../projects.json').done(function(data) {
+		$.getJSON('projects.json').done(function(data) {
 			$('.modal-overlay').removeClass('hide');
 			$('.modal-window').removeClass('hide').addClass('zoomIn animated');
 		});
