@@ -380,19 +380,21 @@ section {
 
 	#projects div.projects-row {
 		margin: 40px 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
 	}
 
 		#projects div.projects-row div.project {
-			width: 22%;
+			width: calc(25% - 20px);
 			height: auto;
 			overflow: hidden;
-			float: left;
 			display: inline-block;
 			text-align: left;
-			margin: 0 20px;
 			color: #fff;
 			position: relative;
 			cursor: pointer;
+      margin: 0 20px 20px 0;
 		}
 
 			#projects div.projects-row div.project:first-child { margin-left: 0; }
