@@ -12,6 +12,11 @@
 	.modal-body #casestudy-left, .modal-body #casestudy-right { max-width: 100%; }
 	
 	.modal-body #casestudy-left { margin-bottom: 15px; }
+  
+  #banner div.banner-contents h1 {
+    font-size: 64px;
+    line-height: 1.15;
+  }
 }
 
 @media only screen and (max-width: 640px) {
