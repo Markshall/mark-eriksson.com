@@ -24,8 +24,12 @@ $(function() {
 		e.preventDefault();
 		
 		var $nav = $('nav#navigation ul');
-    
-    $nav[$nav.is(':visible') ? 'fadeOut' : 'fadeIn']('slow');
+		
+		if ($nav.is(':visible')) {
+			$nav.fadeOut('slow');
+		} else {
+			$nav.fadeIn('slow');
+		}
 		
 		$(this).toggleClass('crossactive');
 		
