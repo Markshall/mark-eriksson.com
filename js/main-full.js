@@ -1,10 +1,5 @@
 $(function() {
-	$('header#home').css('height', $(window).height());
-	
-	$(window).on('resize orientationchange', function() {
-		$('header#home').css('height', $(window).height());
-		$('body').css('width', $(window).width());
-	}).on('scroll', function() {
+	$(window).on('scroll', function() {
 		var Header = $('header#home').height(),
 			ScrTop = $(this).scrollTop(),
 			$Nav   = $('nav#navigation');
