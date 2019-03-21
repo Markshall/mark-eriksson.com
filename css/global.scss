@@ -11,17 +11,6 @@
 	box-shadow: none;
 }
 
-@font-face {
-    font-family: OpenSansBold;
-    src: url('../fonts/opensans/bold/OpenSans-Bold-webfont.eot');
-    src: url('../fonts/opensans/bold/OpenSans-Bold-webfont.eot?#iefix') format('embedded-opentype'),
-         url('../fonts/opensans/bold/OpenSans-Bold-webfont.woff') format('woff'),
-         url('../fonts/opensans/bold/OpenSans-Bold-webfont.ttf') format('truetype'),
-         url('../fonts/opensans/bold/OpenSans-Bold-webfont.svg#open_sansbold') format('svg');
-    font-weight: normal;
-    font-style: normal;
-}
-
 em { font-style: italic; }
 
 .pull-left { float: left !important; }
@@ -131,7 +120,9 @@ header {
 
 			nav#navigation ul li {
 				display: inline-block;
-				font: 12px/32px OpenSansBold, sans-serif;
+        font-weight: 900;
+        font-size: 12px;
+        line-height: 32px;
 				text-shadow: 0 0 6px rgba(0, 0, 0, .6);
 			}
 
@@ -295,7 +286,9 @@ section {
 		color: #454444;
 		float: left;
 		text-transform: uppercase;
-		font: 20px/30px OpenSansBold, sans-serif;
+    font-weight: 900;
+    font-size: 20px;
+    line-height: 30px;
 	}
 
 		#resume h3 span {
@@ -350,7 +343,8 @@ section {
 				#resume div.skills-meter div.skill h4 {
 					text-transform: uppercase;
 					color: #353030;
-					font: bold 15px OpenSansBold, sans-serif;
+          font-weight: 900;
+          font-size: 15px;
 				}
 
 				#resume div.skills-meter div.skill div.progress-bar {
@@ -377,7 +371,8 @@ section {
 	#projects span.header {
 		text-transform: uppercase;
 		color: #9E9C9C;
-		font: 16px OpenSansBold, sans-serif;
+    font-weight: 900;
+    font-size: 16px;
 	}
 
 	#projects div.projects-row {
@@ -440,7 +435,8 @@ section {
 					#projects div.projects-row div.project div.project-overlay span { display: block; }
 
 					#projects div.projects-row div.project div.project-overlay span.jobname {
-						font: 15px OpenSansBold;
+            font-size: 15px;
+            font-weight: 900;
 						color: #fafafa;
 						margin-bottom: 8px;
 					}
@@ -547,7 +543,8 @@ section {
 				background-color: #333232;
 				color: #fff;
 				text-transform: uppercase;
-				font: 19px OpenSansBold, sans-serif;
+        font-size: 15px;
+        font-weight: 600;
 				letter-spacing: 2.3px;
 				border-radius: 2px;
 				cursor: pointer;

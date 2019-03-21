@@ -1,12 +1,5 @@
 @charset "utf-8";
 
-@media screen and (-webkit-min-device-pixel-ratio: 0) {
-	@font-face {
-		font-family: 'OpenSansBold';
-		src: url('../fonts/opensans/bold/OpenSans-Bold-webfont.svg#open_sansbold') format('svg');
-	}
-}
-
 /* iphone, ipad and other smartphones */
 @media only screen and (max-width: 768px) {
 	.modal-body #casestudy-left, .modal-body #casestudy-right { max-width: 100%; }

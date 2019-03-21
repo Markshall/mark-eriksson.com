@@ -70,7 +70,7 @@ $(function() {
 			$('div#contactResult').fadeOut('fast');
 
 			$.ajax({
-				url: "inc/contactSend.php",
+				url: "/inc/contactSend.php",
 				type: "POST",
 				dataType: "json",
 				data: $(this).serialize(),
@@ -119,7 +119,7 @@ $(function() {
 		e.preventDefault();
 		
 		var section  = this.hash,
-			$section = $(section);
+        $section = $(section);
 		
 		$('html, body').stop().animate({
 			'scrollTop': $section.offset().top
