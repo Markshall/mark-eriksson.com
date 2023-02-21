@@ -397,35 +397,26 @@ section {
 
 #projects .projects-row {
   margin: 40px 0;
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  gap: 1rem;
   justify-content: center;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 }
 
 #projects .projects-row .project {
-  width: calc(25% - 20px);
-  height: auto;
   overflow: hidden;
+  aspect-ratio: 1;
   display: inline-block;
   text-align: left;
   color: #fff;
   position: relative;
   cursor: pointer;
-  margin: 0 20px 20px 0;
-}
-
-#projects .projects-row .project:first-child {
-  margin-left: 0;
-}
-#projects .projects-row .project:last-child {
-  margin-right: 0;
 }
 
 #projects .projects-row .project img {
   max-width: 100%;
   width: 100%;
-  transform: scale(1);
-  -webkit-transform: scale(1);
+  height: 100%;
   transition: all 0.3s ease-in-out;
   -webkit-transition: all 0.3s ease-in-out;
 }
@@ -681,13 +672,6 @@ footer ul.copyright-details {
 
 footer ul.copyright-details li {
   display: inline-block;
-}
-
-footer ul.copyright-details li:last-child:before {
-  content: "\2022";
-  font-size: 14px;
-  color: #f4a556;
-  padding: 0 12px 0 8px;
 }
 
 footer div.back-to-top {

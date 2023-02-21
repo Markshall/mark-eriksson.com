@@ -1,4 +1,3 @@
-@charset "UTF-8";
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
 a, abbr, acronym, address, big, cite, code,
@@ -325,14 +324,10 @@ properly.
 --------------------------------------------------------------------- */
 .first {
   clear: left;
-}
-
-/* first column in default screen */
+} /* first column in default screen */
 .s-first {
   clear: none;
-}
-
-/* first column in smaller screens */
+} /* first column in smaller screens */
 /* smaller screens
 --------------------------------------------------------------- */
 @media only screen and (max-width: 900px) {
@@ -340,24 +335,19 @@ properly.
   .s-bgrid-sixths [class*=column] {
     width: 16.66667%;
   }
-
   .s-bgrid-quarters [class*=column] {
     width: 25%;
   }
-
   .s-bgrid-thirds [class*=column] {
     width: 33.33333%;
   }
-
   .s-bgrid-halves [class*=column] {
     width: 50%;
   }
-
   /* block grids left clearing */
   .first {
     clear: none;
   }
-
   .s-first {
     clear: left;
   }
@@ -370,7 +360,6 @@ properly.
     margin: 0 auto;
     padding: 0;
   }
-
   .column, .columns {
     width: auto !important;
     float: none;
@@ -378,62 +367,48 @@ properly.
     margin-right: 0;
     padding: 0 30px;
   }
-
   .row .row {
     width: auto;
     max-width: none;
     margin: 0 -30px;
   }
-
   [class*=column] + [class*=column]:last-child {
     float: none;
   }
-
   [class*=bgrid] [class*=column] + [class*=column]:last-child {
     float: none;
   }
-
   /* Offsets */
   .row .offset-1 {
     margin-left: 0%;
   }
-
   .row .offset-2 {
     margin-left: 0%;
   }
-
   .row .offset-3 {
     margin-left: 0%;
   }
-
   .row .offset-4 {
     margin-left: 0%;
   }
-
   .row .offset-5 {
     margin-left: 0%;
   }
-
   .row .offset-6 {
     margin-left: 0%;
   }
-
   .row .offset-7 {
     margin-left: 0%;
   }
-
   .row .offset-8 {
     margin-left: 0%;
   }
-
   .row .offset-9 {
     margin-left: 0%;
   }
-
   .row .offset-10 {
     margin-left: 0%;
   }
-
   .row .offset-11 {
     margin-left: 0%;
   }
@@ -675,8 +650,7 @@ nav#navigation ul li a {
   left: 50%;
   width: 52px;
   height: 52px;
-  margin-left: -26px;
-  /*26 because 52/2 = 26*/
+  margin-left: -26px; /*26 because 52/2 = 26*/
 }
 
 #banner div.banner-contents div.go-down a {
@@ -855,36 +829,26 @@ section {
 
 #projects .projects-row {
   margin: 40px 0;
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  gap: 1rem;
   justify-content: center;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 }
 
 #projects .projects-row .project {
-  width: calc(25% - 20px);
-  height: auto;
   overflow: hidden;
+  aspect-ratio: 1;
   display: inline-block;
   text-align: left;
   color: #fff;
   position: relative;
   cursor: pointer;
-  margin: 0 20px 20px 0;
-}
-
-#projects .projects-row .project:first-child {
-  margin-left: 0;
-}
-
-#projects .projects-row .project:last-child {
-  margin-right: 0;
 }
 
 #projects .projects-row .project img {
   max-width: 100%;
   width: 100%;
-  transform: scale(1);
-  -webkit-transform: scale(1);
+  height: 100%;
   transition: all 0.3s ease-in-out;
   -webkit-transition: all 0.3s ease-in-out;
 }
@@ -1142,13 +1106,6 @@ footer ul.copyright-details li {
   display: inline-block;
 }
 
-footer ul.copyright-details li:last-child:before {
-  content: "•";
-  font-size: 14px;
-  color: #f4a556;
-  padding: 0 12px 0 8px;
-}
-
 footer div.back-to-top {
   display: block;
   position: relative;
@@ -1183,11 +1140,9 @@ footer div.back-to-top a span {
   .modal-body #casestudy-left, .modal-body #casestudy-right {
     max-width: 100%;
   }
-
   .modal-body #casestudy-left {
     margin-bottom: 15px;
   }
-
   #banner div.banner-contents h1 {
     font-size: 64px;
     line-height: 1.15;
@@ -1198,16 +1153,13 @@ footer div.back-to-top a span {
     width: 100%;
     margin-bottom: 7px;
   }
-
   nav#navigation a.toggleNavigation {
     display: block;
   }
-
   .opacity {
     background: transparent !important;
     box-shadow: none !important;
   }
-
   nav#navigation ul {
     background: #000000;
     width: 80%;
@@ -1216,7 +1168,6 @@ footer div.back-to-top a span {
     padding: 10px 30px 40px 30px;
     box-sizing: border-box;
   }
-
   nav#navigation ul li {
     display: block;
     margin: 0;
@@ -1224,120 +1175,96 @@ footer div.back-to-top a span {
     text-align: left;
     border-bottom: 1px solid #313131;
   }
-
   #banner div.banner-contents h1 {
     font-size: 42px !important;
   }
-
   #banner div.banner-contents h2 {
     font-size: 15px;
     width: 100%;
     margin-top: 15px;
     line-height: 28px;
   }
-
   #banner div.banner-contents hr {
     width: 80%;
     margin-top: 15px;
   }
-
   #banner div.banner-contents ul.social-icons {
     margin-top: 15px;
   }
-
   #banner div.banner-contents ul.social-icons li {
     font-size: 26px;
     margin: 0 10px;
   }
-
   #about img.profile-picture {
     float: right;
     margin: 53px 0 1px 20px;
     height: 100px;
     width: 100px;
   }
-
   #resume div.three.columns h3 {
     text-align: center;
     float: none;
   }
-
   #resume div.nine.columns {
     display: block;
     margin-top: 45px;
     text-align: center;
   }
-
   #resume .skills-meter .skill h4 {
     text-align: left !important;
   }
-
   #projects div.projects-row div.project {
     float: none !important;
     width: 83% !important;
     margin: 10px 0 !important;
   }
-
   #contact .contact-row {
     margin: 5px auto;
   }
-
   #contact .input-group {
     margin: 13px auto;
   }
-
   #contact .contact-row.multi .input-group {
     width: 100%;
     float: none;
     margin: 16px 0;
   }
-
   #contact .two.columns {
     display: none;
   }
-
   #contact input[type=text], #contact input[type=email] {
     width: 100%;
   }
-
   #contact textarea {
     width: 100%;
   }
-
   #contact div#contactResult {
     margin-left: 0;
     width: 100%;
     margin-bottom: 20px;
   }
-
   footer ul.footer-social li {
     margin: 0 12px;
   }
-
   footer ul.footer-social li a {
     font-size: 24px;
   }
-
   footer .twelve.columns {
     width: 100%;
     padding: 0;
   }
-
   footer ul.copyright-details li {
     font-size: 13px;
     display: block;
     margin: 12px 0;
   }
-
   footer ul.copyright-details li:last-child {
     margin-bottom: 0;
   }
-
   footer ul.copyright-details li:last-child:before {
     content: "";
     padding: 0;
   }
-
   footer div.back-to-top {
     left: 42%;
     bottom: 167px;
@@ -3379,5 +3306,3 @@ footer div.back-to-top a span {
 .fa-bomb:before {
   content: "\f1e2";
 }
-
-/*# sourceMappingURL=styles.css.map */

@@ -1,286 +1,402 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<title>Mark Eriksson - Online Portfolio and Resume of Mark Eriksson</title>
-		<meta name="google-site-verification" content="8Jc4FewGXJAlAyUQ8x7ri_KQMPFXXySugqH5IA_BgGQ" />
-		<meta name="viewport" content="initial-scale=1.0, width=device-width, maximum-scale=1.0, user-scalable=no" />
+  <head>
+    <meta charset="utf-8" />
+    <title>Mark Eriksson - Online Portfolio and Resume of Mark Eriksson</title>
+    <meta
+      name="google-site-verification"
+      content="8Jc4FewGXJAlAyUQ8x7ri_KQMPFXXySugqH5IA_BgGQ"
+    />
+    <meta
+      name="viewport"
+      content="initial-scale=1.0, width=device-width, maximum-scale=1.0, user-scalable=no"
+    />
 
-		<link rel="dns-prefetch" href="//fonts.googleapis.com" crossorigin />
-		<link rel="dns-prefetch" href="//ajax.googleapis.com" crossorigin />
-		<link rel="preload" href="/js/jquery.waypoints.min.js" as="script" />
-		<link rel="preload" href="/js/main.min.js" as="script" />
+    <link rel="dns-prefetch" href="//fonts.googleapis.com" crossorigin />
+    <link rel="dns-prefetch" href="//ajax.googleapis.com" crossorigin />
+    <link rel="preload" href="/js/jquery.waypoints.min.js" as="script" />
+    <link rel="preload" href="/js/main.min.js" as="script" />
 
-		<link type="text/css" rel="stylesheet" href="/css/styles.css" />
-		<link href="//fonts.googleapis.com/css?family=Droid+Serif|Open+Sans:400,600,700,900" rel="stylesheet" type="text/css">
+    <link type="text/css" rel="stylesheet" href="/css/styles.css" />
+    <link
+      href="//fonts.googleapis.com/css?family=Droid+Serif|Open+Sans:400,600,700,900"
+      rel="stylesheet"
+      type="text/css"
+    />
 
-		<meta name="description" content="Online Portfolio and Resume of Mark Eriksson." />
+    <meta
+      name="description"
+      content="Online Portfolio and Resume of Mark Eriksson."
+    />
 
-		<meta property="og:title" content="Mark Eriksson" />
-		<meta property="og:type" content="website" />
-		<meta property="og:url" content="https://mark-eriksson.com/" />
-		<meta property="og:description" content="Online Portfolio and Resume of Mark Eriksson." />
-		<meta property="og:image" content="https://mark-eriksson.com/img/logo.png" />
-		<meta property="og:image:type" content="image/png" />
-		<meta property="og:image:width" content="300" />
-		<meta property="og:image:height" content="300" />
+    <meta property="og:title" content="Mark Eriksson" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://mark-eriksson.com/" />
+    <meta
+      property="og:description"
+      content="Online Portfolio and Resume of Mark Eriksson."
+    />
+    <meta
+      property="og:image"
+      content="https://mark-eriksson.com/img/logo.png"
+    />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="300" />
+    <meta property="og:image:height" content="300" />
 
-		<!-- Background image shot by hateom from InterfaceLIFT (https://interfacelift.com/wallpaper/details/3025/insomnia.html) -->
+    <!-- Background image shot by hateom from InterfaceLIFT (https://interfacelift.com/wallpaper/details/3025/insomnia.html) -->
 
-		<!-- Global site tag (gtag.js) - Google Analytics -->
-		<script async src="https://www.googletagmanager.com/gtag/js?id=UA-21727306-1"></script>
-		<script>
-			window.dataLayer = window.dataLayer || [];
-			function gtag(){dataLayer.push(arguments);}
-			gtag('js', new Date());
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=UA-21727306-1"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
 
-			gtag('config', 'UA-21727306-1');
-		</script>
-	</head>
+      gtag("config", "UA-21727306-1");
+    </script>
+  </head>
 
-	<body ontouchstart="">
-		<header id="home">
-			<nav id="navigation">
-				<a href="javascript:void(0);" id="toggleNavigation" class="toggleNavigation">
-					<span class="white-line hamburger-top"></span>
-					<span class="white-line hamburger-bottom"></span>
-				</a>
-				<ul>
-					<li class="active"><a href="#home" class="scrolly">Home</a></li>
-					<li><a href="#about" class="scrolly">About</a></li>
-					<li><a href="#resume" class="scrolly">Résumé</a></li>
-					<li><a href="#projects" class="scrolly">Projects</a></li>
-					<li><a href="#contact" class="scrolly">Contact</a></li>
-				</ul>
-			</nav>
+  <body ontouchstart="">
+    <header id="home">
+      <nav id="navigation">
+        <a
+          href="javascript:void(0);"
+          id="toggleNavigation"
+          class="toggleNavigation"
+        >
+          <span class="white-line hamburger-top"></span>
+          <span class="white-line hamburger-bottom"></span>
+        </a>
+        <ul>
+          <li class="active"><a href="#home" class="scrolly">Home</a></li>
+          <li><a href="#resume" class="scrolly">Résumé</a></li>
+          <li><a href="#projects" class="scrolly">Projects</a></li>
+          <li><a href="#contact" class="scrolly">Contact</a></li>
+        </ul>
+      </nav>
 
-			<div id="banner" class="row clearfix">
-				<div class="banner-contents">
-					<h1>I'm Mark Eriksson.</h1>
-					<h2>
-						<span>Full-Stack Developer.</span>
-						HTML, CSS/Sass, JavaScript/jQuery, PHP, Vue, React, Node.js, MySQL, Visual Basic
-					</h2>
-					<hr />
-					<ul class="social-icons">
-						<li><a href="https://www.github.com/Markshall" target="_blank"><span class="fa fa-github"></span></a></li>
-						<li><a href="https://www.codepen.io/Markshall" target="_blank"><span class="fa fa-codepen"></span></a></li>
-						<li><a href="https://www.linkedin.com/in/markeriksson/" target="_blank"><span class="fa fa-linkedin"></span></a></li>
-						<li><a href="https://www.twitter.com/markshall94" target="_blank"><span class="fa fa-twitter"></span></a></li>
-						<li><a href="https://www.instagram.com/meriksson94" target="_blank"><span class="fa fa-instagram"></span></a></li>
-					</ul>
+      <div id="banner" class="row clearfix">
+        <div class="banner-contents">
+          <h1>I'm Mark Eriksson.</h1>
+          <h2>
+            <span>Full-Stack Developer.</span>
+            HTML, CSS/Sass, JavaScript/jQuery, PHP, Vue, React, Node.js, MySQL,
+            Visual Basic
+          </h2>
+          <hr />
+          <ul class="social-icons">
+            <li>
+              <a href="https://www.github.com/Markshall" target="_blank"
+                ><span class="fa fa-github"></span
+              ></a>
+            </li>
+            <li>
+              <a href="https://www.codepen.io/Markshall" target="_blank"
+                ><span class="fa fa-codepen"></span
+              ></a>
+            </li>
+            <li>
+              <a
+                href="https://www.linkedin.com/in/markeriksson/"
+                target="_blank"
+                ><span class="fa fa-linkedin"></span
+              ></a>
+            </li>
+          </ul>
 
-					<div class="go-down">
-						<a href="#about" class="scrolly"><span class="fa fa-chevron-circle-down"></span></a>
-					</div>
-				</div>
-			</div>
-		</header>
+          <div class="go-down">
+            <a href="#about" class="scrolly"
+              ><span class="fa fa-chevron-circle-down"></span
+            ></a>
+          </div>
+        </div>
+      </div>
+    </header>
 
-		<section id="about">
-			<div class="row clearfix">
-				<div class="three columns">
-					<!-- I really need to get a professional picture sorted out-->
-					<img src="/img/profpic.png" alt="Mark Eriksson" class="profile-picture" loading="lazy" />
-				</div>
+    <section id="resume">
+      <div class="row education clearfix">
+        <div class="three columns">
+          <h3><span>Education</span></h3>
+        </div>
 
-				<div class="nine columns">
-					<h2>About me</h2>
-					<!-- I suck at talking about myself, but here goes... -->
-					<p>
-						As you will have seen from the header, my name is Mark Eriksson.
-						I'm a 27 year old, self-taught web developer with a huge passion
-						for the web and all things technical.
-					</p>
+        <div class="nine columns">
+          <div class="resume-block first">
+            <h2>Liverpool John Moores University</h2>
+            <span class="role">Computer Studies</span> &middot;
+            <span class="date">September 2013</span>
+            <div class="info">
+              <p>
+                I studied a course called Computer Studies which consisted of 5
+                modules; web design, programming, computer systems, computing in
+                practice, computing and society.
+              </p>
+            </div>
+          </div>
 
-					<p>
-						I've been making websites since the age of 11 and haven't
-						lost interest since. I first got interested in making
-						websites when I started using Piczo&mdash;a site-builder where you
-						could sign up and make your own website. After being introduced to
-						being able to make my own websites, I wanted to learn more
-						about how they are built manually without the aid of a drag-and-drop
-						system, which enables elements to be placed where you want, so I
-						did this by visiting other websites and viewing the source code
-						and figuring out how they were put together.
-					</p>
+          <div class="resume-block last">
+            <h2>Cowley International Sixth Form</h2>
+            <span class="role">Level 3 Diploma for IT Practitioners</span>
+            &middot; <span class="date">Sep '10 &mdash; Apr '12</span>
+            <div class="info">
+              <p>
+                I studied a 2 year course in ICT at college which consisted of
+                18 different units, all of which I received a Distinction in, so
+                my final grade from Cowley was a Triple Distinction Distinction
+                Distinction in ICT.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
 
-					<p>
-					  I write code in HTML, CSS, PHP and JavaScript using
-						Visual Studio Code and I communicate with MySQL databases.
-					</p>
+      <div class="row work clearfix">
+        <div class="three columns">
+          <h3><span>Work</span></h3>
+        </div>
 
-					<p>
-						I enjoy making websites, playing snooker, watching TV series
-						and listening to music amongst other things that an average
-						27 year old male would enjoy to do.
-					</p>
-				</div>
-			</div>
-		</section>
+        <div class="nine columns">
+          <div class="resume-block first last">
+            <h2>Crown Oil Ltd</h2>
+            <span class="role">Senior Web Developer</span> &middot;
+            <span class="date">Jul '18 &mdash; Present</span>
+            <div class="info">
+              <p>
+                Design and develop full-scale websites for sub-companies of
+                Crown Oil Ltd.
+              </p>
+              <p>Languages and technologies involved:</p>
+              <ul
+                style="
+                  padding-top: 25px;
+                  display: grid;
+                  grid-template-columns: 50% 50%;
+                "
+              >
+                <li>PHP</li>
+                <li>HTML</li>
+                <li>CSS/Sass</li>
+                <li>JavaScript/jQuery</li>
+                <li>MySQL</li>
+                <li>Git</li>
+                <li>WordPress</li>
+                <li>PuTTY</li>
+                <li>AWS (<em>EC2, RDS, S3, Route 53&hellip;</em>)</li>
+                <li>Vue</li>
+                <li>React</li>
+                <li>Webpack</li>
+                <li>Snowpack</li>
+                <li>Node.js</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-		<section id="resume">
-			<div class="row education clearfix">
-				<div class="three columns">
-					<h3><span>Education</span></h3>
-				</div>
+    <section id="projects">
+      <span class="header">Here are a few projects I've worked on.</span>
+      <p style="font-size: 13px; color: #969696; margin-top: 8px">
+        <em>Details to follow soon&hellip;</em>
+      </p>
 
-				<div class="nine columns">
-					<div class="resume-block first">
-						<h2>Liverpool John Moores University</h2>
-						<span class="role">Computer Studies</span> &middot; <span class="date">September 2013</span>
-						<div class="info">
-							<p>
-								I studied a course called Computer Studies which consisted
-								of 5 modules; web design, programming, computer systems,
-								computing in practice, computing and society.
-							</p>
-						</div>
-					</div>
+      <div class="projects">
+        <div class="row clearfix">
+          <div class="projects-row">
+            <a
+              href="https://sustainability.crownoil.co.uk/"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="project"
+            >
+              <img
+                src="/img/projects/crownoilsustainability.jpg"
+                alt="Crown Oil Sustainability"
+                width="224"
+                height="224"
+                loading="lazy"
+              />
+              <div class="project-overlay">
+                <span class="jobname">Crown Oil Sustainability</span>
+                <span class="role">Lead developer</span>
+              </div>
+            </a>
+            <a
+              href="https://www.crownoilenvironmental.co.uk/"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="project"
+            >
+              <img
+                src="/img/projects/crownoilenvironmental.jpg"
+                alt="Crown Oil Environmental"
+                width="224"
+                height="224"
+                loading="lazy"
+              />
+              <div class="project-overlay">
+                <span class="jobname">Crown Oil Environmental</span>
+                <span class="role">Lead developer</span>
+              </div>
+            </a>
+            <a
+              href="https://www.speedyfuels.co.uk/"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="project"
+            >
+              <img
+                src="/img/projects/speedyfuels.jpg"
+                alt="Speedy Fuels"
+                width="224"
+                height="224"
+                loading="lazy"
+              />
+              <div class="project-overlay">
+                <span class="jobname">Speedy Fuels</span>
+                <span class="role">Lead developer</span>
+              </div>
+            </a>
+            <a
+              href="https://www.nationwidefuels.co.uk/"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="project"
+            >
+              <img
+                src="/img/projects/nationwidefuels.jpg"
+                alt="Nationwide Fuels"
+                width="224"
+                height="224"
+                loading="lazy"
+              />
+              <div class="project-overlay">
+                <span class="jobname">Nationwide Fuels</span>
+                <span class="role">Lead developer</span>
+              </div>
+            </a>
+            <a
+              href="https://www.crownenergy.co.uk/"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="project"
+            >
+              <img
+                src="/img/projects/crownenergy.jpg"
+                alt="Crown Energy"
+                width="224"
+                height="224"
+                loading="lazy"
+              />
+              <div class="project-overlay">
+                <span class="jobname">Crown Energy</span>
+                <span class="role">Lead developer</span>
+              </div>
+            </a>
+            <a
+              href="https://www.crownoil.co.uk/"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="project"
+            >
+              <img
+                src="/img/projects/crownoil.jpg"
+                alt="Crown Oil"
+                width="224"
+                height="224"
+                loading="lazy"
+              />
+              <div class="project-overlay">
+                <span class="jobname">Crown Oil</span>
+                <span class="role">Lead developer</span>
+              </div>
+            </a>
+            <a
+              href="https://www.birlemoil.co.uk/"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="project"
+            >
+              <img
+                src="/img/projects/birlemoil.jpg"
+                alt="Birlem Oil"
+                width="224"
+                height="224"
+                loading="lazy"
+              />
+              <div class="project-overlay">
+                <span class="jobname">Birlem Oil</span>
+                <span class="role">Lead developer</span>
+              </div>
+            </a>
+            <div class="project">
+              <img
+                src="/img/projects/theholyspirit.jpg"
+                alt="The Holy Spirit"
+                width="224"
+                height="224"
+                loading="lazy"
+              />
+              <div class="project-overlay">
+                <span class="jobname">The Holy Spirit</span>
+                <span class="role">Web design &amp; development</span>
+              </div>
+            </div>
+            <div class="project">
+              <img
+                src="/img/projects/cvdesignsolutions.jpg"
+                alt="CV Design Solutions"
+                width="224"
+                height="224"
+                loading="lazy"
+              />
+              <div class="project-overlay">
+                <span class="jobname">CV Design Solutions</span>
+                <span class="role">Web design &amp; development</span>
+              </div>
+            </div>
+            <div class="project">
+              <img
+                src="/img/projects/susv1.jpg"
+                alt="sUS v1"
+                width="224"
+                height="224"
+                loading="lazy"
+              />
+              <div class="project-overlay">
+                <span class="jobname">sUS v1</span>
+                <span class="role">Project creator &amp; developer</span>
+              </div>
+            </div>
+            <a
+              href="https://www.inwork.at/"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="project"
+            >
+              <img
+                src="/img/projects/inworkat.jpg"
+                alt="InWorkAt"
+                width="224"
+                height="224"
+                loading="lazy"
+              />
+              <div class="project-overlay">
+                <span class="jobname">InWorkAt</span>
+                <span class="role">Project creator &amp; developer</span>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
 
-					<div class="resume-block last">
-						<h2>Cowley International Sixth Form</h2>
-						<span class="role">Level 3 Diploma for IT Practitioners</span> &middot; <span class="date">Sep '10 &mdash; Apr '12</span>
-						<div class="info">
-							<p>
-								I studied a 2 year course in ICT at college which consisted
-								of 18 different units, all of which I received a Distinction
-								in, so my final grade from Cowley was a Triple Distinction
-								Distinction Distinction in ICT.
-							</p>
-						</div>
-					</div>
-				</div>
-			</div>
-
-			<div class="row work clearfix">
-				<div class="three columns">
-					<h3><span>Work</span></h3>
-				</div>
-
-				<div class="nine columns">
-					<div class="resume-block first last">
-						<h2>Crown Oil Ltd</h2>
-						<span class="role">Senior Web Developer</span> &middot; <span class="date">Jul '18 &mdash; Present</span>
-						<div class="info">
-							<p>
-								Design and develop full-scale websites for sub-companies of Crown Oil Ltd.
-							</p>
-							<p>
-							  Languages and technologies involved:
-							</p>
-							<ul style="padding-top: 25px; display: grid; grid-template-columns: 50% 50%;">
-							  <li>PHP</li>
-							  <li>HTML</li>
-							  <li>CSS/Sass</li>
-							  <li>JavaScript/jQuery</li>
-							  <li>MySQL</li>
-							  <li>Git</li>
-							  <li>WordPress</li>
-							  <li>PuTTY</li>
-							  <li>AWS (<em>EC2, RDS, S3, Route 53&hellip;</em>)</li>
-							  <li>Vue</li>
-							  <li>React</li>
-								<li>Webpack</li>
-								<li>Snowpack</li>
-								<li>Node.js</li>
-							</ul>
-						</div>
-					</div>
-				</div>
-			</div>
-		</section>
-
-		<section id="projects">
-			<span class="header">Here are a few projects I've worked on.</span>
-			<p style="font-size: 13px;color: #969696;margin-top: 8px;"><em>Details to follow soon&hellip;</em></p>
-
-			<div class="projects">
-				<div class="row clearfix">
-					<div class="projects-row clearfix">
-						<a href="https://sustainability.crownoil.co.uk/" target="_blank" rel="noopener noreferrer" class="project">
-							<img src="/img/projects/crownoilsustainability.jpg" alt="Crown Oil Sustainability" width="224" height="224" loading="lazy" />
-							<div class="project-overlay">
-								<span class="jobname">Crown Oil Sustainability</span>
-								<span class="role">Lead developer</span>
-							</div>
-						</a>
-						<a href="https://www.crownoilenvironmental.co.uk/" target="_blank" rel="noopener noreferrer" class="project">
-							<img src="/img/projects/crownoilenvironmental.jpg" alt="Crown Oil Environmental" width="224" height="224" loading="lazy" />
-							<div class="project-overlay">
-								<span class="jobname">Crown Oil Environmental</span>
-								<span class="role">Lead developer</span>
-							</div>
-						</a>
-						<a href="https://www.speedyfuels.co.uk/" target="_blank" rel="noopener noreferrer" class="project">
-							<img src="/img/projects/speedyfuels.jpg" alt="Speedy Fuels" width="224" height="224" loading="lazy" />
-							<div class="project-overlay">
-								<span class="jobname">Speedy Fuels</span>
-								<span class="role">Lead developer</span>
-							</div>
-						</a>
-						<a href="https://www.nationwidefuels.co.uk/" target="_blank" rel="noopener noreferrer" class="project">
-							<img src="/img/projects/nationwidefuels.jpg" alt="Nationwide Fuels" width="224" height="224" loading="lazy" />
-							<div class="project-overlay">
-								<span class="jobname">Nationwide Fuels</span>
-								<span class="role">Lead developer</span>
-							</div>
-						</a>
-						<a href="https://www.crownenergy.co.uk/" target="_blank" rel="noopener noreferrer" class="project">
-							<img src="/img/projects/crownenergy.jpg" alt="Crown Energy" width="224" height="224" loading="lazy" />
-							<div class="project-overlay">
-								<span class="jobname">Crown Energy</span>
-								<span class="role">Lead developer</span>
-							</div>
-						</a>
-            <a href="https://www.crownoil.co.uk/" target="_blank" rel="noopener noreferrer" class="project">
-							<img src="/img/projects/crownoil.jpg" alt="Crown Oil" width="224" height="224" loading="lazy" />
-							<div class="project-overlay">
-								<span class="jobname">Crown Oil</span>
-								<span class="role">Lead developer</span>
-							</div>
-						</a>
-					  <a href="https://www.birlemoil.co.uk/" target="_blank" rel="noopener noreferrer" class="project">
-							<img src="/img/projects/birlemoil.jpg" alt="Birlem Oil" width="224" height="224" loading="lazy" />
-							<div class="project-overlay">
-								<span class="jobname">Birlem Oil</span>
-								<span class="role">Lead developer</span>
-							</div>
-						</a>
-						<div class="project">
-							<img src="/img/projects/theholyspirit.jpg" alt="The Holy Spirit" width="224" height="224" loading="lazy" />
-							<div class="project-overlay">
-								<span class="jobname">The Holy Spirit</span>
-								<span class="role">Web design &amp; development</span>
-							</div>
-						</div>
-						<div class="project">
-							<img src="/img/projects/cvdesignsolutions.jpg" alt="CV Design Solutions" width="224" height="224" loading="lazy" />
-							<div class="project-overlay">
-								<span class="jobname">CV Design Solutions</span>
-								<span class="role">Web design &amp; development</span>
-							</div>
-						</div>
-						<div class="project">
-							<img src="/img/projects/susv1.jpg" alt="sUS v1" width="224" height="224" loading="lazy" />
-							<div class="project-overlay">
-								<span class="jobname">sUS v1</span>
-								<span class="role">Project creator &amp; developer</span>
-							</div>
-						</div>
-						<a href="https://www.inwork.at/" target="_blank" rel="noopener noreferrer" class="project">
-							<img src="/img/projects/inworkat.jpg" alt="InWorkAt" width="224" height="224" loading="lazy" />
-							<div class="project-overlay">
-								<span class="jobname">InWorkAt</span>
-								<span class="role">Project creator &amp; developer</span>
-							</div>
-						</a>
-					</div>
-				</div>
-			</div>
-		</section>
-
-		<section id="contact">
+    <!--<section id="contact">
 			<div class="row clearfix">
 				<div class="two columns">
 					<span class="fa fa-envelope email"></span>
@@ -345,33 +461,46 @@
 					<a class="contactTwitter" href="http://twitter.com/markshall94" target="_blank">Follow me</a>
 				</div>
 			</div>
-		</section>
+		</section>-->
 
-		<footer>
-			<div class="row clearfix">
-				<div class="twelve columns">
-					<ul class="footer-social">
-						<li><a href="https://www.github.com/Markshall" target="_blank"><span class="fa fa-github"></span></a></li>
-						<li><a href="https://www.codepen.io/Markshall" target="_blank"><span class="fa fa-codepen"></span></a></li>
-						<li><a href="https://www.linkedin.com/in/markeriksson/" target="_blank"><span class="fa fa-linkedin"></span></a></li>
-						<li><a href="https://www.twitter.com/markshall94" target="_blank"><span class="fa fa-twitter"></span></a></li>
-						<li><a href="https://www.instagram.com/meriksson94" target="_blank"><span class="fa fa-instagram"></span></a></li>
-					</ul>
+    <footer>
+      <div class="row clearfix">
+        <div class="twelve columns">
+          <ul class="footer-social">
+            <li>
+              <a href="https://www.github.com/Markshall" target="_blank"
+                ><span class="fa fa-github"></span
+              ></a>
+            </li>
+            <li>
+              <a href="https://www.codepen.io/Markshall" target="_blank"
+                ><span class="fa fa-codepen"></span
+              ></a>
+            </li>
+            <li>
+              <a
+                href="https://www.linkedin.com/in/markeriksson/"
+                target="_blank"
+                ><span class="fa fa-linkedin"></span
+              ></a>
+            </li>
+          </ul>
 
-					<ul class="copyright-details">
-						<li>&copy; Copyright 2021 Mark Eriksson</li>
-						<li><i class="fa fa-code accent"></i> with <i class="fa fa-heart accent"></i> by Mark Eriksson</li>
-					</ul>
-				</div>
-			</div>
-			<div class="back-to-top">
-				<a href="#home" class="scrolly"><span class="fa fa-chevron-up"></span></a>
-			</div>
-		</footer>
+          <ul class="copyright-details">
+            <li>&copy; Copyright 2023 Mark Eriksson</li>
+          </ul>
+        </div>
+      </div>
+      <div class="back-to-top">
+        <a href="#home" class="scrolly"
+          ><span class="fa fa-chevron-up"></span
+        ></a>
+      </div>
+    </footer>
 
-		<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-		<script src="/js/jquery.waypoints.min.js"></script>
-		<script src="/js/main.min.js"></script>
-		<!--coded by Mark Eriksson-->
-	</body>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="/js/jquery.waypoints.min.js"></script>
+    <script src="/js/main.min.js"></script>
+    <!--coded by Mark Eriksson-->
+  </body>
 </html>
