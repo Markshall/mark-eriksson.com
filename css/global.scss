@@ -76,9 +76,13 @@ nav#navigation {
   z-index: 30;
 }
 
-nav#navigation.opacity {
-  background: #2c2b2b;
-  box-shadow: 0 2px 9px rgba(0, 0, 0, 0.4);
+@media (min-width: 768px) {
+  nav#navigation {
+    background-color: rgba(44, 43, 43, 0.5);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 2px 9px rgba(0, 0, 0, 0.4);
+  }
 }
 
 nav#navigation a.toggleNavigation {
@@ -127,6 +131,10 @@ nav#navigation ul {
   width: auto;
   min-height: 47px;
   text-align: center;
+}
+
+nav#navigation ul.nav-toggle {
+  display: block;
 }
 
 nav#navigation ul li {
