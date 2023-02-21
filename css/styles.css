@@ -513,7 +513,7 @@ nav#navigation {
     box-shadow: 0 2px 9px rgba(0, 0, 0, 0.4);
   }
 }
-nav#navigation a.toggleNavigation {
+nav#navigation button.toggleNavigation {
   width: 59px;
   height: 57px;
   background: #f4a556;
@@ -521,9 +521,10 @@ nav#navigation a.toggleNavigation {
   top: 0;
   right: 32px;
   display: none;
+  border: none;
 }
 
-nav#navigation a.toggleNavigation span.white-line {
+nav#navigation button.toggleNavigation span.white-line {
   height: 3px;
   display: block;
   background-color: #fff;
@@ -532,27 +533,27 @@ nav#navigation a.toggleNavigation span.white-line {
   margin-right: auto;
   border-radius: 2px;
   position: relative;
-  transition: all 0.45s ease-in;
+  transition: all 0.25s linear;
 }
 
-a.toggleNavigation span.white-line.hamburger-top {
-  top: 17px;
+button.toggleNavigation span.white-line.hamburger-top {
+  top: -5px;
 }
 
-a.toggleNavigation.crossactive span.white-line.hamburger-top {
+button.toggleNavigation.crossactive span.white-line.hamburger-top {
   transform: rotate(45deg);
   -webkit-transform: rotate(45deg);
-  top: 26px;
+  top: 3px;
 }
 
-a.toggleNavigation span.white-line.hamburger-bottom {
-  top: 34px;
+button.toggleNavigation span.white-line.hamburger-bottom {
+  top: 6px;
 }
 
-a.toggleNavigation.crossactive span.white-line.hamburger-bottom {
+button.toggleNavigation.crossactive span.white-line.hamburger-bottom {
   transform: rotate(-45deg);
   -webkit-transform: rotate(-45deg);
-  top: 23px;
+  top: 0px;
 }
 
 nav#navigation ul {
@@ -1144,24 +1145,14 @@ footer div.back-to-top a span {
 }
 
 /* iphone, ipad and other smartphones */
-@media only screen and (max-width: 768px) {
-  .modal-body #casestudy-left, .modal-body #casestudy-right {
-    max-width: 100%;
-  }
-  .modal-body #casestudy-left {
-    margin-bottom: 15px;
-  }
+@media (max-width: 768px) {
   #banner div.banner-contents h1 {
     font-size: 64px;
     line-height: 1.15;
   }
 }
-@media only screen and (max-width: 640px) {
-  .modal-body #casestudy-left .casestudy-lists .content-holder {
-    width: 100%;
-    margin-bottom: 7px;
-  }
-  nav#navigation a.toggleNavigation {
+@media (max-width: 640px) {
+  nav#navigation button.toggleNavigation {
     display: block;
   }
   .opacity {
@@ -1203,12 +1194,6 @@ footer div.back-to-top a span {
     font-size: 26px;
     margin: 0 10px;
   }
-  #about img.profile-picture {
-    float: right;
-    margin: 53px 0 1px 20px;
-    height: 100px;
-    width: 100px;
-  }
   #resume div.three.columns h3 {
     text-align: center;
     float: none;
@@ -1225,31 +1210,6 @@ footer div.back-to-top a span {
     float: none !important;
     width: 83% !important;
     margin: 10px 0 !important;
-  }
-  #contact .contact-row {
-    margin: 5px auto;
-  }
-  #contact .input-group {
-    margin: 13px auto;
-  }
-  #contact .contact-row.multi .input-group {
-    width: 100%;
-    float: none;
-    margin: 16px 0;
-  }
-  #contact .two.columns {
-    display: none;
-  }
-  #contact input[type=text], #contact input[type=email] {
-    width: 100%;
-  }
-  #contact textarea {
-    width: 100%;
-  }
-  #contact div#contactResult {
-    margin-left: 0;
-    width: 100%;
-    margin-bottom: 20px;
   }
   footer ul.footer-social li {
     margin: 0 12px;

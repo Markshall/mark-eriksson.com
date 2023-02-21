@@ -85,7 +85,7 @@ nav#navigation {
   }
 }
 
-nav#navigation a.toggleNavigation {
+nav#navigation button.toggleNavigation {
   width: 59px;
   height: 57px;
   background: #f4a556;
@@ -93,9 +93,10 @@ nav#navigation a.toggleNavigation {
   top: 0;
   right: 32px;
   display: none;
+  border: none;
 }
 
-nav#navigation a.toggleNavigation span.white-line {
+nav#navigation button.toggleNavigation span.white-line {
   height: 3px;
   display: block;
   background-color: #fff;
@@ -104,27 +105,27 @@ nav#navigation a.toggleNavigation span.white-line {
   margin-right: auto;
   border-radius: 2px;
   position: relative;
-  transition: all 0.45s ease-in;
+  transition: all 0.25s linear;
 }
 
-a.toggleNavigation span.white-line.hamburger-top {
-  top: 17px;
+button.toggleNavigation span.white-line.hamburger-top {
+  top: -5px;
 }
 
-a.toggleNavigation.crossactive span.white-line.hamburger-top {
+button.toggleNavigation.crossactive span.white-line.hamburger-top {
   transform: rotate(45deg);
   -webkit-transform: rotate(45deg);
-  top: 26px;
+  top: 3px;
 }
 
-a.toggleNavigation span.white-line.hamburger-bottom {
-  top: 34px;
+button.toggleNavigation span.white-line.hamburger-bottom {
+  top: 6px;
 }
 
-a.toggleNavigation.crossactive span.white-line.hamburger-bottom {
+button.toggleNavigation.crossactive span.white-line.hamburger-bottom {
   transform: rotate(-45deg);
   -webkit-transform: rotate(-45deg);
-  top: 23px;
+  top: 0px;
 }
 
 nav#navigation ul {
