@@ -7,3 +7,8 @@ document
 
     this.classList.toggle("crossactive");
   });
+
+const yearEl = document.querySelector("#year");
+if (yearEl) {
+  yearEl.innerText = new Date().getFullYear();
+}
