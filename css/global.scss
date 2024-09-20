@@ -464,6 +464,7 @@ section {
 #projects .projects-row .project .project-overlay span.jobname {
   font-size: 15px;
   font-weight: 900;
+  pointer-events: none;
   color: #fafafa;
   margin-bottom: 8px;
 }
@@ -471,6 +472,7 @@ section {
 #projects .projects-row .project .project-overlay span.role {
   font-size: 13px;
   font-weight: normal;
+  pointer-events: none;
   color: #faf7f7;
 }
 
