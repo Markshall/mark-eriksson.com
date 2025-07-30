@@ -132,6 +132,7 @@ nav#navigation ul {
   width: auto;
   min-height: 47px;
   text-align: center;
+  scroll-target-group: auto;
 }
 
 nav#navigation ul.nav-toggle {
@@ -146,15 +147,15 @@ nav#navigation ul li {
   text-shadow: 0 0 6px rgba(0, 0, 0, 0.6);
 }
 
-nav#navigation ul li.active > a {
-  color: #ea941f;
-}
-
 nav#navigation ul li a {
   color: #fff;
   display: block;
   text-decoration: none;
   padding: 8px 20px;
+}
+
+nav#navigation ul li a:target-current {
+  color: #f4a556;
 }
 
 #banner {
