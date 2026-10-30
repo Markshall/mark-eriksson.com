@@ -26,8 +26,11 @@ if [[ ! -f dist/index.html ]]; then
   exit 1
 fi
 
-# --delete removes old hashed assets; .well-known/ (e.g. Let's Encrypt) is protected.
-rsync -avz --delete --filter='P .well-known/' \
+# --delete removes old hashed assets. Paths managed outside this repo are
+# protected from it: Let's Encrypt's /.well-known/ and the CheckCheck app at /check/.
+rsync -avz --delete \
+  --filter='P /.well-known/' \
+  --filter='P /check/' \
   -e "ssh -p ${DEPLOY_PORT:-22}" \
   "$@" \
   dist/ "${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH%/}/"
