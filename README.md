@@ -1,67 +1,77 @@
 # mark-eriksson.com
-[Preview link](https://www.mark-eriksson.com)
 
-The files to my online portfolio, mark-eriksson.com
+Source for **[mark-eriksson.com](https://www.mark-eriksson.com)**, the portfolio and CV of Mark Eriksson, a full-stack developer.
 
-## Previews
+It's a single static page with a light/dark theme, a filterable project gallery with desktop and mobile screenshots of each site, and an experience timeline. There's no framework: just HTML, CSS and TypeScript, built with [Vite](https://vite.dev).
 
-### Desktop
-![Desktop version](https://markshall.github.io/screenshots/mark-eriksson.com/desktop_2.png)
-
-### Mobile
-![Mobile version](https://markshall.github.io/screenshots/mark-eriksson.com/mobile_2.png)
-
-## Project layout
-
-```
-src/        Site source: index.html, styles/, scripts/, assets/ (Vite processes and hashes these)
-public/     Copied as-is to the site root (favicon, robots.txt, sitemap.xml, ads.txt, og:image)
-dist/       Build output — this is what goes on the server (git-ignored)
-```
-
-## Development
-
-Run the Vite dev server in Docker (with hot reload) at http://localhost:5173:
+## Quick start
 
 ```shell
 docker compose up
 ```
 
-Dependencies are reinstalled in the container automatically when `package-lock.json` changes.
+That starts the Vite dev server with hot reload at http://localhost:5173. Dependencies are installed inside the container and reinstalled automatically when `package-lock.json` changes.
 
-## Project screenshots
-
-Full-page desktop (1440px) and mobile (390px) screenshots of each project are saved to `src/assets/screenshots/<id>-desktop.webp` and `<id>-mobile.webp`. Projects are listed in `src/data/projects.js`, which the site also reads.
-
-To add a project, add it to `src/data/projects.js`, then run:
+If you'd rather run it without Docker, use Node 24+:
 
 ```shell
-npm run screenshots                 # capture projects with no screenshots yet
-npm run screenshots -- crownoil     # recapture specific project ids
-npm run screenshots -- --all        # recapture everything
+npm install
+npm run dev
 ```
 
-This runs on your machine rather than in Docker, and uses your installed Google Chrome. Cookie banners, chat widgets and other floating overlays are hidden before each capture.
+## Project layout
 
-## Build
+```
+src/
+  index.html         The page
+  styles/            CSS
+  scripts/           TypeScript: theme toggle, project gallery, page behaviour
+  data/projects.ts   The list of projects, shared by the site and the screenshot script
+  assets/            Images processed and hashed by Vite, including project screenshots
+public/              Copied as-is to the site root (favicon, robots.txt, sitemap.xml, ads.txt)
+scripts/             Screenshot capture and deploy scripts
+dist/                Build output, which is what goes on the server (git-ignored)
+```
+
+## Scripts
+
+| Command               | What it does                               |
+| --------------------- | ------------------------------------------ |
+| `npm run dev`         | Start the dev server                       |
+| `npm run typecheck`   | Check TypeScript types                     |
+| `npm run build`       | Type-check, then build to `dist/`          |
+| `npm run preview`     | Serve `dist/` locally                      |
+| `npm run screenshots` | Capture project screenshots (see below)    |
+| `npm run deploy`      | Build and upload to the server (see below) |
+
+Absolute URLs in `src/index.html` (`og:url`, `og:image`) use `%VITE_SITE_URL%`, which is set in `.env.development` (localhost) and `.env.production` (the live domain).
+
+## Adding a project
+
+Projects are listed in `src/data/projects.ts`. Each one gets a full-page desktop (1440px) and mobile (390px) screenshot, saved as `src/assets/screenshots/<id>-desktop.webp` and `<id>-mobile.webp`.
+
+Add the project to `src/data/projects.ts`, then capture its screenshots:
 
 ```shell
-npm run build    # outputs to dist/
-npm run preview  # serve dist/ locally
+npm run screenshots                  # capture projects with no screenshots yet
+npm run screenshots -- crown-oil     # recapture specific project ids
+npm run screenshots -- --all         # recapture everything
 ```
 
-## Deploy
+This runs on your machine rather than in Docker and drives your installed Google Chrome. Cookie banners, chat widgets and other floating overlays are hidden before each capture.
 
-Pushing to `master` runs `.github/workflows/deploy.yml`, which builds the site and uploads `dist/` with rsync over SSH. Add these repository secrets:
+## Deploying
 
-| Secret | Value |
-| --- | --- |
-| `DEPLOY_HOST` | Server hostname |
-| `DEPLOY_USER` | SSH user |
-| `DEPLOY_PATH` | Web root, e.g. `/var/www/mark-eriksson.com` |
-| `DEPLOY_PORT` | Optional, defaults to 22 |
-| `DEPLOY_SSH_KEY` | Private key for a deploy-only key pair |
-| `DEPLOY_KNOWN_HOSTS` | Output of `ssh-keyscan <host>` |
+Pushing to `master` runs `.github/workflows/deploy.yml`, which builds the site and uploads `dist/` with rsync over SSH. It needs these repository secrets:
+
+| Secret               | Value                                       |
+| -------------------- | ------------------------------------------- |
+| `DEPLOY_HOST`        | Server hostname                             |
+| `DEPLOY_USER`        | SSH user                                    |
+| `DEPLOY_PATH`        | Web root, e.g. `/var/www/mark-eriksson.com` |
+| `DEPLOY_PORT`        | Optional, defaults to 22                    |
+| `DEPLOY_SSH_KEY`     | Private key for a deploy-only key pair      |
+| `DEPLOY_KNOWN_HOSTS` | Output of `ssh-keyscan <host>`              |
 
 To deploy by hand, copy `.env.example` to `.env`, fill it in, then:
 
@@ -70,4 +80,4 @@ To deploy by hand, copy `.env.example` to `.env`, fill it in, then:
 npm run deploy           # build + upload
 ```
 
-The upload uses `rsync --delete`, so anything in the web root that isn't in `dist/` is removed (except `.well-known/`). Do a dry run first.
+The upload uses `rsync --delete`, so anything in the web root that isn't in `dist/` is removed, apart from `.well-known/` and `check/`, which are managed separately. Do a dry run first.
