@@ -23,6 +23,14 @@ jobs:
       - run: npm ci
       - run: npm run build
 
+      # The server's port 22 is firewalled to known IPs, so reach it over Tailscale.
+      - name: Connect to Tailscale
+        uses: tailscale/github-action@v3
+        with:
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+          tags: tag:ci
+
       - name: Configure SSH
         run: |
           install -m 700 -d ~/.ssh
