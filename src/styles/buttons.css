@@ -1,0 +1,38 @@
+.btn {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 0 24px;
+  border-radius: 999px;
+  border: 1.5px solid transparent;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.btn-solid {
+  background: var(--btn-bg);
+  color: var(--btn-text);
+}
+
+.btn-outline {
+  border-color: var(--ink);
+}
+
+.btn-light {
+  padding: 0 22px;
+  background: var(--band-ink);
+  color: #111418;
+}
+
+.icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1.5px solid var(--band-control);
+  background: transparent;
+  color: var(--band-ink);
+  cursor: pointer;
+}

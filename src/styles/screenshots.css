@@ -1,0 +1,143 @@
+/* Desktop and mobile screenshots; the phone overlaps the browser's corner. */
+.stage {
+  position: relative;
+
+  &.has-shots {
+    padding-bottom: 15%;
+
+    .browser {
+      width: 97%;
+    }
+  }
+
+  &:not(.has-shots) {
+    .shot,
+    .phone {
+      display: none;
+    }
+  }
+
+  &.has-shots .canvas {
+    display: none;
+  }
+}
+
+.browser {
+  display: block;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--band-line);
+  background: var(--panel);
+  color: inherit;
+  text-decoration: none;
+  box-shadow: 0 30px 60px rgb(0 0 0 / 0.35);
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+.phone {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 25.5%;
+  min-width: 96px;
+  /* Scale with the .explorer container so small phones keep their corners. */
+  border-radius: min(30px, 3.5cqi);
+  border: clamp(3px, 1cqi, 6px) solid var(--band-line);
+  background: var(--panel);
+  overflow: hidden;
+  box-shadow: 0 30px 60px rgb(0 0 0 / 0.45);
+
+  .shot {
+    aspect-ratio: 390 / 844;
+  }
+}
+
+/* A window onto a full-page screenshot that scrolls to the bottom on hover. */
+.shot {
+  aspect-ratio: 1440 / 900;
+  overflow: hidden;
+  container-type: size;
+}
+
+.shot-track {
+  display: block;
+  width: 100%;
+  height: auto;
+  transition: transform 0.8s ease;
+}
+
+.browser:is(:hover, :focus-visible) .shot-track,
+.phone:hover .shot-track {
+  transform: translateY(calc(-100% + 100cqh));
+  transition: transform var(--scroll-time, 9s) linear;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shot-track,
+  .browser:is(:hover, :focus-visible) .shot-track,
+  .phone:hover .shot-track {
+    transform: none;
+    transition: none;
+  }
+}
+
+.browser-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--band-line);
+}
+
+.dots {
+  display: flex;
+  gap: 6px;
+
+  span {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--band-control);
+  }
+}
+
+.url {
+  flex-grow: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: var(--band);
+  font-size: 13px;
+  color: var(--band-muted);
+}
+
+/* Shown instead of screenshots until they've been captured. */
+.canvas {
+  position: relative;
+  aspect-ratio: 1440 / 900;
+  overflow: hidden;
+  background-color: var(--panel);
+  background-image:
+    linear-gradient(var(--band-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--band-grid) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+.big-num {
+  position: absolute;
+  right: -8px;
+  bottom: -40px;
+  font-size: 260px;
+  font-weight: 700;
+  letter-spacing: -0.06em;
+  line-height: 1;
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--accent);
+  opacity: 0.55;
+}

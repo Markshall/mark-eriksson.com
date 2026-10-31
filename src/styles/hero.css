@@ -1,0 +1,47 @@
+.hero {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  padding-block: 72px 88px;
+
+  h1 {
+    text-transform: lowercase;
+    font-size: clamp(3rem, 9vw, 8rem);
+    line-height: 0.95;
+    letter-spacing: -0.045em;
+    font-weight: 700;
+  }
+}
+
+.lede {
+  max-width: 46rem;
+  font-size: 22px;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 24px;
+  padding-top: 40px;
+  border-top: 1px solid var(--line);
+
+  p {
+    color: var(--muted);
+    font-size: 15px;
+  }
+
+  .stat {
+    color: var(--ink);
+    font-size: 44px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+  }
+}

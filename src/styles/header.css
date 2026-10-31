@@ -1,0 +1,78 @@
+.site-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-block: 24px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+}
+
+.brand-name {
+  text-transform: lowercase;
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: -0.02em;
+}
+
+.site-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  scroll-target-group: auto;
+
+  a {
+    padding: 12px 14px;
+    text-decoration: none;
+
+    /* Scroll-spy where supported (Chrome 140+). */
+    &:target-current {
+      color: var(--accent);
+    }
+  }
+
+  /* Once wrapped under the brand, align the first link's text with the
+     page edge and push the theme toggle to the right. */
+  @media (max-width: 700px) {
+    flex: 1 1 100%;
+    margin-inline-start: -10px;
+
+    a {
+      padding-inline: 10px;
+    }
+
+    .theme-toggle {
+      margin-left: auto;
+    }
+  }
+}
+
+.theme-toggle {
+  width: 44px;
+  height: 44px;
+  margin-left: 8px;
+  border-color: var(--line);
+  color: var(--ink);
+
+  .icon-sun {
+    display: none;
+  }
+
+  :root[data-theme="dark"] & {
+    .icon-sun {
+      display: block;
+    }
+
+    .icon-moon {
+      display: none;
+    }
+  }
+}

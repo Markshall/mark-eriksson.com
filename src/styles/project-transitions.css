@@ -1,0 +1,72 @@
+/* View transitions between projects (see transition() in projects.ts).
+   Only the named parts animate; the rest of the page updates in place. */
+:root:active-view-transition-type(project) {
+  view-transition-name: none;
+
+  .browser {
+    view-transition-name: project-browser;
+  }
+
+  .phone {
+    view-transition-name: project-phone;
+  }
+
+  .project-title {
+    view-transition-name: project-title;
+  }
+
+  &::view-transition-group(*) {
+    animation-duration: 0.35s;
+    animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  /* Keep the title's text unstretched if its width changes. */
+  &::view-transition-old(project-title),
+  &::view-transition-new(project-title) {
+    width: auto;
+    height: 100%;
+    object-fit: none;
+    object-position: left center;
+  }
+}
+
+/* Screenshots scale past each other: going forward, the old project grows
+   and fades towards the viewer as the new one grows into place; going back
+   reverses it. The phone trails slightly. */
+:root:active-view-transition-type(project) {
+  --scale-out: 1.08;
+  --scale-in: 0.92;
+
+  &::view-transition-old(project-browser),
+  &::view-transition-old(project-phone) {
+    animation: 0.25s ease-in both project-out;
+  }
+
+  &::view-transition-new(project-browser),
+  &::view-transition-new(project-phone) {
+    animation: 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) both project-in;
+  }
+
+  &::view-transition-new(project-phone) {
+    animation-delay: 0.06s;
+  }
+}
+
+:root:active-view-transition-type(prev) {
+  --scale-out: 0.92;
+  --scale-in: 1.08;
+}
+
+@keyframes project-out {
+  to {
+    opacity: 0;
+    scale: var(--scale-out);
+  }
+}
+
+@keyframes project-in {
+  from {
+    opacity: 0;
+    scale: var(--scale-in);
+  }
+}
