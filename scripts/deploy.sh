@@ -26,9 +26,16 @@ if [[ ! -f dist/index.html ]]; then
   exit 1
 fi
 
+# CI logs are public, so only print a summary there rather than every file name.
+if [[ -n "${CI:-}" ]]; then
+  output=(--stats)
+else
+  output=(-v)
+fi
+
 # --delete removes old hashed assets. Paths managed outside this repo are
 # protected from it: Let's Encrypt's /.well-known/ and the CheckCheck app at /check/.
-rsync -avz --delete \
+rsync -az "${output[@]}" --delete \
   --filter='P /.well-known/' \
   --filter='P /check/' \
   -e "ssh -p ${DEPLOY_PORT:-22}" \
