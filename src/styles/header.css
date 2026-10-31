@@ -2,13 +2,13 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
   gap: 16px;
   padding-block: 24px;
 }
 
 .brand {
   display: flex;
+  margin-inline-end: auto;
   align-items: center;
   gap: 12px;
   text-decoration: none;
@@ -39,18 +39,15 @@
     }
   }
 
-  /* Once wrapped under the brand, align the first link's text with the
-     page edge and push the theme toggle to the right. */
-  @media (max-width: 700px) {
+  /* On narrow screens, move below the brand and theme toggle and align the
+     first link's text with the page edge. */
+  @media (max-width: 760px) {
+    order: 1;
     flex: 1 1 100%;
     margin-inline-start: -10px;
 
     a {
       padding-inline: 10px;
-    }
-
-    .theme-toggle {
-      margin-left: auto;
     }
   }
 }
@@ -58,7 +55,6 @@
 .theme-toggle {
   width: 44px;
   height: 44px;
-  margin-left: 8px;
   border-color: var(--line);
   color: var(--ink);
 
