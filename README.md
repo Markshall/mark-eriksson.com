@@ -64,16 +64,16 @@ This runs on your machine rather than in Docker and drives your installed Google
 
 Pushing to `master` runs `.github/workflows/deploy.yml`, which builds the site and uploads `dist/` with rsync over SSH. The server's SSH port is firewalled, so the runner joins the tailnet first and connects to the server's Tailscale address. It needs these repository secrets:
 
-| Secret               | Value                                               |
-| -------------------- | --------------------------------------------------- |
-| `DEPLOY_HOST`        | Server's Tailscale IP (`tailscale ip -4`)           |
-| `DEPLOY_USER`        | SSH user                                            |
-| `DEPLOY_PATH`        | Web root, e.g. `/var/www/mark-eriksson.com`         |
-| `DEPLOY_PORT`        | Optional, defaults to 22                            |
-| `DEPLOY_SSH_KEY`     | Private key for a deploy-only key pair              |
-| `DEPLOY_KNOWN_HOSTS` | Output of `ssh-keyscan <DEPLOY_HOST>`               |
-| `TS_OAUTH_CLIENT_ID` | Tailscale OAuth client ID (auth keys write scope)   |
-| `TS_OAUTH_SECRET`    | Tailscale OAuth client secret                       |
+| Secret               | Value                                             |
+| -------------------- | ------------------------------------------------- |
+| `DEPLOY_HOST`        | Server's Tailscale IP (`tailscale ip -4`)         |
+| `DEPLOY_USER`        | SSH user                                          |
+| `DEPLOY_PATH`        | Web root, e.g. `/var/www/mark-eriksson.com`       |
+| `DEPLOY_PORT`        | Optional, defaults to 22                          |
+| `DEPLOY_SSH_KEY`     | Private key for a deploy-only key pair            |
+| `DEPLOY_KNOWN_HOSTS` | Output of `ssh-keyscan <DEPLOY_HOST>`             |
+| `TS_OAUTH_CLIENT_ID` | Tailscale OAuth client ID (auth keys write scope) |
+| `TS_OAUTH_SECRET`    | Tailscale OAuth client secret                     |
 
 The OAuth client must be allowed to create devices tagged `tag:ci`. See [docs/deploying.md](docs/deploying.md) for how the whole flow works, setup from scratch, and troubleshooting.
 

@@ -71,11 +71,11 @@ Tailscale's access controls should limit `tag:ci` to SSH on the web server, so a
 
 ## Troubleshooting
 
-| Error in the Upload step                 | Meaning                                                                                                                        |
-| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| `Connection timed out`                   | Packets aren't reaching the server. The runner isn't on the tailnet, or `DEPLOY_HOST` is the public address.                   |
-| `Host key verification failed`           | `DEPLOY_KNOWN_HOSTS` is empty or was scanned from a different address than `DEPLOY_HOST`.                                       |
-| `Permission denied (publickey,password)` | The server was reached but refused the key. Check the key is really in `authorized_keys` and `DEPLOY_USER` is right.           |
+| Error in the Upload step                 | Meaning                                                                                                              |
+| ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `Connection timed out`                   | Packets aren't reaching the server. The runner isn't on the tailnet, or `DEPLOY_HOST` is the public address.         |
+| `Host key verification failed`           | `DEPLOY_KNOWN_HOSTS` is empty or was scanned from a different address than `DEPLOY_HOST`.                            |
+| `Permission denied (publickey,password)` | The server was reached but refused the key. Check the key is really in `authorized_keys` and `DEPLOY_USER` is right. |
 
 The server's `/var/log/auth.log` shows which user and address each attempt came from, which tells the cases apart.
 
