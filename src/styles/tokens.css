@@ -1,0 +1,43 @@
+/* Each theme token is light-dark(light, dark), resolved by color-scheme:
+   the system setting by default, or the visitor's choice via data-theme. */
+:root {
+  color-scheme: light dark;
+
+  &[data-theme="light"] {
+    color-scheme: light;
+  }
+
+  &[data-theme="dark"] {
+    color-scheme: dark;
+  }
+
+  --accent: #2b4eff;
+
+  --bg: light-dark(#f4f4f1, #0e1013);
+  --ink: light-dark(#111418, #ecedef);
+  --ink-2: light-dark(#2b3038, #c9cdd4);
+  --muted: light-dark(#555b66, #9aa1ad);
+  --line: light-dark(#d6d6d0, #2a2e35);
+  --chip: light-dark(#e8e8e3, #1c2026);
+  --btn-bg: light-dark(#111418, #ecedef);
+  --btn-text: light-dark(#f4f4f1, #0e1013);
+  --link: light-dark(#1f3fe0, #8fa2ff);
+  --band: light-dark(#111418, #15181d);
+  --band-edge: light-dark(#111418, #23272e);
+  --panel: light-dark(#1a1e25, #1d2128);
+
+  /* The projects band is dark in both themes. */
+  --band-ink: #ecedef;
+  --band-muted: #a3a9b5;
+  --band-line: #2a2f38;
+  --band-control: #3a404b;
+  --band-grid: #262b33;
+  --row-active: #232831;
+  --row-text: #d4d7dd;
+  --num-active: #8fa2ff;
+  --json-string: #9fdcae;
+  --json-number: #f2c27a;
+
+  --font-sans: "Space Grotesk Variable", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
+}

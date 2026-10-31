@@ -1,0 +1,16 @@
+@import "@fontsource-variable/space-grotesk/wght.css";
+@import "@fontsource-variable/jetbrains-mono/wght.css";
+
+@import "./tokens.css";
+@import "./base.css";
+@import "./buttons.css";
+@import "./icons.css";
+@import "./header.css";
+@import "./hero.css";
+@import "./section-title.css";
+@import "./projects.css";
+@import "./screenshots.css";
+@import "./project-details.css";
+@import "./project-transitions.css";
+@import "./resume.css";
+@import "./footer.css";

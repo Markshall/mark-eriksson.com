@@ -1,0 +1,32 @@
+/* An SVG arrow used as a mask, so it takes the text colour and looks the
+   same everywhere, unlike arrow characters, which vary by font and device.
+   Points right; the modifiers rotate it. */
+.arrow-icon {
+  display: inline-block;
+  flex-shrink: 0;
+  width: 0.85em;
+  height: 0.85em;
+  background: currentColor;
+  mask: url("../assets/icons/arrow.svg") center / contain no-repeat;
+
+  &.up {
+    rotate: -90deg;
+  }
+
+  &.down {
+    rotate: 90deg;
+  }
+
+  &.up-right {
+    rotate: -45deg;
+  }
+}
+
+/* Space the arrow with a gap rather than a space character, so a link's
+   underline stops at the end of its text. Zero specificity, so components
+   like .btn can set their own gap. */
+:where(a:has(> .arrow-icon)) {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+}
