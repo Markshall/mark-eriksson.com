@@ -106,7 +106,7 @@ export function initProjects(section: HTMLElement) {
       const button = document.createElement("button");
       button.type = "button";
       button.innerHTML =
-        '<span class="num"></span><span class="name"></span><span class="arrow" aria-hidden="true"></span>';
+        '<span class="num"></span><span class="name"></span><span class="arrow arrow-icon" aria-hidden="true"></span>';
       required(button, ".num").textContent = project.num;
       required(button, ".name").textContent = project.name;
       if (i === state.index) button.setAttribute("aria-current", "true");

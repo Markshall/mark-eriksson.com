@@ -93,12 +93,12 @@
         color: var(--num-active);
       }
 
-      .arrow::after {
-        content: "→";
+      .arrow {
+        visibility: visible;
 
         /* Stacked below 340px list + 32px gap + 520px project: it's underneath. */
         @container (width < 892px) {
-          content: "↓";
+          rotate: 90deg;
         }
       }
     }
@@ -120,7 +120,7 @@
   }
 
   .arrow {
-    font-family: var(--font-mono);
+    visibility: hidden;
   }
 }
 
