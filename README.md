@@ -75,7 +75,7 @@ Pushing to `master` runs `.github/workflows/deploy.yml`, which builds the site a
 | `TS_OAUTH_CLIENT_ID` | Tailscale OAuth client ID (auth keys write scope)   |
 | `TS_OAUTH_SECRET`    | Tailscale OAuth client secret                       |
 
-The OAuth client must be allowed to create devices tagged `tag:ci`.
+The OAuth client must be allowed to create devices tagged `tag:ci`. See [docs/deploying.md](docs/deploying.md) for how the whole flow works, setup from scratch, and troubleshooting.
 
 To deploy by hand, copy `.env.example` to `.env`, fill it in, then:
 
