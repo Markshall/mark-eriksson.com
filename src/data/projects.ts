@@ -1,6 +1,7 @@
 // The portfolio's projects. Shared by the site and scripts/screenshots.ts:
 // add a project here, then run `npm run screenshots` to capture it.
-// `year`, `stack` and `summary` are optional and hidden until filled in.
+// `year`, `stack`, `summary` and `body` are optional and hidden until filled in.
+// Each project also gets its own page at /projects/<id>/ (scripts/pages.ts).
 export interface Project {
   /** Used for screenshot file names: src/assets/screenshots/<id>-<view>.webp */
   id: string;
@@ -13,7 +14,10 @@ export interface Project {
   /** Year the site went live. */
   year?: number;
   stack?: string[];
+  /** One or two sentences, shown in the gallery and as the project page's intro. */
   summary?: string;
+  /** Longer write-up for the project page (/projects/<id>/), one string per paragraph. */
+  body?: string[];
 }
 
 export const PROJECTS = (

@@ -30,6 +30,12 @@
   color: #111418;
 }
 
+/* An outlined button on the dark projects band. */
+.btn-ghost {
+  border-color: var(--band-control);
+  color: var(--band-ink);
+}
+
 .icon-btn {
   display: flex;
   align-items: center;

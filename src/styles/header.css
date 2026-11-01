@@ -39,6 +39,12 @@
     }
   }
 
+  /* Generated pages link to the homepage's sections, apart from #contact, so
+     the scroll-spy would only ever highlight /contact. */
+  &.no-spy {
+    scroll-target-group: none;
+  }
+
   /* On narrow screens, move below the brand and theme toggle and align the
      first link's text with the page edge. */
   @media (max-width: 760px) {
