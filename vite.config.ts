@@ -77,12 +77,11 @@ function pageStatsPlugin(): Plugin {
   };
 }
 
-// The project pages and notes (scripts/pages.ts). The pages themselves are
-// generated before the build starts (see defineConfig below); this plugin
-// regenerates them in dev when a source changes, makes each project's social
-// preview image, and shows the notes link only once there are notes.
-function generatedPagesPlugin(generated: GeneratedPage[]): Plugin {
-  const hasNotes = generated.some(page => page.path === "/notes/");
+// The project pages (scripts/pages.ts). The pages themselves are generated
+// before the build starts (see defineConfig below); this plugin regenerates
+// them in dev when a source changes, and makes each project's social preview
+// image.
+function generatedPagesPlugin(): Plugin {
   return {
     name: "generated-pages",
     configureServer(server) {
@@ -90,16 +89,9 @@ function generatedPagesPlugin(generated: GeneratedPage[]): Plugin {
       server.watcher.add(sources);
       server.watcher.on("all", (_event, file) => {
         if (!sources.some(source => file.startsWith(source))) return;
-        generatePages({ drafts: true });
+        generatePages();
         server.ws.send({ type: "full-reload" });
       });
-    },
-    // Elements marked data-notes-link (the nav and footer links) are removed
-    // while there are no notes to link to.
-    transformIndexHtml(html) {
-      return hasNotes
-        ? html.replaceAll(" data-notes-link", "")
-        : html.replace(/\s*<a\b[^>]*\sdata-notes-link[^>]*>[\s\S]*?<\/a>/g, "");
     },
     // A 1200×630 crop of the top of each desktop screenshot, for link previews.
     async generateBundle() {
@@ -152,28 +144,21 @@ function cspHashes(): Plugin {
   };
 }
 
-export default defineConfig(({ mode, command, isPreview }) => {
+export default defineConfig(({ mode, isPreview }) => {
   // .env files live in the project folder (next to this file), not in src/.
   const { VITE_SITE_URL } = loadEnv(mode, import.meta.dirname, "VITE_");
   if (!VITE_SITE_URL) throw new Error(`VITE_SITE_URL is not set in .env.${mode}`);
 
-  // Write the project pages and notes into src/ before Vite looks for its
-  // inputs. Draft notes are only shown by the dev server. `vite preview` only
-  // serves dist/, so it leaves them alone.
-  const generated = isPreview ? [] : generatePages({ drafts: command === "serve" });
+  // Write the project pages into src/ before Vite looks for its inputs.
+  // `vite preview` only serves dist/, so it leaves them alone.
+  const generated = isPreview ? [] : generatePages();
 
   return {
     root: "src",
     publicDir: "../public",
     envDir: "..",
     // imagetools resizes the project screenshots (see SRCSETS in projects.ts).
-    plugins: [
-      imagetools(),
-      seoFiles(VITE_SITE_URL, generated),
-      generatedPagesPlugin(generated),
-      pageStatsPlugin(),
-      cspHashes(),
-    ],
+    plugins: [imagetools(), seoFiles(VITE_SITE_URL, generated), generatedPagesPlugin(), pageStatsPlugin(), cspHashes()],
     build: {
       outDir: "../dist",
       emptyOutDir: true,

@@ -1,27 +1,24 @@
 // Generates the pages that come from data rather than being written by hand:
-// a page per project (/projects/<id>/, from src/data/projects.ts) and the
-// notes (/notes/ and /notes/<slug>/, from content/notes/*.md). Each page is
-// templates/layout.html with its own <main>.
+// a page per project (/projects/<id>/, from src/data/projects.ts). Each page
+// is templates/layout.html with its own <main>.
 //
 // The pages are written into src/ (git-ignored) so Vite builds and serves them
 // like the hand-written ones: same CSS, scripts, asset hashing, CSP hashes and
 // build-time stats. vite.config.ts runs this before every build and dev server
 // start, and again in dev whenever a source file changes.
-import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { marked } from "marked";
 import { PROJECTS, SCORES_MEASURED } from "../src/data/projects.ts";
 
 const ROOT = join(import.meta.dirname, "..");
 const SRC = join(ROOT, "src");
-const NOTES_DIR = join(ROOT, "content", "notes");
 const SCREENSHOTS = join(SRC, "assets", "screenshots");
 
 /** Files whose changes mean the pages should be generated again. */
-export const PAGE_SOURCES = ["src/data/projects.ts", "templates", "content/notes", "src/assets/screenshots"];
+export const PAGE_SOURCES = ["src/data/projects.ts", "templates", "src/assets/screenshots"];
 
-/** Folders under src/ that this script owns and rewrites. */
-const GENERATED = ["projects", "notes"];
+/** The folder under src/ that this script owns and rewrites. */
+const GENERATED = "projects";
 
 export interface GeneratedPage {
   /** URL path, e.g. /projects/crown-oil/ */
@@ -281,139 +278,6 @@ function projectPage(project: Project, i: number): string {
 }
 
 // ---------------------------------------------------------------------------
-// Notes
-
-export interface Note {
-  slug: string;
-  title: string;
-  description: string;
-  /** YYYY-MM-DD */
-  date: string;
-  draft: boolean;
-  html: string;
-}
-
-// A note is Markdown with a front matter block of `key: value` lines:
-//
-//   ---
-//   title: Hashing inline scripts into a CSP
-//   description: One line for search results and link previews.
-//   date: 2026-11-01
-//   draft: true
-//   ---
-function readNote(file: string): Note {
-  const source = readFileSync(join(NOTES_DIR, file), "utf8");
-  const match = source.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
-  if (!match) throw new Error(`content/notes/${file}: missing front matter`);
-  const meta = Object.fromEntries(
-    match[1].split("\n").map(line => {
-      const [, key, value] = line.match(/^(\w+):\s*(.*)$/) ?? [];
-      if (!key) throw new Error(`content/notes/${file}: bad front matter line "${line}"`);
-      return [key, value.trim()];
-    }),
-  );
-  for (const key of ["title", "description", "date"]) {
-    if (!meta[key]) throw new Error(`content/notes/${file}: front matter needs "${key}"`);
-  }
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(meta.date)) throw new Error(`content/notes/${file}: date must be YYYY-MM-DD`);
-  return {
-    slug: file.replace(/\.md$/, ""),
-    title: meta.title,
-    description: meta.description,
-    date: meta.date,
-    draft: meta.draft === "true",
-    html: marked.parse(match[2], { async: false }),
-  };
-}
-
-/** Every note, newest first. Drafts are left out unless `drafts` is set. */
-export function readNotes({ drafts = false } = {}): Note[] {
-  if (!existsSync(NOTES_DIR)) return [];
-  return readdirSync(NOTES_DIR)
-    .filter(file => file.endsWith(".md"))
-    .map(readNote)
-    .filter(note => drafts || !note.draft)
-    .sort((a, b) => b.date.localeCompare(a.date));
-}
-
-const longDate = (date: string) =>
-  new Date(`${date}T12:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
-
-const draftBadge = (note: Note) => (note.draft ? html` <span class="pill mono">draft</span>` : false);
-
-function notePage(note: Note): string {
-  const path = `/notes/${note.slug}/`;
-  return page({
-    title: `${note.title} — Mark Eriksson`,
-    description: note.description,
-    path,
-    ogType: "article",
-    ogImage: "/img/og-image.png",
-    script: "/scripts/page.ts",
-    jsonLd: {
-      "@context": "https://schema.org",
-      "@graph": [
-        {
-          "@type": "BlogPosting",
-          headline: note.title,
-          description: note.description,
-          datePublished: note.date,
-          url: `${SITE}${path}`,
-          author: PERSON,
-        },
-        breadcrumbs(["Notes", "/notes/"], [note.title, path]),
-      ],
-    },
-    main: html`<main class="wrap">
-      <article class="prose note">
-        <a class="case-back mono" href="/notes/">${arrow("left")} ~/notes</a>
-        <div class="section-title">
-          <p class="eyebrow mono"><time datetime="${note.date}">${longDate(note.date)}</time>${draftBadge(note)}</p>
-          <h1>${note.title}</h1>
-        </div>
-        ${raw(note.html)}
-      </article>
-    </main>`,
-  });
-}
-
-function notesIndex(notes: Note[]): string {
-  return page({
-    title: "Notes — Mark Eriksson",
-    description: "Notes from Mark Eriksson on building and running websites: problems solved and things learned.",
-    path: "/notes/",
-    ogType: "website",
-    ogImage: "/img/og-image.png",
-    script: "/scripts/page.ts",
-    jsonLd: {
-      "@context": "https://schema.org",
-      "@type": "Blog",
-      name: "Notes — Mark Eriksson",
-      url: `${SITE}/notes/`,
-      author: PERSON,
-    },
-    main: html`<main class="wrap">
-      <div class="prose">
-        <div class="section-title">
-          <p class="eyebrow mono">~/notes</p>
-          <h1>Notes</h1>
-        </div>
-        <ol class="note-list">
-          ${notes.map(
-            note =>
-              html`<li>
-                <a href="/notes/${note.slug}/">${note.title}</a>${draftBadge(note)}
-                <p>${note.description}</p>
-                <time class="eyebrow mono" datetime="${note.date}">${longDate(note.date)}</time>
-              </li>`,
-          )}
-        </ol>
-      </div>
-    </main>`,
-  });
-}
-
-// ---------------------------------------------------------------------------
 
 function write(pages: GeneratedPage[], path: string, file: string, content: string, sources: string[]) {
   mkdirSync(join(ROOT, file, ".."), { recursive: true });
@@ -421,9 +285,9 @@ function write(pages: GeneratedPage[], path: string, file: string, content: stri
   pages.push({ path, file, sources });
 }
 
-/** Rewrite every generated page. Drafts are included only when `drafts` is set (the dev server). */
-export function generatePages({ drafts = false } = {}): GeneratedPage[] {
-  for (const dir of GENERATED) rmSync(join(SRC, dir), { recursive: true, force: true });
+/** Rewrite every generated page. */
+export function generatePages(): GeneratedPage[] {
+  rmSync(join(SRC, GENERATED), { recursive: true, force: true });
   const pages: GeneratedPage[] = [];
   const shared = ["templates", "src/data/projects.ts"];
 
@@ -435,15 +299,5 @@ export function generatePages({ drafts = false } = {}): GeneratedPage[] {
     ]);
   });
 
-  const notes = readNotes({ drafts });
-  if (notes.length) {
-    write(pages, "/notes/", "src/notes/index.html", notesIndex(notes), ["templates", "content/notes"]);
-    for (const note of notes) {
-      write(pages, `/notes/${note.slug}/`, `src/notes/${note.slug}/index.html`, notePage(note), [
-        "templates",
-        `content/notes/${note.slug}.md`,
-      ]);
-    }
-  }
   return pages;
 }

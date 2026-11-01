@@ -88,3 +88,15 @@ test("every project has both screenshots", async ({ page }) => {
     await page.getByRole("button", { name: "Next project" }).click();
   }
 });
+
+test("screen readers hear the newly selected project, but not on page load", async ({ page }) => {
+  await page.goto("/");
+  const announce = page.locator("[data-announce]");
+  await expect(page.locator("[data-name]")).toHaveText(PROJECTS[0].name);
+  await expect(announce).toHaveText("");
+
+  await page.getByRole("button", { name: "Next project" }).click();
+  await expect(announce).toHaveText(`${PROJECTS[1].name}, 2 of ${PROJECTS.length}`);
+  // The live region replaced the project panel as the thing that's announced.
+  await expect(page.locator(".project")).not.toHaveAttribute("aria-live");
+});
