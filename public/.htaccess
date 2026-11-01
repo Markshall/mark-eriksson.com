@@ -41,4 +41,11 @@ ErrorDocument 404 /404.html
   <If "%{REQUEST_URI} !~ m#^/check/# && %{REQUEST_FILENAME} =~ m#\.html$#">
     Header set Cache-Control "public, max-age=0, must-revalidate, s-maxage=14400"
   </If>
+
+  # Other files that keep their URLs: favicons, link preview images, the
+  # sitemap, robots.txt and ads.txt. A day is short enough for a change to show
+  # up soon, and the deploy purges changed ones from Cloudflare.
+  <If "%{REQUEST_URI} !~ m#^/(assets|check)/# && %{REQUEST_URI} =~ m#\.(ico|svg|png|jpe?g|webp|xml|txt)$#">
+    Header set Cache-Control "public, max-age=86400"
+  </If>
 </IfModule>

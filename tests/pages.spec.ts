@@ -1,4 +1,5 @@
 import { test, expect } from "./fixtures.ts";
+import { pageStats } from "../src/data/stats.ts";
 
 // The theme toggle, and the standalone pages loading cleanly.
 test.beforeEach(async ({ page }) => {
@@ -39,3 +40,18 @@ for (const [path, heading] of [
     expect(errors).toEqual([]);
   });
 }
+
+test.describe("without JavaScript", () => {
+  test.use({ javaScriptEnabled: false });
+
+  // The build writes the stats into the HTML (the page-stats plugin), so
+  // they're right before, or without, the page's scripts.
+  test("the hero stats and footer year are already in the HTML", async ({ page }) => {
+    const stats = pageStats();
+    await page.goto("/");
+    await expect(page.locator("[data-years]")).toHaveText(String(stats["data-years"]));
+    await expect(page.locator("[data-project-total]")).toHaveText(String(stats["data-project-total"]));
+    await expect(page.locator("[data-personal-total]")).toHaveText(String(stats["data-personal-total"]));
+    await expect(page.locator("[data-year]")).toHaveText(String(stats["data-year"]));
+  });
+});
