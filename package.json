@@ -10,7 +10,8 @@
     "screenshots": "node scripts/screenshots.ts",
     "typecheck": "tsc",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "lighthouse": "npm run build && npx -y @lhci/cli@0.15.1 autorun"
   },
   "devDependencies": {
     "@types/node": "^26.6.6",

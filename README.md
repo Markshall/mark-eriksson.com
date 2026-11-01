@@ -35,16 +35,17 @@ dist/                Build output, which is what goes on the server (git-ignored
 
 ## Scripts
 
-| Command                | What it does                               |
-| ---------------------- | ------------------------------------------ |
-| `npm run dev`          | Start the dev server                       |
-| `npm run typecheck`    | Check TypeScript types                     |
-| `npm run format`       | Format all files with Prettier             |
-| `npm run format:check` | Check formatting without changing files    |
-| `npm run build`        | Type-check, then build to `dist/`          |
-| `npm run preview`      | Serve `dist/` locally                      |
-| `npm run screenshots`  | Capture project screenshots (see below)    |
-| `npm run deploy`       | Build and upload to the server (see below) |
+| Command                | What it does                                |
+| ---------------------- | ------------------------------------------- |
+| `npm run dev`          | Start the dev server                        |
+| `npm run typecheck`    | Check TypeScript types                      |
+| `npm run format`       | Format all files with Prettier              |
+| `npm run format:check` | Check formatting without changing files     |
+| `npm run build`        | Type-check, then build to `dist/`           |
+| `npm run preview`      | Serve `dist/` locally                       |
+| `npm run lighthouse`   | Build, then audit the pages with Lighthouse |
+| `npm run screenshots`  | Capture project screenshots (see below)     |
+| `npm run deploy`       | Build and upload to the server (see below)  |
 
 Absolute URLs in `src/index.html` (`og:url`, `og:image`) use `%VITE_SITE_URL%`, which is set in `.env.development` (localhost) and `.env.production` (the live domain).
 
@@ -110,7 +111,7 @@ The rest is updated by hand:
 
 ## Deploying
 
-Pull requests into `master` run `.github/workflows/check.yml`, which checks formatting and builds the site but never deploys. Only the merge deploys.
+Pull requests into `master` run `.github/workflows/check.yml`, which checks formatting, builds the site and audits it with [Lighthouse CI](https://github.com/GoogleChrome/lighthouse-ci), but never deploys. Only the merge deploys. The Lighthouse settings are in `lighthouserc.json`. It audits `/`, `/privacy/` and `/404.html` three times each and fails the check if accessibility drops below 100, SEO below 100 (except on the `noindex` 404 page) or best practices below 95. Performance only warns, because shared runners give noisy scores. The HTML reports are attached to the workflow run as `lighthouse-reports`. Run `npm run lighthouse` to audit locally; the reports go to `.lighthouseci/reports/`. `@lhci/cli` runs through `npx` at a pinned version rather than from `package.json`, because its dependencies have open `npm audit` advisories.
 
 Pushing to `master` runs `.github/workflows/deploy.yml` when the push touches something that affects the built site (`src/`, `public/`, dependencies, build config, or the deploy script and workflow themselves). Commits that only change the README, docs or other tooling don't deploy. You can also run it by hand from the Actions tab. The workflow builds the site and uploads `dist/` with rsync over SSH. The server's SSH port is firewalled, so the runner joins the tailnet first and connects to the server's Tailscale address. It needs these repository secrets:
 
