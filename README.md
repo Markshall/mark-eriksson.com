@@ -35,14 +35,16 @@ dist/                Build output, which is what goes on the server (git-ignored
 
 ## Scripts
 
-| Command               | What it does                               |
-| --------------------- | ------------------------------------------ |
-| `npm run dev`         | Start the dev server                       |
-| `npm run typecheck`   | Check TypeScript types                     |
-| `npm run build`       | Type-check, then build to `dist/`          |
-| `npm run preview`     | Serve `dist/` locally                      |
-| `npm run screenshots` | Capture project screenshots (see below)    |
-| `npm run deploy`      | Build and upload to the server (see below) |
+| Command                | What it does                               |
+| ---------------------- | ------------------------------------------ |
+| `npm run dev`          | Start the dev server                       |
+| `npm run typecheck`    | Check TypeScript types                     |
+| `npm run format`       | Format all files with Prettier             |
+| `npm run format:check` | Check formatting without changing files    |
+| `npm run build`        | Type-check, then build to `dist/`          |
+| `npm run preview`      | Serve `dist/` locally                      |
+| `npm run screenshots`  | Capture project screenshots (see below)    |
+| `npm run deploy`       | Build and upload to the server (see below) |
 
 Absolute URLs in `src/index.html` (`og:url`, `og:image`) use `%VITE_SITE_URL%`, which is set in `.env.development` (localhost) and `.env.production` (the live domain).
 
@@ -59,6 +61,41 @@ npm run screenshots -- --all         # recapture everything
 ```
 
 This runs on your machine rather than in Docker and drives your installed Google Chrome. Cookie banners, chat widgets and other floating overlays are hidden before each capture.
+
+A few things to know when a capture goes wrong:
+
+- If a site is down or times out (60s to load), that view is skipped, the rest carry on, and the script exits non-zero listing what failed. Any existing screenshot for the failed view is left untouched, so re-run with just those ids.
+- Pages taller than 16,383px (WebP's limit) are cropped at that height, with a warning.
+- Videos are frozen on their last frame and the page is scrolled through first so lazy-loaded images appear. If a site still looks wrong, check it in Chrome with reduced motion turned on, because that's how it's captured.
+
+## Editing the page
+
+Only the project gallery is generated from data. Everything else is plain HTML in `src/index.html`:
+
+| Section                     | Where                                                   |
+| --------------------------- | ------------------------------------------------------- |
+| Hero intro and buttons      | `<section class="hero">`                                |
+| Experience, skills chips    | `<section id="resume">`, one `.job-head` block per role |
+| Contact email, social links | `<footer id="contact">`                                 |
+| Page title, description, OG | `<head>`                                                |
+
+The hero stats fill themselves in from `src/scripts/main.ts`: years since `CAREER_START`, the number of projects, and the number with category `Personal`. The footer year is also set there. The numbers written in the HTML are only fallbacks.
+
+## Theming
+
+Colours are CSS custom properties in `src/styles/tokens.css`. Each theme colour is written once as `light-dark(<light>, <dark>)`, so change both values in the same place. The projects band is dark in both themes and has its own `--band-*` tokens.
+
+By default the page follows the system light/dark setting. The toggle (`src/scripts/theme.ts`) sets `data-theme` on `<html>`, which overrides `color-scheme`, and remembers the choice in `localStorage`. Until a visitor clicks the toggle, the page keeps following system changes.
+
+## SEO and static files
+
+Nothing here is generated, so update it by hand:
+
+- `public/sitemap.xml` has a single URL. Bump `<lastmod>` after significant content changes.
+- `public/robots.txt` is empty, which allows everything.
+- `public/ads.txt` declares the Google AdSense publisher ID. Keep it if AdSense is in use on the domain.
+- `public/img/og-image.png` (1200×630) is the link preview image. Replace it in place if the design changes.
+- Google Tag Manager (`GTM-PV3S2MV`) is loaded by an inline snippet at the top of `src/index.html`, with a `<noscript>` fallback at the start of `<body>`.
 
 ## Deploying
 
@@ -85,3 +122,7 @@ npm run deploy           # build + upload
 ```
 
 The upload uses `rsync --delete`, so anything in the web root that isn't in `dist/` is removed, apart from `.well-known/` and `check/`, which are managed separately. Do a dry run first.
+
+## License
+
+There's no open-source license, so all rights are reserved. The code is public to read and learn from. The project screenshots show client sites, and those sites belong to their owners.
