@@ -224,7 +224,7 @@ export const PROJECTS = (
       id: "checkcheck",
       name: "CheckCheck",
       role: "Creator",
-      url: "www.mark-eriksson.com/check/",
+      url: "www.mark-eriksson.com/check",
       cat: "Personal",
       year: 2015,
       stack: ["Vanilla JS"],
