@@ -19,7 +19,8 @@
     "prettier": "3.9.10",
     "sharp": "^0.35.5",
     "typescript": "^7.0.2",
-    "vite": "^8.3.5"
+    "vite": "^8.3.5",
+    "vite-imagetools": "^12.0.1"
   },
   "dependencies": {
     "@fontsource-variable/jetbrains-mono": "^5.3.0",
