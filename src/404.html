@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Page not found — Mark Eriksson</title>
+    <meta name="robots" content="noindex" />
+    <meta name="color-scheme" content="light dark" />
+
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <!-- Apply the saved or system theme before first paint to avoid a flash. -->
+    <script>
+      try {
+        document.documentElement.dataset.theme =
+          localStorage.getItem("theme") ?? (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      } catch {}
+    </script>
+
+    <!-- Served for any missing URL, so assets are linked from the site root. -->
+    <link rel="stylesheet" href="/styles/main.css" />
+    <script type="module" src="/scripts/not-found.ts"></script>
+  </head>
+
+  <body>
+    <header class="site-header wrap">
+      <a href="/" class="brand" aria-label="Mark Eriksson, home">
+        <svg aria-hidden="true" width="52" height="28" viewBox="0 0 130 70" shape-rendering="crispEdges">
+          <path
+            fill="currentColor"
+            d="M0 0h10v70h-10z M10 10h10v10h-10z M20 20h10v10h-10z M30 30h10v10h-10z M40 20h10v10h-10z M50 10h10v10h-10z M60 0h10v70h-10z M70 0h30v10h-30z M70 30h20v10h-20z M70 60h30v10h-30z"
+          />
+          <path class="blink accent-fill" d="M110 60h20v10h-20z" />
+        </svg>
+        <span class="brand-name mono">Mark Eriksson</span>
+      </a>
+
+      <button
+        type="button"
+        class="icon-btn theme-toggle"
+        data-theme-toggle
+        aria-label="Switch to dark mode"
+        aria-pressed="false"
+      >
+        <svg
+          class="icon-sun"
+          aria-hidden="true"
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <circle cx="12" cy="12" r="4" />
+          <path
+            d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"
+          />
+        </svg>
+        <svg
+          class="icon-moon"
+          aria-hidden="true"
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" />
+        </svg>
+      </button>
+    </header>
+
+    <main>
+      <section class="hero wrap">
+        <p class="eyebrow mono">// error 404 · not found</p>
+        <h1>Nothing here<span class="blink accent">_</span></h1>
+        <p class="lede">That page doesn’t exist, or it’s moved. The rest of the site is one click away.</p>
+        <div class="actions">
+          <a href="/" class="btn btn-solid">Go to the homepage</a>
+          <a href="/#projects" class="btn btn-outline">See my work</a>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

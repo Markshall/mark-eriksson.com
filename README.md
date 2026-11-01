@@ -81,6 +81,10 @@ Only the project gallery is generated from data. Everything else is plain HTML i
 
 The hero stats fill themselves in from `src/scripts/main.ts`: years since `CAREER_START`, the number of projects, and the number with category `Personal`. The footer year is also set there. The numbers written in the HTML are only fallbacks.
 
+Each project has a shareable link, `/#projects/<id>`, using the `id` from `src/data/projects.ts`. Opening one selects that project and scrolls to the gallery. As visitors browse, the address bar updates to match without adding history entries. In the gallery, the left and right arrow keys step through projects, and up and down do the same while focus is in the list.
+
+`src/404.html` is the not-found page, built as a second Vite entry. `public/.htaccess` tells Apache to serve it for missing URLs (`ErrorDocument 404 /404.html`), which needs `AllowOverride` to include `FileInfo` for the web root.
+
 ## Theming
 
 Colours are CSS custom properties in `src/styles/tokens.css`. Each theme colour is written once as `light-dark(<light>, <dark>)`, so change both values in the same place. The projects band is dark in both themes and has its own `--band-*` tokens.

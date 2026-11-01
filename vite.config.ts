@@ -57,6 +57,12 @@ export default defineConfig(({ mode }) => {
       outDir: "../dist",
       emptyOutDir: true,
     },
+    rollupOptions: {
+      input: {
+        main: "src/index.html",
+        notFound: "src/404.html",
+      },
+    },
     server: {
       host: true,
       port: 5173,
