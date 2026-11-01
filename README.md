@@ -99,7 +99,9 @@ Nothing here is generated, so update it by hand:
 
 ## Deploying
 
-Pushing to `master` runs `.github/workflows/deploy.yml`, which builds the site and uploads `dist/` with rsync over SSH. The server's SSH port is firewalled, so the runner joins the tailnet first and connects to the server's Tailscale address. It needs these repository secrets:
+Pull requests into `master` run `.github/workflows/check.yml`, which checks formatting and builds the site but never deploys. Only the merge deploys.
+
+Pushing to `master` runs `.github/workflows/deploy.yml` when the push touches something that affects the built site (`src/`, `public/`, dependencies, build config, or the deploy script and workflow themselves). Commits that only change the README, docs or other tooling don't deploy. You can also run it by hand from the Actions tab. The workflow builds the site and uploads `dist/` with rsync over SSH. The server's SSH port is firewalled, so the runner joins the tailnet first and connects to the server's Tailscale address. It needs these repository secrets:
 
 | Secret               | Value                                             |
 | -------------------- | ------------------------------------------------- |

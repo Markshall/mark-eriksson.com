@@ -6,7 +6,7 @@ The secrets the workflow needs are listed in the [README](../README.md#deploying
 
 ## Step by step
 
-1. **Push to `master`.** GitHub matches the push against `on: push` in `.github/workflows/deploy.yml` and starts a fresh Ubuntu VM (the "runner"). It is thrown away when the job ends.
+1. **Push to `master`.** GitHub matches the push against `on: push` in `.github/workflows/deploy.yml`. The `paths:` list there means it only runs when the push changes a file that affects the built site; README, docs and tooling-only pushes are skipped. If it matches, GitHub starts a fresh Ubuntu VM (the "runner"). It is thrown away when the job ends.
 2. **Build.** The runner checks out the repo, runs `npm ci` and `npm run build`, and ends up with the site in `dist/`. Nothing has touched the server yet.
 3. **Connect to Tailscale.** `tailscale/github-action` installs Tailscale, uses the OAuth client (`TS_OAUTH_CLIENT_ID` / `TS_OAUTH_SECRET`) to get a short-lived single-use login tagged `tag:ci`, and joins the tailnet as a temporary device with its own `100.x.y.z` address. The runner and the server are now on the same private network.
 4. **Configure SSH.** The runner writes the deploy private key (`DEPLOY_SSH_KEY`), the server's public host key (`DEPLOY_KNOWN_HOSTS`) and a small SSH config to `~/.ssh/`.

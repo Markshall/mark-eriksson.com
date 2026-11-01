@@ -3,6 +3,19 @@ name: Deploy
 on:
   push:
     branches: [master]
+    # Only deploy when something that affects the built site changes, so
+    # README/docs/tooling commits don't redeploy. Run it by hand from the
+    # Actions tab (workflow_dispatch) to force a deploy.
+    paths:
+      - "src/**"
+      - "public/**"
+      - "package.json"
+      - "package-lock.json"
+      - "vite.config.ts"
+      - "tsconfig.json"
+      - ".env.production"
+      - "scripts/deploy.sh"
+      - ".github/workflows/deploy.yml"
   workflow_dispatch:
 
 concurrency:
