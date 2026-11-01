@@ -10,7 +10,7 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { marked } from "marked";
-import { PROJECTS } from "../src/data/projects.ts";
+import { PROJECTS, SCORES_MEASURED } from "../src/data/projects.ts";
 
 const ROOT = join(import.meta.dirname, "..");
 const SRC = join(ROOT, "src");
@@ -148,6 +148,29 @@ const shot = (project: Project, view: "desktop" | "mobile", alt: string) =>
     decoding="async"
   />`;
 
+// The site's GTmetrix results, laid out like the homepage's hero stats.
+function scoresSection(scores: NonNullable<Project["scores"]>): Raw {
+  const items: [value: string, label: Raw][] = [
+    [`${scores.performance}%`, html`performance`],
+    [`${scores.structure}%`, html`structure`],
+    [`${scores.lcp} ms`, html`<abbr title="Largest Contentful Paint">LCP</abbr>`],
+    [`${scores.tbt} ms`, html`<abbr title="Total Blocking Time">TBT</abbr>`],
+    [String(scores.cls), html`<abbr title="Cumulative Layout Shift">CLS</abbr>`],
+  ];
+  return html`<section class="case-scores" aria-labelledby="scores-h">
+    <h2 class="eyebrow mono" id="scores-h">// GTmetrix, ${SCORES_MEASURED}</h2>
+    <div class="stats">
+      ${items.map(
+        ([value, label]) =>
+          html`<div>
+            <p class="stat">${value}</p>
+            <p>${label}</p>
+          </div>`,
+      )}
+    </div>
+  </section>`;
+}
+
 function projectMain(project: Project, i: number): Raw {
   const href = `https://${project.url}/`;
   const prev = PROJECTS[(i - 1 + PROJECTS.length) % PROJECTS.length];
@@ -185,6 +208,7 @@ function projectMain(project: Project, i: number): Raw {
                 </div>`,
             )}
         </dl>
+        ${project.scores ? scoresSection(project.scores) : false}
       </div>
 
       <section class="band" aria-label="Screenshots">
