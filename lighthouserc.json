@@ -2,7 +2,12 @@
   "ci": {
     "collect": {
       "staticDistDir": "./dist",
-      "url": ["http://localhost/", "http://localhost/privacy/", "http://localhost/404.html"],
+      "url": [
+        "http://localhost/",
+        "http://localhost/privacy/",
+        "http://localhost/404.html",
+        "http://localhost/projects/crown-oil/"
+      ],
       "numberOfRuns": 3
     },
     "assert": {
