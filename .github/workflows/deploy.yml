@@ -9,6 +9,9 @@ on:
     paths:
       - "src/**"
       - "public/**"
+      - "content/**"
+      - "templates/**"
+      - "scripts/pages.ts"
       - "package.json"
       - "package-lock.json"
       - "vite.config.ts"

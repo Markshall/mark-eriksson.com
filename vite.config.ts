@@ -1,10 +1,13 @@
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
+import sharp from "sharp";
 import { defineConfig, loadEnv, type Plugin } from "vite";
 import { imagetools } from "vite-imagetools";
 import { pageStats } from "./src/data/stats.ts";
+import { PROJECTS } from "./src/data/projects.ts";
+import { generatePages, PAGE_SOURCES, projectOgImage, screenshotFile, type GeneratedPage } from "./scripts/pages.ts";
 
 // The date a page last changed: the last commit touching its files, or today
 // if git isn't available (e.g. building from a tarball).
@@ -19,8 +22,8 @@ function lastModified(paths: string[]): string {
   return new Date().toISOString().slice(0, 10);
 }
 
-// Pages listed in the sitemap, with the files whose changes count as changes
-// to that page.
+// Hand-written pages listed in the sitemap, with the files whose changes count
+// as changes to that page. Generated pages (scripts/pages.ts) are added to these.
 const PAGES = [
   { path: "/", sources: ["src", "public"] },
   { path: "/privacy/", sources: ["src/privacy"] },
@@ -28,7 +31,7 @@ const PAGES = [
 
 // Write sitemap.xml and robots.txt into the build, using the site URL from
 // .env.production so they always match the canonical and og:url tags.
-function seoFiles(siteUrl: string): Plugin {
+function seoFiles(siteUrl: string, generated: GeneratedPage[]): Plugin {
   return {
     name: "seo-files",
     apply: "build",
@@ -39,13 +42,15 @@ function seoFiles(siteUrl: string): Plugin {
         fileName: "sitemap.xml",
         source: `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${PAGES.map(
-  page => `  <url>
+${[...PAGES, ...generated]
+  .map(
+    page => `  <url>
     <loc>${site}${page.path}</loc>
     <lastmod>${lastModified(page.sources)}</lastmod>
   </url>
 `,
-).join("")}</urlset>
+  )
+  .join("")}</urlset>
 `,
       });
       this.emitFile({
@@ -68,6 +73,46 @@ function pageStatsPlugin(): Plugin {
         html = html.replace(new RegExp(`(<[a-z]+\\b[^>]*\\s${attr}(?=[\\s>])[^>]*>)[^<]*`, "g"), `$1${value}`);
       }
       return html;
+    },
+  };
+}
+
+// The project pages and notes (scripts/pages.ts). The pages themselves are
+// generated before the build starts (see defineConfig below); this plugin
+// regenerates them in dev when a source changes, makes each project's social
+// preview image, and shows the notes link only once there are notes.
+function generatedPagesPlugin(generated: GeneratedPage[]): Plugin {
+  const hasNotes = generated.some(page => page.path === "/notes/");
+  return {
+    name: "generated-pages",
+    configureServer(server) {
+      const sources = PAGE_SOURCES.map(source => join(import.meta.dirname, source));
+      server.watcher.add(sources);
+      server.watcher.on("all", (_event, file) => {
+        if (!sources.some(source => file.startsWith(source))) return;
+        generatePages({ drafts: true });
+        server.ws.send({ type: "full-reload" });
+      });
+    },
+    // Elements marked data-notes-link (the nav and footer links) are removed
+    // while there are no notes to link to.
+    transformIndexHtml(html) {
+      return hasNotes
+        ? html.replaceAll(" data-notes-link", "")
+        : html.replace(/\s*<a\b[^>]*\sdata-notes-link[^>]*>[\s\S]*?<\/a>/g, "");
+    },
+    // A 1200×630 crop of the top of each desktop screenshot, for link previews.
+    async generateBundle() {
+      for (const project of PROJECTS) {
+        const file = screenshotFile(project.id, "desktop");
+        if (!existsSync(file)) continue;
+        const source = await sharp(file).extract({ left: 0, top: 0, width: 1440, height: 756 }).toBuffer();
+        this.emitFile({
+          type: "asset",
+          fileName: projectOgImage(project.id).slice(1),
+          source: await sharp(source).resize(1200, 630).jpeg({ quality: 82, mozjpeg: true }).toBuffer(),
+        });
+      }
     },
   };
 }
@@ -107,17 +152,28 @@ function cspHashes(): Plugin {
   };
 }
 
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ mode, command, isPreview }) => {
   // .env files live in the project folder (next to this file), not in src/.
   const { VITE_SITE_URL } = loadEnv(mode, import.meta.dirname, "VITE_");
   if (!VITE_SITE_URL) throw new Error(`VITE_SITE_URL is not set in .env.${mode}`);
+
+  // Write the project pages and notes into src/ before Vite looks for its
+  // inputs. Draft notes are only shown by the dev server. `vite preview` only
+  // serves dist/, so it leaves them alone.
+  const generated = isPreview ? [] : generatePages({ drafts: command === "serve" });
 
   return {
     root: "src",
     publicDir: "../public",
     envDir: "..",
     // imagetools resizes the project screenshots (see SRCSETS in projects.ts).
-    plugins: [imagetools(), seoFiles(VITE_SITE_URL), pageStatsPlugin(), cspHashes()],
+    plugins: [
+      imagetools(),
+      seoFiles(VITE_SITE_URL, generated),
+      generatedPagesPlugin(generated),
+      pageStatsPlugin(),
+      cspHashes(),
+    ],
     build: {
       outDir: "../dist",
       emptyOutDir: true,
@@ -130,6 +186,7 @@ export default defineConfig(({ mode }) => {
           main: "src/index.html",
           notFound: "src/404.html",
           privacy: "src/privacy/index.html",
+          ...Object.fromEntries(generated.map(page => [page.path.slice(1, -1).replaceAll("/", "-"), page.file])),
         },
       },
     },

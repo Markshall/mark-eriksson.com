@@ -100,6 +100,7 @@
       <nav class="site-nav mono" aria-label="Main">
         <a href="#resume">/résumé</a>
         <a href="#projects">/projects</a>
+        <a href="/notes/" data-notes-link>/notes</a>
         <a href="#contact">/contact</a>
         <a href="https://github.com/Markshall" target="_blank" rel="noopener noreferrer">
           github
@@ -231,10 +232,13 @@
               </dl>
 
               <div class="project-actions">
-                <a class="btn btn-light" data-visit target="_blank" rel="noopener noreferrer">
-                  Visit site
-                  <span class="arrow-icon up-right" aria-hidden="true"></span>
-                </a>
+                <div class="project-links">
+                  <a class="btn btn-light" data-visit target="_blank" rel="noopener noreferrer">
+                    Visit site
+                    <span class="arrow-icon up-right" aria-hidden="true"></span>
+                  </a>
+                  <a class="btn btn-ghost" data-details>Details</a>
+                </div>
                 <div class="pager">
                   <button type="button" class="icon-btn" data-prev aria-label="Previous project">
                     <svg
@@ -366,6 +370,7 @@
             GitHub
             <span class="arrow-icon up-right" aria-hidden="true"></span>
           </a>
+          <a href="/notes/" data-notes-link>Notes</a>
           <a href="https://codepen.io/Markshall" target="_blank" rel="noopener noreferrer">
             CodePen
             <span class="arrow-icon up-right" aria-hidden="true"></span>
