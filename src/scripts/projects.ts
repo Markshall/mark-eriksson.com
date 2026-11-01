@@ -66,6 +66,13 @@ function transition(update: () => void, ...types: string[]) {
 }
 
 // Hover-scroll speed through a screenshot, in rendered pixels per second.
+/** How much of the element is on screen, relative to as much of it as could fit. */
+function visibleFraction(el: HTMLElement): number {
+  const { top, bottom, height } = el.getBoundingClientRect();
+  const visible = Math.min(bottom, innerHeight) - Math.max(top, 0);
+  return Math.max(0, visible) / Math.min(height, innerHeight);
+}
+
 const SCROLL_SPEED = 130;
 
 // Time the hover scroll to the screenshot's rendered length, so long and
@@ -155,9 +162,11 @@ export function initProjects(section: HTMLElement) {
       if (i === state.index) button.setAttribute("aria-current", "true");
       button.addEventListener("click", () => {
         if (i === state.index) return;
-        // When the list stacks above the project, the project is likely off
-        // screen: skip the unseen transition and bring it into view instead.
-        if (stacked()) {
+        // When the list stacks above the project, the project may be off
+        // screen: if it's mostly out of view, skip the unseen transition and
+        // bring it into view instead. If it's mostly visible, leave the
+        // scroll position alone and animate as usual.
+        if (stacked() && visibleFraction($(".project")) < 0.5) {
           state.index = i;
           render();
           $(".project").scrollIntoView({ behavior: reducedMotion.matches ? "instant" : "smooth", block: "start" });
