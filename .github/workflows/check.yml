@@ -25,3 +25,17 @@ jobs:
       - run: npm ci
       - run: npm run format:check
       - run: npm run build
+
+      # Audit the built pages with Lighthouse (lighthouserc.json): accessibility
+      # must score 100, SEO 100 except on the noindex 404 page, and best
+      # practices 95+. Performance only warns, because shared runners are noisy.
+      # Run outside package.json because @lhci/cli's dependencies have open
+      # npm audit advisories.
+      - run: npx -y @lhci/cli@0.15.1 autorun
+
+      - name: Upload Lighthouse reports
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-reports
+          path: .lighthouseci/reports/
