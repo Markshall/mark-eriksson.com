@@ -1,6 +1,6 @@
 name: Check
 
-# Build and lint pull requests before they're merged. Runs on every PR (no
+# Build, test and lint pull requests before they're merged. Runs on every PR (no
 # paths filter) because format:check also covers the README and docs. Needs
 # no secrets and never deploys.
 on:
@@ -25,6 +25,10 @@ jobs:
       - run: npm ci
       - run: npm run format:check
       - run: npm run build
+
+      # Smoke tests against the built site (tests/*.spec.ts), in the runner's
+      # preinstalled Google Chrome.
+      - run: npx playwright test
 
       # Audit the built pages with Lighthouse (lighthouserc.json): accessibility
       # must score 100, SEO 100 except on the noindex 404 page, and best

@@ -39,6 +39,7 @@ dist/                Build output, which is what goes on the server (git-ignored
 | ---------------------- | ------------------------------------------- |
 | `npm run dev`          | Start the dev server                        |
 | `npm run typecheck`    | Check TypeScript types                      |
+| `npm test`             | Build, then run the smoke tests             |
 | `npm run format`       | Format all files with Prettier              |
 | `npm run format:check` | Check formatting without changing files     |
 | `npm run build`        | Type-check, then build to `dist/`           |
@@ -48,6 +49,17 @@ dist/                Build output, which is what goes on the server (git-ignored
 | `npm run deploy`       | Build and upload to the server (see below)  |
 
 Absolute URLs in `src/index.html` (`og:url`, `og:image`) use `%VITE_SITE_URL%`, which is set in `.env.development` (localhost) and `.env.production` (the live domain).
+
+## Tests
+
+`tests/` has Playwright smoke tests for the built site, run against `vite preview` (config in `playwright.config.ts`). `npm test` builds first; if `dist/` is already built, `npx playwright test` runs them alone. They cover:
+
+- **Consent:** nothing loads from Google Tag Manager until the visitor accepts, and Reject and Accept are both remembered.
+- **Project gallery:** project links, filters, the arrow keys and pager, and both screenshots for every project.
+- **Theme:** the page follows the system setting until the visitor picks a theme, then keeps their choice.
+- **Pages:** `/`, `/privacy/` and `/404.html` load without console errors.
+
+They use your installed Google Chrome, like the screenshot script, so there's no browser download. The tests never reach the internet: GTM requests get an empty script, and any other request off the site is blocked and fails the test. A new third-party request therefore has to be added deliberately in `tests/fixtures.ts`.
 
 ## Adding a project
 
@@ -111,7 +123,7 @@ The rest is updated by hand:
 
 ## Deploying
 
-Pull requests into `master` run `.github/workflows/check.yml`, which checks formatting, builds the site and audits it with [Lighthouse CI](https://github.com/GoogleChrome/lighthouse-ci), but never deploys. Only the merge deploys. The Lighthouse settings are in `lighthouserc.json`. It audits `/`, `/privacy/` and `/404.html` three times each and fails the check if accessibility drops below 100, SEO below 100 (except on the `noindex` 404 page) or best practices below 95. Performance only warns, because shared runners give noisy scores. The HTML reports are attached to the workflow run as `lighthouse-reports`. Run `npm run lighthouse` to audit locally; the reports go to `.lighthouseci/reports/`. `@lhci/cli` runs through `npx` at a pinned version rather than from `package.json`, because its dependencies have open `npm audit` advisories.
+Pull requests into `master` run `.github/workflows/check.yml`, which checks formatting, builds the site, runs the smoke tests and audits it with [Lighthouse CI](https://github.com/GoogleChrome/lighthouse-ci), but never deploys. Only the merge deploys. The Lighthouse settings are in `lighthouserc.json`. It audits `/`, `/privacy/` and `/404.html` three times each and fails the check if accessibility drops below 100, SEO below 100 (except on the `noindex` 404 page) or best practices below 95. Performance only warns, because shared runners give noisy scores. The HTML reports are attached to the workflow run as `lighthouse-reports`. Run `npm run lighthouse` to audit locally; the reports go to `.lighthouseci/reports/`. `@lhci/cli` runs through `npx` at a pinned version rather than from `package.json`, because its dependencies have open `npm audit` advisories.
 
 Pushing to `master` runs `.github/workflows/deploy.yml` when the push touches something that affects the built site (`src/`, `public/`, dependencies, build config, or the deploy script and workflow themselves). Commits that only change the README, docs or other tooling don't deploy. You can also run it by hand from the Actions tab. The workflow builds the site and uploads `dist/` with rsync over SSH. The server's SSH port is firewalled, so the runner joins the tailnet first and connects to the server's Tailscale address. It needs these repository secrets:
 

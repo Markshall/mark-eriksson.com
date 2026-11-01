@@ -5,3 +5,5 @@ package-lock.json
 !src/index.html
 !src/404.html
 !src/privacy/index.html
+test-results/
+playwright-report/
