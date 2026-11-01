@@ -56,11 +56,11 @@ export default defineConfig(({ mode }) => {
     build: {
       outDir: "../dist",
       emptyOutDir: true,
-    },
-    rollupOptions: {
-      input: {
-        main: "src/index.html",
-        notFound: "src/404.html",
+      rollupOptions: {
+        input: {
+          main: "src/index.html",
+          notFound: "src/404.html",
+        },
       },
     },
     server: {

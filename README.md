@@ -28,7 +28,7 @@ src/
   scripts/           TypeScript: theme toggle, project gallery, page behaviour
   data/projects.ts   The list of projects, shared by the site and the screenshot script
   assets/            Images processed and hashed by Vite, including project screenshots
-public/              Copied as-is to the site root (favicons, og-image, ads.txt)
+public/              Copied as-is to the site root (favicons, og-image, ads.txt, .htaccess)
 scripts/             Screenshot capture and deploy scripts
 dist/                Build output, which is what goes on the server (git-ignored)
 ```
