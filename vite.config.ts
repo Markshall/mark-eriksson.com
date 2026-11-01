@@ -1,5 +1,6 @@
 import { execFileSync } from "node:child_process";
 import { defineConfig, loadEnv, type Plugin } from "vite";
+import { imagetools } from "vite-imagetools";
 
 // The date a page last changed: the last commit touching its files, or today
 // if git isn't available (e.g. building from a tarball).
@@ -61,7 +62,8 @@ export default defineConfig(({ mode }) => {
     root: "src",
     publicDir: "../public",
     envDir: "..",
-    plugins: [seoFiles(VITE_SITE_URL)],
+    // imagetools resizes the project screenshots (see SRCSETS in projects.ts).
+    plugins: [imagetools(), seoFiles(VITE_SITE_URL)],
     build: {
       outDir: "../dist",
       emptyOutDir: true,

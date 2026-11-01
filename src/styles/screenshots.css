@@ -66,7 +66,37 @@
   display: block;
   width: 100%;
   height: auto;
-  transition: transform 0.8s ease;
+  transition:
+    opacity 0.3s ease,
+    transform 0.8s ease;
+}
+
+/* A skeleton shimmers in the frame while its screenshot loads (projects.ts
+   sets data-loading). */
+.shot {
+  --skeleton: color-mix(in srgb, var(--panel), var(--band-ink) 4%);
+  --skeleton-shine: color-mix(in srgb, var(--panel), var(--band-ink) 10%);
+
+  background: var(--skeleton);
+
+  &[data-loading] {
+    background-image: linear-gradient(100deg, transparent 30%, var(--skeleton-shine) 50%, transparent 70%);
+    background-size: 250% 100%;
+    animation: shimmer 1.6s ease-in-out infinite;
+
+    .shot-track {
+      opacity: 0;
+    }
+  }
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: 0 0;
+  }
 }
 
 .browser:is(:hover, :focus-visible) .shot-track,
@@ -81,6 +111,11 @@
   .phone:hover .shot-track {
     transform: none;
     transition: none;
+  }
+
+  .shot[data-loading] {
+    animation: none;
+    background-image: none;
   }
 }
 

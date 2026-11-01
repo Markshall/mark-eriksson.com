@@ -51,7 +51,7 @@ Absolute URLs in `src/index.html` (`og:url`, `og:image`) use `%VITE_SITE_URL%`, 
 
 ## Adding a project
 
-Projects are listed in `src/data/projects.ts`. Each one gets a full-page desktop (1440px) and mobile (390px) screenshot, saved as `src/assets/screenshots/<id>-desktop.webp` and `<id>-mobile.webp`.
+Projects are listed in `src/data/projects.ts`. Each one gets a full-page desktop (1440px) and mobile (390px) screenshot, saved as `src/assets/screenshots/<id>-desktop.webp` and `<id>-mobile.webp`. Only these full-size captures are committed: at build time, [vite-imagetools](https://github.com/JonasKruckenberg/imagetools) resizes them into smaller copies (`SRCSETS` in `src/scripts/projects.ts`) and the browser picks the one that fits the screen.
 
 Add the project to `src/data/projects.ts`, then capture its screenshots:
 
