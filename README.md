@@ -28,7 +28,7 @@ src/
   scripts/           TypeScript: theme toggle, project gallery, page behaviour
   data/projects.ts   The list of projects, shared by the site and the screenshot script
   assets/            Images processed and hashed by Vite, including project screenshots
-public/              Copied as-is to the site root (favicon, robots.txt, sitemap.xml, ads.txt)
+public/              Copied as-is to the site root (favicons, og-image, ads.txt)
 scripts/             Screenshot capture and deploy scripts
 dist/                Build output, which is what goes on the server (git-ignored)
 ```
@@ -89,10 +89,15 @@ By default the page follows the system light/dark setting. The toggle (`src/scri
 
 ## SEO and static files
 
-Nothing here is generated, so update it by hand:
+`sitemap.xml` and `robots.txt` are generated at build time by the `seo-files` plugin in `vite.config.ts`, using `VITE_SITE_URL`:
 
-- `public/sitemap.xml` has a single URL. Bump `<lastmod>` after significant content changes.
-- `public/robots.txt` is empty, which allows everything.
+- `sitemap.xml` has a single URL. Its `<lastmod>` is the date of the last commit that touched `src/` or `public/` (or today, if git isn't available).
+- `robots.txt` allows everything and points to the sitemap.
+
+`src/index.html` also has a `<link rel="canonical">` and a JSON-LD `Person` block (name, job title, employer, skills, GitHub and CodePen profiles). Update the JSON-LD when the résumé changes.
+
+The rest is updated by hand:
+
 - `public/ads.txt` declares the Google AdSense publisher ID. Keep it if AdSense is in use on the domain.
 - `public/img/og-image.png` (1200×630) is the link preview image. Replace it in place if the design changes.
 - Google Tag Manager (`GTM-PV3S2MV`) is loaded by an inline snippet at the top of `src/index.html`, with a `<noscript>` fallback at the start of `<body>`.
