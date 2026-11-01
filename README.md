@@ -80,7 +80,7 @@ Only the project gallery is generated from data. Everything else is plain HTML i
 | Contact email, social links | `<footer id="contact">`                                 |
 | Page title, description, OG | `<head>`                                                |
 
-The hero stats fill themselves in from `src/scripts/main.ts`: years since `CAREER_START`, the number of projects, and the number with category `Personal`. The footer year is also set there. The numbers written in the HTML are only fallbacks.
+The hero stats and footer year are worked out in `src/data/stats.ts`: years since `CAREER_START`, the number of projects, and the number with category `Personal`. The `page-stats` plugin in `vite.config.ts` writes them into the built HTML, into the element with the matching data attribute (`data-years`, `data-project-total`, `data-personal-total`, `data-year`), so the numbers typed in the HTML are overwritten and can be left as they are. The years and footer year are also refreshed in the browser, in case the site isn't rebuilt for a while.
 
 Each project has a shareable link, `/#projects/<id>`, using the `id` from `src/data/projects.ts`. Opening one selects that project and scrolls to the gallery. As visitors browse, the address bar updates to match without adding history entries. In the gallery, the left and right arrow keys step through projects, and up and down do the same while focus is in the list.
 
@@ -93,6 +93,16 @@ Each project has a shareable link, `/#projects/<id>`, using the `id` from `src/d
 Colours are CSS custom properties in `src/styles/tokens.css`. Each theme colour is written once as `light-dark(<light>, <dark>)`, so change both values in the same place. The projects band is dark in both themes and has its own `--band-*` tokens.
 
 By default the page follows the system light/dark setting. The toggle (`src/scripts/theme.ts`) sets `data-theme` on `<html>`, which overrides `color-scheme`, and remembers the choice in `localStorage`. Until a visitor clicks the toggle, the page keeps following system changes.
+
+## Headers and caching
+
+`public/.htaccess` sets the response headers. It needs `mod_headers`, and `AllowOverride` must include `FileInfo` (as `ErrorDocument` already does). If `mod_headers` is missing, the headers are quietly skipped, so check them after deploying with `curl -I https://www.mark-eriksson.com/`.
+
+- **Security headers** on every response: HSTS, `X-Content-Type-Options` and `Referrer-Policy`. Everything except `/check/` also gets a Content-Security-Policy, `X-Frame-Options`, `Cross-Origin-Opener-Policy` and `Permissions-Policy`. `/check/` is left out because it's deployed separately and loads Google Fonts, AdSense and inline scripts.
+- **The CSP** allows scripts from this site and Google Tag Manager only. Inline scripts (the theme script in each `<head>`) are allowed by hash. The `csp-hashes` plugin in `vite.config.ts` hashes them after each build and writes the hashes into `dist/.htaccess` in place of `__INLINE_SCRIPT_HASHES__`, so editing one can't leave a stale hash. If the GTM container starts running other tags (or Custom HTML tags), add their hosts to the CSP or they'll be blocked; the browser console names what was blocked.
+- **Caching:** files in `/assets/` have content-hashed names, so browsers cache them for a year (`immutable`). HTML pages are revalidated on every visit (`max-age=0`), which costs a 304 when nothing changed and means a returning visitor never gets an old page pointing at assets the deploy deleted. `s-maxage` still lets Cloudflare cache them, and the deploy purges the changed ones.
+
+The skill logos on the résumé are served as separate SVG files rather than inlined into the stylesheet (`assetsInlineLimit` in `vite.config.ts`), which keeps the CSS every page waits for small.
 
 ## SEO and static files
 
