@@ -17,6 +17,10 @@
     rotate: 90deg;
   }
 
+  &.left {
+    rotate: 180deg;
+  }
+
   &.up-right {
     rotate: -45deg;
   }

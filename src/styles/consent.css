@@ -1,0 +1,55 @@
+.consent {
+  position: fixed;
+  inset-inline: 16px;
+  bottom: 16px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 420px;
+  margin-inline-start: auto;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--bg);
+  color: var(--ink);
+  box-shadow: 0 12px 32px rgb(0 0 0 / 0.18);
+
+  &[hidden] {
+    display: none;
+  }
+
+  p {
+    font-size: 15px;
+    color: var(--ink-2);
+  }
+
+  a {
+    color: var(--link);
+  }
+}
+
+.consent-title {
+  font-weight: 700;
+}
+
+/* Accept and reject look the same, so neither is the easier choice. */
+.consent-actions {
+  display: flex;
+  gap: 12px;
+
+  .btn {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+.link-btn {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}

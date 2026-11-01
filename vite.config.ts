@@ -1,11 +1,11 @@
 import { execFileSync } from "node:child_process";
 import { defineConfig, loadEnv, type Plugin } from "vite";
 
-// The date the site's content last changed: the last commit touching src/ or
-// public/, or today if git isn't available (e.g. building from a tarball).
-function lastModified(): string {
+// The date a page last changed: the last commit touching its files, or today
+// if git isn't available (e.g. building from a tarball).
+function lastModified(paths: string[]): string {
   try {
-    const date = execFileSync("git", ["log", "-1", "--format=%cs", "--", "src", "public"], {
+    const date = execFileSync("git", ["log", "-1", "--format=%cs", "--", ...paths], {
       encoding: "utf8",
       stdio: ["ignore", "pipe", "ignore"],
     }).trim();
@@ -13,6 +13,13 @@ function lastModified(): string {
   } catch {}
   return new Date().toISOString().slice(0, 10);
 }
+
+// Pages listed in the sitemap, with the files whose changes count as changes
+// to that page.
+const PAGES = [
+  { path: "/", sources: ["src", "public"] },
+  { path: "/privacy/", sources: ["src/privacy"] },
+];
 
 // Write sitemap.xml and robots.txt into the build, using the site URL from
 // .env.production so they always match the canonical and og:url tags.
@@ -27,11 +34,13 @@ function seoFiles(siteUrl: string): Plugin {
         fileName: "sitemap.xml",
         source: `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>${site}/</loc>
-    <lastmod>${lastModified()}</lastmod>
+${PAGES.map(
+  page => `  <url>
+    <loc>${site}${page.path}</loc>
+    <lastmod>${lastModified(page.sources)}</lastmod>
   </url>
-</urlset>
+`,
+).join("")}</urlset>
 `,
       });
       this.emitFile({
@@ -60,6 +69,7 @@ export default defineConfig(({ mode }) => {
         input: {
           main: "src/index.html",
           notFound: "src/404.html",
+          privacy: "src/privacy/index.html",
         },
       },
     },

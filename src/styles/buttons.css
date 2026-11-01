@@ -6,8 +6,13 @@
   padding: 0 24px;
   border-radius: 999px;
   border: 1.5px solid transparent;
+  /* Reset <button> defaults so a .btn button looks like a .btn link. */
+  background: none;
+  color: inherit;
+  font: inherit;
   text-decoration: none;
   font-weight: 500;
+  cursor: pointer;
 }
 
 .btn-solid {
