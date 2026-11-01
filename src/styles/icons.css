@@ -34,3 +34,117 @@
   align-items: center;
   gap: 0.5em;
 }
+
+/* Skill logos on the résumé chips, masked like .arrow-icon so they take the
+   text colour instead of brand colours. The logos are from Simple Icons
+   (CC0), except Playwright's, which is from Devicon (MIT). Where there's no
+   usable logo (AWS, Composer, MySQL, PHPUnit, REST APIs), a plain glyph stands in. */
+.skill-icon {
+  display: inline-block;
+  flex-shrink: 0;
+  width: 1.1em;
+  height: 1.1em;
+  background: currentColor;
+  mask: center / contain no-repeat;
+  opacity: 0.75;
+
+  &.laravel {
+    mask-image: url("../assets/icons/skills/laravel.svg");
+  }
+  &.php {
+    mask-image: url("../assets/icons/skills/php.svg");
+  }
+  &.nodedotjs {
+    mask-image: url("../assets/icons/skills/nodedotjs.svg");
+  }
+  &.database {
+    mask-image: url("../assets/icons/skills/database.svg");
+  }
+  &.redis {
+    mask-image: url("../assets/icons/skills/redis.svg");
+  }
+  &.wordpress {
+    mask-image: url("../assets/icons/skills/wordpress.svg");
+  }
+  &.vuedotjs {
+    mask-image: url("../assets/icons/skills/vuedotjs.svg");
+  }
+  &.react {
+    mask-image: url("../assets/icons/skills/react.svg");
+  }
+  &.javascript {
+    mask-image: url("../assets/icons/skills/javascript.svg");
+  }
+  &.typescript {
+    mask-image: url("../assets/icons/skills/typescript.svg");
+  }
+  &.jquery {
+    mask-image: url("../assets/icons/skills/jquery.svg");
+  }
+  &.html5 {
+    mask-image: url("../assets/icons/skills/html5.svg");
+  }
+  &.css {
+    mask-image: url("../assets/icons/skills/css.svg");
+  }
+  &.sass {
+    mask-image: url("../assets/icons/skills/sass.svg");
+  }
+  &.tailwindcss {
+    mask-image: url("../assets/icons/skills/tailwindcss.svg");
+  }
+  &.cloud {
+    mask-image: url("../assets/icons/skills/cloud.svg");
+  }
+  &.docker {
+    mask-image: url("../assets/icons/skills/docker.svg");
+  }
+  &.githubactions {
+    mask-image: url("../assets/icons/skills/githubactions.svg");
+  }
+  &.vite {
+    mask-image: url("../assets/icons/skills/vite.svg");
+  }
+  &.git {
+    mask-image: url("../assets/icons/skills/git.svg");
+  }
+  &.github {
+    mask-image: url("../assets/icons/skills/github.svg");
+  }
+  &.postgresql {
+    mask-image: url("../assets/icons/skills/postgresql.svg");
+  }
+  &.pwa {
+    mask-image: url("../assets/icons/skills/pwa.svg");
+  }
+  &.nginx {
+    mask-image: url("../assets/icons/skills/nginx.svg");
+  }
+  &.apache {
+    mask-image: url("../assets/icons/skills/apache.svg");
+  }
+  &.caddy {
+    mask-image: url("../assets/icons/skills/caddy.svg");
+  }
+  &.phpunit {
+    mask-image: url("../assets/icons/skills/phpunit.svg");
+  }
+  &.vitest {
+    mask-image: url("../assets/icons/skills/vitest.svg");
+  }
+  &.playwright {
+    mask-image: url("../assets/icons/skills/playwright.svg");
+  }
+  &.api {
+    mask-image: url("../assets/icons/skills/api.svg");
+  }
+  &.cloudflare {
+    mask-image: url("../assets/icons/skills/cloudflare.svg");
+  }
+  &.composer {
+    mask-image: url("../assets/icons/skills/composer.svg");
+  }
+  &.npm {
+    mask-image: url("../assets/icons/skills/npm.svg");
+  }
+}

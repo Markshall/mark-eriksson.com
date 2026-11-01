@@ -46,6 +46,9 @@
   font-size: 13px;
 
   li {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     padding: 8px 12px;
     border-radius: 8px;
     background: var(--chip);
