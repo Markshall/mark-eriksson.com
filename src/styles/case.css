@@ -32,6 +32,30 @@
   }
 }
 
+.case-scores {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  h2 {
+    font-weight: 400;
+  }
+
+  .stats {
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  .stat {
+    font-size: 36px;
+  }
+
+  abbr {
+    text-decoration: none;
+  }
+}
+
 .case-stage {
   max-width: 960px;
   margin-inline: auto;
