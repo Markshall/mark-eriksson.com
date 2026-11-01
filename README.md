@@ -83,6 +83,8 @@ The hero stats fill themselves in from `src/scripts/main.ts`: years since `CAREE
 
 Each project has a shareable link, `/#projects/<id>`, using the `id` from `src/data/projects.ts`. Opening one selects that project and scrolls to the gallery. As visitors browse, the address bar updates to match without adding history entries. In the gallery, the left and right arrow keys step through projects, and up and down do the same while focus is in the list.
 
+`src/privacy/index.html` is the privacy and cookies page, served at `/privacy/` and linked from the footer and the cookie banner. It lists the Google Analytics cookies, so update it if the GTM container starts running other tags. The 404 and privacy pages share `src/scripts/page.ts` and the site's stylesheet.
+
 `src/404.html` is the not-found page, built as a second Vite entry. `public/.htaccess` tells Apache to serve it for missing URLs (`ErrorDocument 404 /404.html`), which needs `AllowOverride` to include `FileInfo` for the web root.
 
 ## Theming
@@ -95,7 +97,7 @@ By default the page follows the system light/dark setting. The toggle (`src/scri
 
 `sitemap.xml` and `robots.txt` are generated at build time by the `seo-files` plugin in `vite.config.ts`, using `VITE_SITE_URL`:
 
-- `sitemap.xml` has a single URL. Its `<lastmod>` is the date of the last commit that touched `src/` or `public/` (or today, if git isn't available).
+- `sitemap.xml` lists the pages in `PAGES` in `vite.config.ts`. Each `<lastmod>` is the date of the last commit that touched that page's files (or today, if git isn't available).
 - `robots.txt` allows everything and points to the sitemap.
 
 `src/index.html` also has a `<link rel="canonical">` and a JSON-LD `Person` block (name, job title, employer, skills, GitHub and CodePen profiles). Update the JSON-LD when the résumé changes.
@@ -104,7 +106,7 @@ The rest is updated by hand:
 
 - `public/ads.txt` declares the Google AdSense publisher ID. Keep it if AdSense is in use on the domain.
 - `public/img/og-image.png` (1200×630) is the link preview image. Replace it in place if the design changes.
-- Google Tag Manager (`GTM-PV3S2MV`) is loaded by an inline snippet at the top of `src/index.html`, with a `<noscript>` fallback at the start of `<body>`.
+- Google Tag Manager (`GTM-PV3S2MV`) only loads after the visitor accepts cookies, as UK GDPR and PECR require. `src/scripts/consent.ts` sets Google Consent Mode to denied, adds the cookie banner (its text is in that file) until the visitor chooses, and remembers the choice in `localStorage`. "Cookie settings" in the footer reopens the banner. Rejecting after accepting switches Consent Mode back to denied and deletes Google's `_ga`/`_gcl` cookies. There's no `<noscript>` fallback, because it would load GTM without asking.
 
 ## Deploying
 

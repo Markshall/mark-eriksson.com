@@ -66,35 +66,9 @@
 
     <link rel="stylesheet" href="./styles/main.css" />
     <script type="module" src="./scripts/main.ts"></script>
-
-    <!-- Google Tag Manager -->
-    <script>
-      (function (w, d, s, l, i) {
-        w[l] = w[l] || [];
-        w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
-        var f = d.getElementsByTagName(s)[0],
-          j = d.createElement(s),
-          dl = l != "dataLayer" ? "&l=" + l : "";
-        j.async = true;
-        j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
-        f.parentNode.insertBefore(j, f);
-      })(window, document, "script", "dataLayer", "GTM-PV3S2MV");
-    </script>
-    <!-- End Google Tag Manager -->
   </head>
 
   <body>
-    <!-- Google Tag Manager (noscript) -->
-    <noscript>
-      <iframe
-        src="https://www.googletagmanager.com/ns.html?id=GTM-PV3S2MV"
-        height="0"
-        width="0"
-        style="display: none; visibility: hidden"
-      ></iframe>
-    </noscript>
-    <!-- End Google Tag Manager (noscript) -->
-
     <header id="home" class="site-header wrap">
       <a href="#home" class="brand" aria-label="Mark Eriksson, home">
         <svg aria-hidden="true" width="52" height="28" viewBox="0 0 130 70" shape-rendering="crispEdges">
@@ -355,6 +329,10 @@
       </div>
       <div class="wrap footer-base mono">
         <span>© <span data-year>2026</span> Mark Eriksson</span>
+        <span class="footer-links">
+          <a href="/privacy/">privacy</a>
+          <button type="button" class="link-btn" data-consent-open>cookie settings</button>
+        </span>
         <a href="#home">
           back to top
           <span class="arrow-icon up" aria-hidden="true"></span>
