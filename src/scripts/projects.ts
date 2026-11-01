@@ -76,9 +76,24 @@ function renderJson(data: Record<string, unknown>): (Node | string)[] {
   return ["{", ...entries, "\n}"];
 }
 
+// Each project has its own link, #projects/<id>, kept in the address bar as
+// the visitor browses so it can be copied and shared.
+const HASH_PREFIX = "#projects/";
+
+const linkedProject = () =>
+  location.hash.startsWith(HASH_PREFIX)
+    ? PROJECTS.find(project => project.id === decodeURIComponent(location.hash.slice(HASH_PREFIX.length)))
+    : undefined;
+
 export function initProjects(section: HTMLElement) {
   const $ = <T extends Element = HTMLElement>(selector: string) => required<T>(section, selector);
   const state = { filter: "All", index: 0 };
+
+  // Show a linked project, switching back to "All" if the current filter hides it.
+  const select = (project: ListedProject) => {
+    if (!visible().includes(project)) state.filter = "All";
+    state.index = visible().indexOf(project);
+  };
 
   const stacked = () => $(".project").offsetTop >= $("[data-list]").offsetTop + $("[data-list]").offsetHeight;
 
@@ -161,14 +176,25 @@ export function initProjects(section: HTMLElement) {
     $("[data-summary]").textContent = project.summary ?? "";
   }
 
-  function render() {
+  // syncHash is false only for the first render of an unlinked visit, so
+  // opening the page at / doesn't rewrite the address to the first project.
+  function render(syncHash = true) {
     const projects = visible();
     for (const [filter, button] of filterButtons) {
       button.setAttribute("aria-pressed", String(filter === state.filter));
     }
     $("[data-count]").textContent = `showing ${projects.length} of ${PROJECTS.length}`;
+    // The list is rebuilt, so keep keyboard focus on it by moving it to the
+    // new current row.
+    const listFocused = $("[data-list]").contains(document.activeElement);
     renderList(projects);
+    if (listFocused) $('[data-list] [aria-current="true"]').focus({ preventScroll: true });
     renderCurrent(projects[state.index], projects.length);
+
+    // replaceState rather than a hash assignment, so browsing doesn't fill the
+    // history or jump the page to the section.
+    const hash = HASH_PREFIX + encodeURIComponent(projects[state.index].id);
+    if (syncHash && location.hash !== hash) history.replaceState(history.state, "", hash);
   }
 
   const step = (delta: number) => {
@@ -189,5 +215,40 @@ export function initProjects(section: HTMLElement) {
   $("[data-prev]").addEventListener("click", () => step(-1));
   $("[data-next]").addEventListener("click", () => step(1));
 
-  render();
+  // Left/right arrows step through projects from anywhere in the explorer;
+  // up/down do the same within the list, where focus follows the selection.
+  $(".explorer").addEventListener("keydown", event => {
+    if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+    const inList = $("[data-list]").contains(event.target as Node);
+    const delta =
+      event.key === "ArrowRight" || (inList && event.key === "ArrowDown")
+        ? 1
+        : event.key === "ArrowLeft" || (inList && event.key === "ArrowUp")
+          ? -1
+          : 0;
+    if (!delta) return;
+    event.preventDefault();
+    step(delta);
+  });
+
+  // There's no element with a project link's id, so the browser won't scroll
+  // to it: bring the section into view instead.
+  const reveal = () => section.scrollIntoView({ behavior: reducedMotion.matches ? "instant" : "smooth" });
+
+  // Following a project link, or editing the hash by hand, selects that project.
+  addEventListener("hashchange", () => {
+    const project = linkedProject();
+    if (!project) return;
+    reveal();
+    if (project === visible()[state.index]) return;
+    transition(() => {
+      select(project);
+      render();
+    });
+  });
+
+  const linked = linkedProject();
+  if (linked) select(linked);
+  render(Boolean(linked));
+  if (linked) reveal();
 }

@@ -28,7 +28,7 @@ src/
   scripts/           TypeScript: theme toggle, project gallery, page behaviour
   data/projects.ts   The list of projects, shared by the site and the screenshot script
   assets/            Images processed and hashed by Vite, including project screenshots
-public/              Copied as-is to the site root (favicon, robots.txt, sitemap.xml, ads.txt)
+public/              Copied as-is to the site root (favicon, robots.txt, sitemap.xml, ads.txt, .htaccess)
 scripts/             Screenshot capture and deploy scripts
 dist/                Build output, which is what goes on the server (git-ignored)
 ```
@@ -80,6 +80,10 @@ Only the project gallery is generated from data. Everything else is plain HTML i
 | Page title, description, OG | `<head>`                                                |
 
 The hero stats fill themselves in from `src/scripts/main.ts`: years since `CAREER_START`, the number of projects, and the number with category `Personal`. The footer year is also set there. The numbers written in the HTML are only fallbacks.
+
+Each project has a shareable link, `/#projects/<id>`, using the `id` from `src/data/projects.ts`. Opening one selects that project and scrolls to the gallery. As visitors browse, the address bar updates to match without adding history entries. In the gallery, the left and right arrow keys step through projects, and up and down do the same while focus is in the list.
+
+`src/404.html` is the not-found page, built as a second Vite entry. `public/.htaccess` tells Apache to serve it for missing URLs (`ErrorDocument 404 /404.html`), which needs `AllowOverride` to include `FileInfo` for the web root.
 
 ## Theming
 

@@ -3,3 +3,4 @@ public
 package-lock.json
 *.html
 !src/index.html
+!src/404.html

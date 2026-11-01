@@ -8,6 +8,12 @@ export default defineConfig({
   build: {
     outDir: "../dist",
     emptyOutDir: true,
+    rollupOptions: {
+      input: {
+        main: "src/index.html",
+        notFound: "src/404.html",
+      },
+    },
   },
   server: {
     host: true,
