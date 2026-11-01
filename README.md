@@ -103,16 +103,18 @@ Pull requests into `master` run `.github/workflows/check.yml`, which checks form
 
 Pushing to `master` runs `.github/workflows/deploy.yml` when the push touches something that affects the built site (`src/`, `public/`, dependencies, build config, or the deploy script and workflow themselves). Commits that only change the README, docs or other tooling don't deploy. You can also run it by hand from the Actions tab. The workflow builds the site and uploads `dist/` with rsync over SSH. The server's SSH port is firewalled, so the runner joins the tailnet first and connects to the server's Tailscale address. It needs these repository secrets:
 
-| Secret               | Value                                             |
-| -------------------- | ------------------------------------------------- |
-| `DEPLOY_HOST`        | Server's Tailscale IP (`tailscale ip -4`)         |
-| `DEPLOY_USER`        | SSH user                                          |
-| `DEPLOY_PATH`        | Web root, e.g. `/var/www/mark-eriksson.com`       |
-| `DEPLOY_PORT`        | Optional, defaults to 22                          |
-| `DEPLOY_SSH_KEY`     | Private key for a deploy-only key pair            |
-| `DEPLOY_KNOWN_HOSTS` | Output of `ssh-keyscan <DEPLOY_HOST>`             |
-| `TS_OAUTH_CLIENT_ID` | Tailscale OAuth client ID (auth keys write scope) |
-| `TS_OAUTH_SECRET`    | Tailscale OAuth client secret                     |
+| Secret                 | Value                                             |
+| ---------------------- | ------------------------------------------------- |
+| `DEPLOY_HOST`          | Server's Tailscale IP (`tailscale ip -4`)         |
+| `DEPLOY_USER`          | SSH user                                          |
+| `DEPLOY_PATH`          | Web root, e.g. `/var/www/mark-eriksson.com`       |
+| `DEPLOY_PORT`          | Optional, defaults to 22                          |
+| `DEPLOY_SSH_KEY`       | Private key for a deploy-only key pair            |
+| `DEPLOY_KNOWN_HOSTS`   | Output of `ssh-keyscan <DEPLOY_HOST>`             |
+| `TS_OAUTH_CLIENT_ID`   | Tailscale OAuth client ID (auth keys write scope) |
+| `TS_OAUTH_SECRET`      | Tailscale OAuth client secret                     |
+| `CLOUDFLARE_ZONE_ID`   | Optional, Cloudflare zone ID for the site         |
+| `CLOUDFLARE_API_TOKEN` | Optional, token with only Zone → Cache Purge      |
 
 The OAuth client must be allowed to create devices tagged `tag:ci`. See [docs/deploying.md](docs/deploying.md) for how the whole flow works, setup from scratch, and troubleshooting.
 
@@ -124,6 +126,8 @@ npm run deploy           # build + upload
 ```
 
 The upload uses `rsync --delete`, so anything in the web root that isn't in `dist/` is removed, apart from `.well-known/` and `check/`, which are managed separately. Do a dry run first.
+
+After the upload, any changed file that keeps its URL (`index.html`, `sitemap.xml`, favicons and so on) is purged from Cloudflare's cache. Hashed files in `assets/` get a new URL when they change, so they're skipped. The purge only runs when both Cloudflare settings are set, and a dry run lists what it would purge.
 
 ## License
 

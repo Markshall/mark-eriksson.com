@@ -15,6 +15,7 @@ on:
       - "tsconfig.json"
       - ".env.production"
       - "scripts/deploy.sh"
+      - "scripts/purge-cache.sh"
       - ".github/workflows/deploy.yml"
   workflow_dispatch:
 
@@ -59,3 +60,5 @@ jobs:
           DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
           DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
+          CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
