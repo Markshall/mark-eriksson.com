@@ -20,6 +20,22 @@ export interface Project {
   body?: string[];
 }
 
+// How every Crown Oil group site is built. Each work project's page ends with
+// this, after the parts specific to that site.
+const GROUP_PLATFORM =
+  "Like every site in the group, it’s a custom WordPress theme, front end and back end, built from scratch. It runs on a back-end library I wrote and share across all of the sites, which handles form submissions, phone and email verification and common utilities. Front-end assets are bundled with Vite, and the sites are hosted on AWS behind Cloudflare.";
+
+// The embeddable tools, mentioned on the sites that use them.
+const EMBEDDED_TOOLS =
+  "The calculators across the group’s sites, including a carbon calculator, a tank size calculator and volume converters, are HTML custom elements I built once and embed wherever they’re needed. Each one takes its colours from the theme of the site it’s on.";
+
+// Quote requests on the fuel sites.
+const QUOTES_TO_CRM =
+  "Quote requests are verified, then saved to a database that the company’s internal CRM picks up, so they reach the sales team without anyone re-keying them.";
+
+const WP_STACK = ["WordPress", "PHP", "TypeScript", "Vite", "AWS", "Cloudflare"];
+const WP_STACK_WITH_TOOLS = ["WordPress", "PHP", "TypeScript", "Web Components", "Vite", "AWS", "Cloudflare"];
+
 export const PROJECTS = (
   [
     {
@@ -29,9 +45,10 @@ export const PROJECTS = (
       url: "www.crownoil.co.uk",
       cat: "Work",
       year: 2019,
-      stack: ["WordPress / PHP", "TypeScript", "Node"],
+      stack: WP_STACK_WITH_TOOLS,
       summary:
-        "The flagship site for a UK fuel and lubricants supplier trading since 1947: product pages for HVO, DERV, red diesel and lubricants, with quote requests feeding the sales team.",
+        "The group’s flagship site, for a UK fuel and lubricants supplier trading since 1947. A custom WordPress theme with product pages for HVO, DERV, red diesel and lubricants, a tank size calculator, and quote forms that feed the company’s CRM.",
+      body: [QUOTES_TO_CRM, EMBEDDED_TOOLS, GROUP_PLATFORM],
     },
     {
       id: "speedy-fuels",
@@ -40,9 +57,10 @@ export const PROJECTS = (
       url: "www.speedyfuels.co.uk",
       cat: "Work",
       year: 2021,
-      stack: ["WordPress / PHP", "TypeScript", "Node"],
+      stack: WP_STACK,
       summary:
-        "A nationwide fuel delivery brand in the Crown Oil group, built around its top products and a quick quote form.",
+        "A nationwide fuel delivery brand in the Crown Oil group. A custom WordPress theme built around its top products, with a quick quote form that goes straight into the group’s CRM.",
+      body: [QUOTES_TO_CRM, GROUP_PLATFORM],
     },
     {
       id: "sf-sus",
@@ -51,9 +69,10 @@ export const PROJECTS = (
       url: "sustainability.speedyfuels.co.uk",
       cat: "Work",
       year: 2023,
-      stack: ["WordPress / PHP", "TypeScript", "Node"],
+      stack: WP_STACK_WITH_TOOLS,
       summary:
-        "A standalone sustainability site setting out Speedy Fuels’ carbon-neutral certification and its path to Net Zero.",
+        "A standalone site setting out Speedy Fuels’ carbon-neutral certification and its path to Net Zero, with a carbon calculator showing the carbon saved by switching from diesel to HVO.",
+      body: [EMBEDDED_TOOLS, GROUP_PLATFORM],
     },
     {
       id: "co-sus",
@@ -62,9 +81,10 @@ export const PROJECTS = (
       url: "sustainability.crownoil.co.uk",
       cat: "Work",
       year: 2022,
-      stack: ["WordPress / PHP", "TypeScript", "Node"],
+      stack: WP_STACK_WITH_TOOLS,
       summary:
-        "The sustainability hub for the UK’s first carbon-neutral fuel supplier, covering its Net Zero pledge and ESG framework, with a calculator showing the carbon saved by switching from diesel to HVO.",
+        "The sustainability hub for the UK’s first carbon-neutral fuel supplier, covering its Net Zero pledge and ESG framework, with a carbon calculator showing the carbon saved by switching from diesel to HVO.",
+      body: [EMBEDDED_TOOLS, GROUP_PLATFORM],
     },
     {
       id: "co-env",
@@ -73,9 +93,10 @@ export const PROJECTS = (
       url: "www.crownoilenvironmental.co.uk",
       cat: "Work",
       year: 2022,
-      stack: ["WordPress / PHP", "TypeScript", "Node"],
+      stack: WP_STACK,
       summary:
-        "The site for Crown Oil’s industrial services arm, presenting tank cleaning and lining, integrity testing and fuel buyback services to commercial customers.",
+        "The site for Crown Oil’s industrial services arm: tank cleaning and lining, integrity testing and fuel buyback for commercial customers. A custom WordPress theme with service, sector and case study pages.",
+      body: [QUOTES_TO_CRM, GROUP_PLATFORM],
     },
     {
       id: "nationwide-fuels",
@@ -84,9 +105,10 @@ export const PROJECTS = (
       url: "www.nationwidefuels.co.uk",
       cat: "Work",
       year: 2020,
-      stack: ["WordPress / PHP", "TypeScript", "Node"],
+      stack: WP_STACK,
       summary:
-        "A fuel and lubricants brand serving the construction, agricultural and industrial sectors, with pages for each fuel type, including heating oil.",
+        "A fuel and lubricants brand serving the construction, agricultural and industrial sectors. A custom WordPress theme with a page for each fuel type, including heating oil, and quote forms that feed the group’s CRM.",
+      body: [QUOTES_TO_CRM, GROUP_PLATFORM],
     },
     {
       id: "crown-energy",
@@ -95,9 +117,10 @@ export const PROJECTS = (
       url: "www.crownenergy.co.uk",
       cat: "Work",
       year: 2026,
-      stack: ["WordPress / PHP", "TypeScript", "Node"],
+      stack: WP_STACK,
       summary:
-        "A site for a gas, electricity and water connections business, aimed at both homeowners and businesses, including options to spread the cost of domestic projects.",
+        "A gas, electricity and water connections business for homeowners and businesses, including options to spread the cost of domestic projects. The group’s newest custom WordPress theme.",
+      body: [GROUP_PLATFORM],
     },
     {
       id: "birlem-oil",
@@ -106,9 +129,10 @@ export const PROJECTS = (
       url: "www.birlemoil.co.uk",
       cat: "Work",
       year: 2018,
-      stack: ["WordPress / PHP", "TypeScript", "Node"],
+      stack: WP_STACK,
       summary:
-        "A nationwide fuel and lubricants brand in the group, focused on its most popular products and delivery coverage.",
+        "A nationwide fuel and lubricants brand in the group. A custom WordPress theme focused on its most popular products and delivery coverage, with quote forms that feed the group’s CRM.",
+      body: [QUOTES_TO_CRM, GROUP_PLATFORM],
     },
     {
       id: "inworkat",
