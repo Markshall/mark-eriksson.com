@@ -1,0 +1,27 @@
+name: Check
+
+# Build and lint pull requests before they're merged. Runs on every PR (no
+# paths filter) because format:check also covers the README and docs. Needs
+# no secrets and never deploys.
+on:
+  pull_request:
+    branches: [master]
+
+concurrency:
+  group: check-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+      - run: npm run format:check
+      - run: npm run build
