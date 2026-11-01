@@ -6,6 +6,7 @@
 //        npm run screenshots -- crown-oil      recapture specific project ids
 //
 // Runs on the host (not in Docker) and drives your installed Google Chrome.
+// Retired projects are captured from their Wayback Machine snapshot.
 import { mkdir, access } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { chromium, type Browser, type BrowserContextOptions, type Page } from "playwright-core";
@@ -41,6 +42,15 @@ if (unknown.length) {
   process.exit(1);
 }
 
+// A retired project's snapshot, with Wayback's "if_" flag so the page is
+// served without the archive's toolbar. Retired projects without a snapshot
+// can't be captured.
+function captureUrl(project: Project): string | undefined {
+  if (!project.retired) return `https://${project.url}/`;
+  const { snapshot } = project.retired;
+  return snapshot && `https://web.archive.org/web/${snapshot}if_/https://${project.url}/`;
+}
+
 const outPath = (project: Project, view: View) => `${OUT_DIR}${project.id}-${view}.webp`;
 const exists = (path: string) =>
   access(path).then(
@@ -49,6 +59,10 @@ const exists = (path: string) =>
   );
 
 async function needsCapture(project: Project) {
+  if (!captureUrl(project)) {
+    if (ids.includes(project.id)) console.warn(`${project.name} is retired with no snapshot, so it can't be captured`);
+    return false;
+  }
   if (all || ids.includes(project.id)) return true;
   if (ids.length) return false;
   const present = await Promise.all((Object.keys(VIEWS) as View[]).map(view => exists(outPath(project, view))));
@@ -116,11 +130,12 @@ async function freezeVideos(page: Page) {
   });
 }
 
-async function capture(browser: Browser, project: Project, view: View) {
+async function capture(browser: Browser, project: Project, view: View, url: string) {
   const context = await browser.newContext({ ...VIEWS[view], reducedMotion: "reduce" });
   const page = await context.newPage();
   try {
-    await page.goto(`https://${project.url}/`, { waitUntil: "load", timeout: 60_000 });
+    // The Wayback Machine is much slower than a live site.
+    await page.goto(url, { waitUntil: "load", timeout: project.retired ? 180_000 : 60_000 });
     await freezeVideos(page);
     await scrollThrough(page);
     await page.waitForLoadState("networkidle", { timeout: 15_000 }).catch(() => {});
@@ -159,10 +174,11 @@ const browser = await chromium.launch({ channel: "chrome" });
 const failed: string[] = [];
 
 for (const project of queue) {
-  console.log(`${project.name} (${project.url})`);
+  const url = captureUrl(project)!;
+  console.log(`${project.name} (${url})`);
   for (const view of Object.keys(VIEWS) as View[]) {
     try {
-      await capture(browser, project, view);
+      await capture(browser, project, view, url);
       console.log(`  ${view}: saved`);
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);

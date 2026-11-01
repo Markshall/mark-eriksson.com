@@ -1,5 +1,5 @@
 import { test, expect } from "./fixtures.ts";
-import { PROJECTS } from "../src/data/projects.ts";
+import { PROJECTS, siteHref } from "../src/data/projects.ts";
 
 // The project gallery: deep links, filters and keyboard navigation.
 // See src/scripts/projects.ts.
@@ -22,8 +22,27 @@ test("a project link opens that project", async ({ page }) => {
 
   await expect(page.locator("[data-name]")).toHaveText(project.name);
   await expect(page.locator('[data-list] [aria-current="true"]')).toContainText(project.name);
-  await expect(page.locator("[data-visit]")).toHaveAttribute("href", `https://${project.url}/`);
+  await expect(page.locator("[data-visit]")).toHaveAttribute("href", siteHref(project)!);
   await expect(page.locator("#projects")).toBeInViewport();
+});
+
+test("retired projects are listed last, labelled and linked to their archived copy", async ({ page }) => {
+  const firstRetired = PROJECTS.findIndex(project => project.retired);
+  expect(firstRetired, "a retired project to test with").toBeGreaterThan(-1);
+  expect(PROJECTS.slice(firstRetired).every(project => project.retired)).toBe(true);
+
+  const retired = PROJECTS[firstRetired];
+  await page.goto(`/#projects/${retired.id}`);
+  await expect(page.locator("[data-retired]")).toBeVisible();
+  await expect(page.locator("[data-retired]")).toHaveText("retired");
+  await expect(page.locator("[data-json]")).toContainText(`"retired": ${retired.retired!.year}`);
+  await expect(page.locator("[data-visit]")).toHaveText("View archived copy");
+  await expect(page.locator("[data-visit]")).toHaveAttribute("href", siteHref(retired)!);
+  await expect(page.locator("[data-href]")).toHaveAttribute("href", /^https:\/\/web\.archive\.org\/web\//);
+
+  await page.goto(`/#projects/${PROJECTS[0].id}`);
+  await expect(page.locator("[data-retired]")).toBeHidden();
+  await expect(page.locator("[data-visit]")).toHaveText("Visit site");
 });
 
 test("an unknown project link falls back to the first project", async ({ page }) => {

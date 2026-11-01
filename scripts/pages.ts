@@ -8,7 +8,7 @@
 // start, and again in dev whenever a source file changes.
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { PROJECTS, SCORES_MEASURED } from "../src/data/projects.ts";
+import { liveYears, previousVersions, PROJECTS, SCORES_MEASURED, siteHref } from "../src/data/projects.ts";
 
 const ROOT = join(import.meta.dirname, "..");
 const SRC = join(ROOT, "src");
@@ -168,14 +168,38 @@ function scoresSection(scores: NonNullable<Project["scores"]>): Raw {
   </section>`;
 }
 
+// Links between a retired project and the project that replaced it.
+function versionNote(project: Project): Raw | false {
+  const link = (p: Project) => html`<a href="/projects/${p.id}/">${p.name}</a>`;
+  const replacement = PROJECTS.find(p => p.id === project.retired?.replacedBy);
+  const previous = previousVersions(project);
+  if (project.retired) {
+    return html`<p class="case-note">
+      Retired in ${project.retired.year}${replacement ? html`, replaced by ${link(replacement)}` : false}.
+      ${project.retired.snapshot ? "The screenshots and link are from the Wayback Machine’s copy." : false}
+    </p>`;
+  }
+  if (!previous.length) return false;
+  return html`<p class="case-note">
+    Previous version${previous.length > 1 ? "s" : ""}:
+    ${previous.map((p, i) => html`${i ? ", " : ""}${link(p)} (${liveYears(p)})`)}.
+  </p>`;
+}
+
+// The screenshot frame links to the site, unless a retired one has no archived copy.
+const browserFrame = (href: string | undefined, content: Raw) =>
+  href
+    ? html`<a class="browser" href="${href}" target="_blank" rel="noopener noreferrer">${content}</a>`
+    : html`<div class="browser">${content}</div>`;
+
 function projectMain(project: Project, i: number): Raw {
-  const href = `https://${project.url}/`;
+  const href = siteHref(project);
   const prev = PROJECTS[(i - 1 + PROJECTS.length) % PROJECTS.length];
   const next = PROJECTS[(i + 1) % PROJECTS.length];
   const shots = hasScreenshots(project);
   const facts: [string, Value][] = [
     ["role", project.role],
-    ["year", project.year],
+    ["year", liveYears(project)],
     ["stack", project.stack?.join(" · ")],
     ["category", project.cat],
   ];
@@ -185,15 +209,23 @@ function projectMain(project: Project, i: number): Raw {
       <div class="wrap case-head">
         <a class="case-back mono" href="/#projects/${project.id}">${arrow("left")} ~/projects</a>
         <div class="section-title">
-          <p class="eyebrow mono">// ${project.num} · ${project.cat.toLowerCase()}</p>
+          <p class="eyebrow mono">
+            // ${project.num} · ${project.cat.toLowerCase()}${project.retired ? " · retired" : ""}
+          </p>
           <h1>${project.name}<span class="accent">_</span></h1>
         </div>
         ${project.summary ? html`<p class="lede">${project.summary}</p>` : false}
-        <div class="actions">
-          <a class="btn btn-solid" href="${href}" target="_blank" rel="noopener noreferrer">
-            Visit ${project.url.replace(/^www\./, "").replace(/\/$/, "")} ${arrow("up-right")}
-          </a>
-        </div>
+        ${
+          href
+            ? html`<div class="actions">
+                <a class="btn btn-solid" href="${href}" target="_blank" rel="noopener noreferrer">
+                  ${project.retired ? "View archived copy" : `Visit ${project.url.replace(/^www\./, "").replace(/\/$/, "")}`}
+                  ${arrow("up-right")}
+                </a>
+              </div>`
+            : false
+        }
+        ${versionNote(project)}
         <dl class="case-facts">
           ${facts
             .filter(([, value]) => value !== undefined)
@@ -211,17 +243,18 @@ function projectMain(project: Project, i: number): Raw {
       <section class="band" aria-label="Screenshots">
         <div class="wrap">
           <div class="stage case-stage${shots ? " has-shots" : ""}">
-            <a class="browser" href="${href}" target="_blank" rel="noopener noreferrer">
-              <div class="browser-bar">
-                <span class="dots" aria-hidden="true"><span></span><span></span><span></span></span>
-                <span class="url mono">https://${project.url}</span>
-              </div>
-              ${
-                shots
-                  ? html`<div class="shot">${shot(project, "desktop", `${project.name} homepage, full page`)}</div>`
-                  : html`<div class="canvas" aria-hidden="true"><span class="big-num">${project.num}</span></div>`
-              }
-            </a>
+            ${browserFrame(
+              href,
+              html`<div class="browser-bar">
+                  <span class="dots" aria-hidden="true"><span></span><span></span><span></span></span>
+                  <span class="url mono">https://${project.url}</span>
+                </div>
+                ${
+                  shots
+                    ? html`<div class="shot">${shot(project, "desktop", `${project.name} homepage, full page`)}</div>`
+                    : html`<div class="canvas" aria-hidden="true"><span class="big-num">${project.num}</span></div>`
+                }`,
+            )}
             ${
               shots
                 ? html`<div class="phone">
@@ -265,7 +298,7 @@ function projectPage(project: Project, i: number): string {
           name: project.name,
           description,
           url: `${SITE}${path}`,
-          about: { "@type": "WebSite", name: project.name, url: `https://${project.url}/` },
+          about: { "@type": "WebSite", name: project.name, ...(siteHref(project) && { url: siteHref(project) }) },
           creator: PERSON,
           ...(project.year && { dateCreated: String(project.year) }),
           ...(project.stack && { keywords: project.stack.join(", ") }),

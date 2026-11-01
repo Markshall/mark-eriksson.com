@@ -1,4 +1,4 @@
-import { PROJECTS } from "../data/projects.ts";
+import { PROJECTS, siteHref } from "../data/projects.ts";
 import { required } from "./dom.ts";
 import { screenshotSrcset, showSkeletonWhileLoading, timeHoverScroll, type View } from "./screenshots.ts";
 
@@ -57,9 +57,12 @@ function visibleFraction(el: HTMLElement): number {
 // The project's details shown as JSON under its title, minus unfilled fields.
 const metadata = (project: ListedProject) =>
   Object.fromEntries(
-    Object.entries({ role: project.role, year: project.year, stack: project.stack }).filter(
-      ([, value]) => value !== undefined,
-    ),
+    Object.entries({
+      role: project.role,
+      year: project.year,
+      retired: project.retired?.year,
+      stack: project.stack,
+    }).filter(([, value]) => value !== undefined),
   );
 
 const token = (kind: string, text: string) =>
@@ -165,7 +168,17 @@ export function initProjects(section: HTMLElement) {
     $("[data-cat]").textContent = project.cat;
     $("[data-name]").textContent = project.name;
     $("[data-json]").replaceChildren(...renderJson(metadata(project)));
-    $<HTMLAnchorElement>("[data-href]").href = $<HTMLAnchorElement>("[data-visit]").href = `https://${project.url}/`;
+    $("[data-retired]").hidden = !project.retired;
+    $("[data-retired]").textContent = project.retired ? "retired" : "";
+
+    // Retired projects link to their archived copy, if they have one.
+    const href = siteHref(project);
+    for (const link of [$<HTMLAnchorElement>("[data-href]"), $<HTMLAnchorElement>("[data-visit]")]) {
+      if (href) link.href = href;
+      else link.removeAttribute("href");
+    }
+    $("[data-visit]").hidden = !href;
+    $("[data-visit-label]").textContent = project.retired ? "View archived copy" : "Visit site";
     $("[data-position]").textContent = `${state.index + 1} / ${total}`;
     const details = $<HTMLAnchorElement>("[data-details]");
     details.href = `/projects/${project.id}/`;

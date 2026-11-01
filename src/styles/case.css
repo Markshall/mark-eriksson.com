@@ -81,3 +81,14 @@
     margin-inline-start: auto;
   }
 }
+
+/* Links between a retired project and the one that replaced it. */
+.case-note {
+  max-width: 60ch;
+  font-size: 15px;
+  color: var(--muted);
+
+  a {
+    color: var(--link);
+  }
+}
