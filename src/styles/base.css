@@ -4,6 +4,11 @@
   box-sizing: border-box;
 }
 
+/* Keep hidden elements hidden even when a class gives them a display. */
+[hidden] {
+  display: none !important;
+}
+
 html {
   scroll-behavior: smooth;
   -webkit-text-size-adjust: none;

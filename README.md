@@ -84,6 +84,10 @@ A few things to know when a capture goes wrong:
 - Pages taller than 16,383px (WebP's limit) are cropped at that height, with a warning.
 - Videos are frozen on their last frame and the page is scrolled through first so lazy-loaded images appear. If a site still looks wrong, check it in Chrome with reduced motion turned on, because that's how it's captured.
 
+### Retired projects
+
+When a site is replaced or taken down, keep it listed and set its `retired` field: the year it went offline, a [Wayback Machine](https://web.archive.org) snapshot timestamp, and (if it was rebuilt) the id of the project that replaced it. Retired projects are listed after the live ones and labelled "retired". Their links go to the archived copy, or nowhere if there's no snapshot. The screenshot script captures them from the snapshot (without the archive's toolbar), allowing 180s for it to load. Their pages show the years they were live and link to the project that replaced them, and that project's page links back. Leave out `scores`, since there's no live site to measure.
+
 ## Project pages
 
 Each project in `src/data/projects.ts` also gets its own page at `/projects/<id>/`. It shows the summary, role, year, stack, the GTmetrix scores if there are any, both screenshots, the `body` write-up (one string per paragraph), and links to the previous and next projects. The gallery's "Details" button links to it.

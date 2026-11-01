@@ -13,6 +13,14 @@
   font-size: 13px;
 }
 
+/* A secondary label beside the category, e.g. "retired". */
+.pill-outline {
+  padding-block: 4.5px;
+  border: 1.5px solid var(--band-control);
+  background: transparent;
+  color: var(--band-muted);
+}
+
 .project-name {
   font-size: clamp(1.75rem, 3.5vw, 2.75rem);
   line-height: 1;

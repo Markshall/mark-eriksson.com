@@ -2,6 +2,7 @@
 // add a project here, then run `npm run screenshots` to capture it.
 // `year`, `stack`, `summary` and `body` are optional and hidden until filled in.
 // Each project also gets its own page at /projects/<id>/ (scripts/pages.ts).
+// Sites that are no longer live stay listed, with `retired` set.
 export interface Project {
   /** Used for screenshot file names: src/assets/screenshots/<id>-<view>.webp */
   id: string;
@@ -29,6 +30,35 @@ export interface Project {
     /** Cumulative Layout Shift. */
     cls: number;
   };
+  /**
+   * Set when the site has been replaced or taken down. Its links then go to
+   * an archived copy instead of the live site, and it's listed after the
+   * live projects. Leave `scores` out: there's no live site to measure.
+   */
+  retired?: {
+    /** Year it stopped being live. */
+    year: number;
+    /**
+     * Wayback Machine snapshot timestamp (e.g. "20250613155358") to link to
+     * and capture screenshots from. Without one, the project has no link.
+     */
+    snapshot?: string;
+    /** Id of the project that replaced it, linked from both project pages. */
+    replacedBy?: string;
+  };
+}
+
+/** Where a project links to: the live site, or its archived copy once retired (none if there isn't one). */
+export function siteHref(project: Project): string | undefined {
+  if (!project.retired) return `https://${project.url}/`;
+  const { snapshot } = project.retired;
+  return snapshot && `https://web.archive.org/web/${snapshot}/https://${project.url}/`;
+}
+
+/** The years the site was live, e.g. "2020–2026", or its launch year while it's still live. */
+export function liveYears(project: Project): string | undefined {
+  if (!project.retired) return project.year === undefined ? undefined : String(project.year);
+  return project.year === undefined ? `until ${project.retired.year}` : `${project.year}–${project.retired.year}`;
 }
 
 // When the GTmetrix scores below were measured, shown with them on each
@@ -149,6 +179,19 @@ export const PROJECTS = (
       scores: { performance: 92, structure: 97, lcp: 501, tbt: 122, cls: 0.15 },
     },
     {
+      id: "crown-energy-2020",
+      name: "Crown Energy (2020)",
+      role: "Lead developer",
+      url: "www.crownenergy.co.uk",
+      cat: "Work",
+      year: 2020,
+      stack: WP_STACK,
+      summary:
+        "The previous Crown Energy site, for its gas, electricity and water connections business serving homes, businesses, the public sector and construction. A custom WordPress theme, live until the 2026 rebuild replaced it.",
+      body: [GROUP_PLATFORM],
+      retired: { year: 2026, snapshot: "20250613155358", replacedBy: "crown-energy" },
+    },
+    {
       id: "birlem-oil",
       name: "Birlem Oil",
       role: "Lead developer",
@@ -192,4 +235,17 @@ export const PROJECTS = (
       ],
     },
   ] satisfies Project[]
-).map((project: Project, i) => ({ ...project, num: String(i + 1).padStart(2, "0") }));
+)
+  // Retired projects go after the live ones, otherwise in the order above.
+  .toSorted((a: Project, b: Project) => Number(Boolean(a.retired)) - Number(Boolean(b.retired)))
+  .map((project: Project, i) => ({ ...project, num: String(i + 1).padStart(2, "0") }));
+
+/** The retired projects that the given one replaced. */
+export const previousVersions = (project: Project) => PROJECTS.filter(p => p.retired?.replacedBy === project.id);
+
+for (const project of PROJECTS) {
+  const replacedBy = project.retired?.replacedBy;
+  if (replacedBy && !PROJECTS.some(p => p.id === replacedBy)) {
+    throw new Error(`${project.id}: retired.replacedBy names an unknown project, "${replacedBy}"`);
+  }
+}
