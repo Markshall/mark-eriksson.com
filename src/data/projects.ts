@@ -85,7 +85,7 @@ export const PROJECTS = (
       scores: { performance: 92, structure: 94, lcp: 609, tbt: 295, cls: 0.01 },
     },
     {
-      id: "sf-sus",
+      id: "speedy-fuels-sustainability",
       name: "Speedy Fuels Sustainability",
       role: "Lead developer",
       url: "sustainability.speedyfuels.co.uk",
@@ -97,7 +97,7 @@ export const PROJECTS = (
       body: [EMBEDDED_TOOLS, GROUP_PLATFORM],
     },
     {
-      id: "co-sus",
+      id: "crown-oil-sustainability",
       name: "Crown Oil Sustainability",
       role: "Lead developer",
       url: "sustainability.crownoil.co.uk",
@@ -110,7 +110,7 @@ export const PROJECTS = (
       scores: { performance: 93, structure: 98, lcp: 512, tbt: 209, cls: 0 },
     },
     {
-      id: "co-env",
+      id: "crown-oil-environmental",
       name: "Crown Oil Environmental",
       role: "Lead developer",
       url: "www.crownoilenvironmental.co.uk",
