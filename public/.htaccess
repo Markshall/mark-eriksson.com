@@ -1,2 +1,44 @@
 # Serve the site's own 404 page for missing URLs.
 ErrorDocument 404 /404.html
+
+# Response headers. Header needs mod_headers, and AllowOverride must include
+# FileInfo for the web root (as ErrorDocument already does).
+<IfModule mod_headers.c>
+  # Safe for everything on the domain, including the CheckCheck app at /check/.
+  Header always set Strict-Transport-Security "max-age=31536000"
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+  # /check/ is deployed separately and loads Google Fonts, AdSense and inline
+  # scripts, so it doesn't get this site's policy.
+  <If "%{REQUEST_URI} !~ m#^/check/#">
+    # Scripts, styles and fonts come from this site only, apart from Google
+    # Tag Manager and the Google Analytics tag it runs, which only load after
+    # the visitor accepts cookies (src/scripts/consent.ts). The allowlist is
+    # Google's, for GA4 with Google Signals. If GTM starts running other tags,
+    # add their hosts here, or they'll be blocked. img-src allows any HTTPS
+    # host because Signals sends a beacon image to the visitor's own country's
+    # Google domain (google.co.uk, google.de, ...), which can't be listed, and
+    # images can't run code.
+    # The build replaces __INLINE_SCRIPT_HASHES__ with the hash of each inline
+    # script (the `csp-hashes` plugin in vite.config.ts), so leave it in place.
+    Header always set Content-Security-Policy "default-src 'self'; script-src 'self' __INLINE_SCRIPT_HASHES__ https://*.googletagmanager.com; style-src 'self'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.g.doubleclick.net https://*.google.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+    Header always set X-Frame-Options "DENY"
+    Header always set Cross-Origin-Opener-Policy "same-origin"
+    Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+  </If>
+
+  # Built files in /assets/ have a content hash in their names, so a changed
+  # file gets a new URL and these can be cached for good.
+  <If "%{REQUEST_URI} =~ m#^/assets/#">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </If>
+
+  # Pages keep their URLs, so browsers check for a new version every time
+  # (a cheap 304 when nothing changed) and never pair an old page with deleted
+  # assets after a deploy. s-maxage lets Cloudflare keep caching them; the
+  # deploy purges each changed page from it.
+  <If "%{REQUEST_URI} !~ m#^/check/# && %{REQUEST_FILENAME} =~ m#\.html$#">
+    Header set Cache-Control "public, max-age=0, must-revalidate, s-maxage=14400"
+  </If>
+</IfModule>

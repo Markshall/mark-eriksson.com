@@ -64,13 +64,29 @@
       } catch {}
     </script>
 
+    <!-- The Latin subsets of both fonts are used above the fold, so fetch
+         them alongside the stylesheet rather than after it has been parsed. -->
+    <link
+      rel="preload"
+      href="../node_modules/@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="../node_modules/@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-wght-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
     <link rel="stylesheet" href="./styles/main.css" />
     <script type="module" src="./scripts/main.ts"></script>
   </head>
 
   <body>
     <header id="home" class="site-header wrap">
-      <a href="#home" class="brand" aria-label="Mark Eriksson, home">
+      <a href="/" class="brand" aria-label="Mark Eriksson, home">
         <svg aria-hidden="true" width="52" height="28" viewBox="0 0 130 70" shape-rendering="crispEdges">
           <path
             fill="currentColor"
@@ -175,7 +191,11 @@
           <div class="explorer">
             <ol class="project-list" data-list></ol>
 
-            <article class="project" aria-live="polite">
+            <!-- Announces the newly selected project to screen readers, rather
+                 than making the whole project panel a live region. -->
+            <p class="visually-hidden" aria-live="polite" data-announce></p>
+
+            <article class="project">
               <div class="stage" data-stage>
                 <a class="browser" data-href target="_blank" rel="noopener noreferrer">
                   <div class="browser-bar">

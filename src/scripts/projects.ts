@@ -221,6 +221,9 @@ export function initProjects(section: HTMLElement) {
     $("[data-summary]").textContent = project.summary ?? "";
   }
 
+  // The first render isn't announced: it's the page loading, not a change.
+  let announce = false;
+
   // syncHash is false only for the first render of an unlinked visit, so
   // opening the page at / doesn't rewrite the address to the first project.
   function render(syncHash = true) {
@@ -235,6 +238,10 @@ export function initProjects(section: HTMLElement) {
     renderList(projects);
     if (listFocused) $('[data-list] [aria-current="true"]').focus({ preventScroll: true });
     renderCurrent(projects[state.index], projects.length);
+    if (announce) {
+      $("[data-announce]").textContent = `${projects[state.index].name}, ${state.index + 1} of ${projects.length}`;
+    }
+    announce = true;
 
     // replaceState rather than a hash assignment, so browsing doesn't fill the
     // history or jump the page to the section.
