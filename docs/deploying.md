@@ -10,8 +10,9 @@ The secrets the workflow needs are listed in the [README](../README.md#deploying
 2. **Build.** The runner checks out the repo, runs `npm ci` and `npm run build`, and ends up with the site in `dist/`. Nothing has touched the server yet.
 3. **Connect to Tailscale.** `tailscale/github-action` installs Tailscale, uses the OAuth client (`TS_OAUTH_CLIENT_ID` / `TS_OAUTH_SECRET`) to get a short-lived single-use login tagged `tag:ci`, and joins the tailnet as a temporary device with its own `100.x.y.z` address. The runner and the server are now on the same private network.
 4. **Configure SSH.** The runner writes the deploy private key (`DEPLOY_SSH_KEY`), the server's public host key (`DEPLOY_KNOWN_HOSTS`) and a small SSH config to `~/.ssh/`.
-5. **Upload.** `scripts/deploy.sh` runs rsync over SSH to `DEPLOY_HOST`, the server's Tailscale address. Only changed files are sent; old ones are removed.
-6. **Clean up.** The action logs out of Tailscale, the temporary device is removed from the tailnet, and the VM is destroyed.
+5. **Upload.** `scripts/deploy.sh` runs rsync over SSH to `DEPLOY_HOST`, the server's Tailscale address. rsync compares file contents (`--checksum`), because a fresh build gives every file a new modification time. Only changed files are sent; old ones are removed.
+6. **Purge the cache.** rsync's list of sent files is saved to a temp file rather than the public log. `scripts/purge-cache.sh` turns it into URLs, skipping `assets/` (hashed names, so a change is a new URL), and asks Cloudflare to purge them. `index.html` is purged as both `/index.html` and `/`. The log only shows how many were purged.
+7. **Clean up.** The action logs out of Tailscale, the temporary device is removed from the tailnet, and the VM is destroyed.
 
 ## What the SSH connection really goes through
 
@@ -67,7 +68,8 @@ Tailscale's access controls should limit `tag:ci` to SSH on the web server, so a
 2. **Tailscale on the server.** `curl -fsSL https://tailscale.com/install.sh | sh`, `sudo tailscale up`, and `tailscale ip -4` for `DEPLOY_HOST`.
 3. **Host key.** Run `ssh-keyscan <tailscale ip>` from a machine on the tailnet (or the server itself) for `DEPLOY_KNOWN_HOSTS`.
 4. **Tailscale admin console.** Add `"tagOwners": { "tag:ci": ["autogroup:admin"] }` to the access controls, then create an OAuth client (Settings → Trust credentials / OAuth clients) with **Auth Keys: Write** and tag `tag:ci`. Store its ID and secret as `TS_OAUTH_CLIENT_ID` and `TS_OAUTH_SECRET`.
-5. **GitHub token.** Pushing changes to `.github/workflows/` needs a token with the `workflow` scope: `gh auth refresh -s workflow` then `gh auth setup-git`.
+5. **Cloudflare.** Create an API token (My Profile → API Tokens → Custom token) with **Zone → Cache Purge** on this zone only. Store it as `CLOUDFLARE_API_TOKEN`, and the zone ID (on the zone's Overview page) as `CLOUDFLARE_ZONE_ID`.
+6. **GitHub token.** Pushing changes to `.github/workflows/` needs a token with the `workflow` scope: `gh auth refresh -s workflow` then `gh auth setup-git`.
 
 ## Troubleshooting
 
@@ -78,6 +80,8 @@ Tailscale's access controls should limit `tag:ci` to SSH on the web server, so a
 | `Permission denied (publickey,password)` | The server was reached but refused the key. Check the key is really in `authorized_keys` and `DEPLOY_USER` is right. |
 
 The server's `/var/log/auth.log` shows which user and address each attempt came from, which tells the cases apart.
+
+If the purge step fails, the files are already uploaded. The error code comes from Cloudflare: `10000` usually means the token lacks Cache Purge on this zone, and `7003` means the zone ID is wrong.
 
 **Testing a key properly.** A `Host *` / `IdentityFile` line in your local `~/.ssh/config` makes SSH offer your personal key on every connection, so a test can succeed without the deploy key ever being used. `ssh-copy-id` is fooled the same way and reports "All keys were skipped". Ignore the config when testing:
 

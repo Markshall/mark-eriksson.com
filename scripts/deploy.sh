@@ -26,18 +26,38 @@ if [[ ! -f dist/index.html ]]; then
   exit 1
 fi
 
+dry_run=
+for arg in "$@"; do
+  case "$arg" in
+    --dry-run | -[!-]*n*) dry_run=1 ;;
+  esac
+done
+
+# rsync prints one itemized line per change ("<f..." for a sent file), which
+# is saved so the purge below knows what changed.
+changes=$(mktemp)
+trap 'rm -f "$changes"' EXIT
+
 # CI logs are public, so only print a summary there rather than every file name.
 if [[ -n "${CI:-}" ]]; then
-  output=(--stats)
+  stats=(--stats)
+  show() { grep -vE '^(\*deleting|[<>ch.][fdLDS][^ ]*) ' || true; }
 else
-  output=(-v)
+  stats=()
+  show() { cat; }
 fi
 
+# --checksum compares contents rather than modification times, which a fresh
+# build always changes, so only files that really changed are sent and listed.
 # --delete removes old hashed assets. Paths managed outside this repo are
 # protected from it: Let's Encrypt's /.well-known/ and the CheckCheck app at /check/.
-rsync -az "${output[@]}" --delete \
+rsync -az --checksum --delete ${stats[@]+"${stats[@]}"} \
+  --out-format='%i %n' \
   --filter='P /.well-known/' \
   --filter='P /check/' \
   -e "ssh -p ${DEPLOY_PORT:-22}" \
   "$@" \
-  dist/ "${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH%/}/"
+  dist/ "${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH%/}/" |
+  tee "$changes" | show
+
+./scripts/purge-cache.sh "$changes" ${dry_run:+--dry-run}
