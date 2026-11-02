@@ -12,7 +12,7 @@ import {
 type ListedProject = (typeof PROJECTS)[number];
 
 // Each project's favicon for its tab, saved by `npm run favicons`.
-const FAVICONS = import.meta.glob<string>("../assets/favicons/*.png", {
+const FAVICONS = import.meta.glob<string>("../assets/favicons/*.webp", {
   eager: true,
   query: "?url",
   import: "default",
@@ -142,7 +142,7 @@ export function initProjects(section: HTMLElement) {
       button.title = project.name;
       button.classList.toggle("retired", Boolean(project.retired));
       // The site's favicon (or the one it shares), or its number if it hasn't got one.
-      const favicon = FAVICONS[`../assets/favicons/${project.favicon ?? project.id}.png`];
+      const favicon = FAVICONS[`../assets/favicons/${project.favicon ?? project.id}.webp`];
       const icon = favicon
         ? Object.assign(new Image(16, 16), { className: "favicon", src: favicon, alt: "", decoding: "async" })
         : Object.assign(document.createElement("span"), { className: "num", textContent: project.num });

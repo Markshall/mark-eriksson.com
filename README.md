@@ -105,7 +105,7 @@ On the site, a project's video plays once over the top of its screenshot when th
 
 ### Favicons
 
-Each project's tab in the gallery shows the site's favicon, saved as `src/assets/favicons/<id>.png` (64px square, so it stays sharp at 16px on high-density screens):
+Each project's tab in the gallery shows the site's favicon, saved as `src/assets/favicons/<id>.webp` (48px square, so it stays sharp at 16px on screens up to 3x, while keeping the homepage within its image budget):
 
 ```shell
 npm run favicons                  # save favicons for projects without one yet

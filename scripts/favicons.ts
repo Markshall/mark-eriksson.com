@@ -1,6 +1,6 @@
 // Save each project's favicon, for its tab in the gallery, as
-// src/assets/favicons/<id>.png (64px square, so it's sharp at 16px on screens
-// up to 4x).
+// src/assets/favicons/<id>.webp (48px square, so it's sharp at 16px on screens
+// up to 3x, and small: the homepage has an image budget, lighthouserc.json).
 //
 // Usage: npm run favicons                  save favicons for projects without one yet
 //        npm run favicons -- --all         save them all again
@@ -18,7 +18,7 @@ import sharp from "sharp";
 import { PROJECTS, type Project } from "../src/data/projects.ts";
 
 const OUT_DIR = fileURLToPath(new URL("../src/assets/favicons/", import.meta.url));
-const SIZE = 64;
+const SIZE = 48;
 
 const args = process.argv.slice(2);
 const all = args.includes("--all");
@@ -49,7 +49,7 @@ function fallbackIcon(project: Project): string {
     : `https://${path}`;
 }
 
-const outPath = (project: Project) => `${OUT_DIR}${project.id}.png`;
+const outPath = (project: Project) => `${OUT_DIR}${project.id}.webp`;
 const exists = (path: string) =>
   access(path).then(
     () => true,
@@ -152,7 +152,7 @@ for (const project of queue) {
     for (const href of await iconCandidates(browser, project, url)) {
       const png = await render(browser, href);
       if (!png) continue;
-      await sharp(png).png({ compressionLevel: 9 }).toFile(outPath(project));
+      await sharp(png).webp({ quality: 90, alphaQuality: 100 }).toFile(outPath(project));
       console.log(`  saved from ${href}`);
       saved = true;
       break;
