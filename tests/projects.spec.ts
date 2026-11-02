@@ -1,4 +1,5 @@
 import { existsSync } from "node:fs";
+import type { Page } from "@playwright/test";
 import { test, expect } from "./fixtures.ts";
 import { PROJECTS, siteHref } from "../src/data/projects.ts";
 
@@ -135,6 +136,33 @@ test("screenshots follow the site's theme where the project has a dark capture",
     await expect(page.locator('[data-shot="desktop"]')).toHaveAttribute("srcset", /\.webp \d+w/);
     await expect(page.locator('[data-shot="desktop"]')).not.toHaveAttribute("srcset", /-dark-/);
   }
+});
+
+const withVideo = PROJECTS.find(project => project.video);
+const videoIn = (page: Page, view: string) => page.locator(`.shot:has([data-shot="${view}"]) video`);
+
+test("a project's videos play over its screenshots", async ({ page }) => {
+  test.skip(!withVideo, "no project has a video");
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.goto(`/#projects/${withVideo!.id}`);
+  // Each plays once its frame is on screen.
+  for (const view of ["desktop", "mobile"]) {
+    await videoIn(page, view).scrollIntoViewIfNeeded();
+    await expect(videoIn(page, view)).toHaveAttribute("data-playing", "");
+  }
+
+  // A project without a video shows just its screenshots.
+  const other = PROJECTS.find(project => !project.video)!;
+  await page.goto(`/#projects/${other.id}`);
+  await expect(page.locator("[data-name]")).toHaveText(other.name);
+  await expect(page.locator(".shot video")).toHaveCount(0);
+});
+
+test("videos don't play for visitors who prefer reduced motion", async ({ page }) => {
+  test.skip(!withVideo, "no project has a video");
+  await page.goto(`/#projects/${withVideo!.id}`);
+  await expect(page.locator('[data-shot="desktop"]')).toHaveJSProperty("complete", true);
+  await expect(page.locator(".shot video")).toHaveCount(0);
 });
 
 test("screen readers hear the newly selected project, but not on page load", async ({ page }) => {

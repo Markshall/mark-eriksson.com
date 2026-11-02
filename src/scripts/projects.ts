@@ -1,6 +1,13 @@
 import { PROJECTS, siteHref } from "../data/projects.ts";
 import { required } from "./dom.ts";
-import { onThemeChange, showScreenshot, showSkeletonWhileLoading, timeHoverScroll, type View } from "./screenshots.ts";
+import {
+  onThemeChange,
+  showScreenshot,
+  showSkeletonWhileLoading,
+  showVideo,
+  timeHoverScroll,
+  type View,
+} from "./screenshots.ts";
 
 type ListedProject = (typeof PROJECTS)[number];
 
@@ -160,12 +167,13 @@ export function initProjects(section: HTMLElement) {
     $("[data-list]").replaceChildren(...rows);
   }
 
-  // The project's screenshots in the current theme. Called again when the
-  // theme changes, to swap between light and dark captures.
+  // The project's screenshots in the current theme, and its videos. Called
+  // again when the theme changes, to swap between light and dark captures.
   function renderShots(project: ListedProject) {
     const shown = (["desktop", "mobile"] as const).map(view => {
       const img = $<HTMLImageElement>(`[data-shot="${view}"]`);
       img.alt = `${project.name} ${view === "desktop" ? "homepage" : "on mobile"}, full page`;
+      showVideo(img.parentElement!, project.id, view);
       return showScreenshot(img, project.id, view);
     });
     $("[data-stage]").classList.toggle("has-shots", shown.every(Boolean));

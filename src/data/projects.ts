@@ -49,6 +49,13 @@ export interface Project {
     /** Id of the project that replaced it, linked from both project pages. */
     replacedBy?: string;
   };
+  /**
+   * For sites whose hero animates on page load: record that many seconds of
+   * the page loading with `npm run videos`, to play over the top of the
+   * screenshots (src/assets/videos/<id>-<view>.mp4). Keep it to 5
+   * seconds or less, so it doesn't need a pause button.
+   */
+  video?: { seconds: number };
 }
 
 /** Where a project links to: the live site, or its archived copy once retired (none if there isn't one). */
@@ -103,6 +110,7 @@ export const PROJECTS = (
         "The group’s flagship site, for a UK fuel and lubricants supplier trading since 1947. A custom WordPress theme with product pages for HVO, DERV, red diesel and lubricants, a tank size calculator, and quote forms that feed the company’s CRM.",
       body: [QUOTES_TO_CRM, EMBEDDED_TOOLS, GROUP_PLATFORM],
       scores: { performance: 96, structure: 90, lcp: 626, tbt: 126, cls: 0.04 },
+      video: { seconds: 5 },
     },
     {
       id: "speedy-fuels",
@@ -116,6 +124,7 @@ export const PROJECTS = (
         "A nationwide fuel delivery brand in the Crown Oil group. A custom WordPress theme built around its top products, with a quick quote form that goes straight into the group’s CRM.",
       body: [QUOTES_TO_CRM, EMBEDDED_TOOLS, GROUP_PLATFORM],
       scores: { performance: 92, structure: 94, lcp: 609, tbt: 295, cls: 0.01 },
+      video: { seconds: 5 },
     },
     {
       id: "speedy-fuels-sustainability",
@@ -128,6 +137,7 @@ export const PROJECTS = (
       summary:
         "A standalone site setting out Speedy Fuels’ carbon-neutral certification and its path to Net Zero, with a carbon calculator showing the carbon saved by switching from diesel to HVO.",
       body: [EMBEDDED_TOOLS, GROUP_PLATFORM],
+      video: { seconds: 5 },
     },
     {
       id: "crown-oil-sustainability",
@@ -141,6 +151,7 @@ export const PROJECTS = (
         "The sustainability hub for the UK’s first carbon-neutral fuel supplier, covering its Net Zero pledge and ESG framework, with a carbon calculator showing the carbon saved by switching from diesel to HVO.",
       body: [EMBEDDED_TOOLS, GROUP_PLATFORM],
       scores: { performance: 93, structure: 98, lcp: 512, tbt: 209, cls: 0 },
+      video: { seconds: 5 },
     },
     {
       id: "crown-oil-environmental",
