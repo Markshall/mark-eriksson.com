@@ -4,7 +4,10 @@
 // Each project also gets its own page at /projects/<id>/ (scripts/pages.ts).
 // Sites that are no longer live stay listed, with `retired` set.
 export interface Project {
-  /** Used for screenshot file names: src/assets/screenshots/<id>-<view>.webp */
+  /**
+   * Used for screenshot file names: src/assets/screenshots/<id>-<view>.webp,
+   * plus <id>-<view>-dark.webp for sites with a dark mode.
+   */
   id: string;
   name: string;
   role: string;

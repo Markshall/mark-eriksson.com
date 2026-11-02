@@ -1,6 +1,6 @@
 import { PROJECTS, siteHref } from "../data/projects.ts";
 import { required } from "./dom.ts";
-import { screenshotSrcset, showSkeletonWhileLoading, timeHoverScroll, type View } from "./screenshots.ts";
+import { onThemeChange, showScreenshot, showSkeletonWhileLoading, timeHoverScroll, type View } from "./screenshots.ts";
 
 type ListedProject = (typeof PROJECTS)[number];
 
@@ -14,8 +14,6 @@ const SIZES: Record<View, string> = {
   desktop: "(min-width: 1200px) 757px, (min-width: 940px) calc(97vw - 408px), calc(97vw - 47px)",
   mobile: "(min-width: 1200px) 199px, (min-width: 940px) calc(25.5vw - 107px), max(96px, calc(25.5vw - 12px))",
 };
-
-const screenshot = (project: ListedProject, view: View) => screenshotSrcset(project.id, view);
 
 const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
 
@@ -162,6 +160,17 @@ export function initProjects(section: HTMLElement) {
     $("[data-list]").replaceChildren(...rows);
   }
 
+  // The project's screenshots in the current theme. Called again when the
+  // theme changes, to swap between light and dark captures.
+  function renderShots(project: ListedProject) {
+    const shown = (["desktop", "mobile"] as const).map(view => {
+      const img = $<HTMLImageElement>(`[data-shot="${view}"]`);
+      img.alt = `${project.name} ${view === "desktop" ? "homepage" : "on mobile"}, full page`;
+      return showScreenshot(img, project.id, view);
+    });
+    $("[data-stage]").classList.toggle("has-shots", shown.every(Boolean));
+  }
+
   function renderCurrent(project: ListedProject, total: number) {
     $("[data-url]").textContent = `https://${project.url}`;
     $("[data-num]").textContent = project.num;
@@ -184,25 +193,7 @@ export function initProjects(section: HTMLElement) {
     details.href = `/projects/${project.id}/`;
     details.setAttribute("aria-label", `${project.name} details`);
 
-    const shots: Record<View, string | undefined> = {
-      desktop: screenshot(project, "desktop"),
-      mobile: screenshot(project, "mobile"),
-    };
-    $("[data-stage]").classList.toggle("has-shots", Boolean(shots.desktop && shots.mobile));
-    for (const [view, srcset] of Object.entries(shots)) {
-      const img = $<HTMLImageElement>(`[data-shot="${view}"]`);
-      if (srcset) {
-        if (img.getAttribute("srcset") !== srcset) {
-          img.srcset = srcset;
-          // Show the skeleton until the new image arrives, rather than the
-          // previous project's screenshot.
-          img.parentElement?.toggleAttribute("data-loading", !img.complete);
-        }
-      } else {
-        img.removeAttribute("srcset");
-      }
-      img.alt = `${project.name} ${view === "desktop" ? "homepage" : "on mobile"}, full page`;
-    }
+    renderShots(project);
 
     $('[data-optional="summary"]').hidden = !project.summary;
     $("[data-summary]").textContent = project.summary ?? "";
@@ -252,6 +243,7 @@ export function initProjects(section: HTMLElement) {
     showSkeletonWhileLoading(img);
   }
   for (const frame of section.querySelectorAll<HTMLElement>(".browser, .phone")) timeHoverScroll(frame);
+  onThemeChange(() => renderShots(visible()[state.index]));
 
   $("[data-prev]").addEventListener("click", () => step(-1));
   $("[data-next]").addEventListener("click", () => step(1));
