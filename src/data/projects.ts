@@ -195,6 +195,31 @@ export const PROJECTS = (
       retired: { year: 2026, snapshot: "20250613155358", replacedBy: "crown-energy" },
     },
     {
+      id: "crown-oil-careers",
+      name: "Crown Oil Careers",
+      role: "Lead developer",
+      url: "www.crownoilcareers.co.uk",
+      cat: "Work",
+      year: 2024,
+      stack: WP_STACK,
+      summary:
+        "The recruitment site for the Crown Oil group, with current vacancies, pages for each location, benefits and culture, and a register-your-interest form that takes CV uploads. A custom WordPress theme, live until the group moved its recruitment to a hosted jobs platform.",
+      body: [GROUP_PLATFORM],
+      retired: { year: 2026, snapshot: "20250619211541" },
+    },
+    {
+      id: "rockdoor",
+      name: "Rockdoor",
+      role: "Lead developer",
+      url: "www.rockdoor.com",
+      cat: "Work",
+      year: 2022,
+      stack: WP_STACK,
+      summary:
+        "The site for a UK manufacturer of high-security composite doors, with a gallery of door styles, colours and glass designs, product and security guides, and a postcode search for finding a trusted installer. A custom WordPress theme with its own blocks, live until the 2026 rebuild replaced it.",
+      retired: { year: 2026, snapshot: "20251023040159" },
+    },
+    {
       id: "birlem-oil",
       name: "Birlem Oil",
       role: "Lead developer",
