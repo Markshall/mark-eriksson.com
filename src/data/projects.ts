@@ -195,6 +195,19 @@ export const PROJECTS = (
       retired: { year: 2026, snapshot: "20250613155358", replacedBy: "crown-energy" },
     },
     {
+      id: "crown-oil-careers",
+      name: "Crown Oil Careers",
+      role: "Lead developer",
+      url: "www.crownoilcareers.co.uk",
+      cat: "Work",
+      year: 2024,
+      stack: WP_STACK,
+      summary:
+        "The recruitment site for the Crown Oil group, with current vacancies, pages for each location, benefits and culture, and a register-your-interest form that takes CV uploads. A custom WordPress theme, live until the group moved its recruitment to a hosted jobs platform.",
+      body: [GROUP_PLATFORM],
+      retired: { year: 2026, snapshot: "20250619211541" },
+    },
+    {
       id: "birlem-oil",
       name: "Birlem Oil",
       role: "Lead developer",
