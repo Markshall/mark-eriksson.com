@@ -1,5 +1,8 @@
 // Capture full-page desktop and mobile screenshots of every project in
 // src/data/projects.js, saved as src/assets/screenshots/<id>-<view>.webp.
+// Each view is also captured with the browser set to dark mode, and saved as
+// <id>-<view>-dark.webp if the site looks different in it; sites without a
+// dark mode only get the light screenshot.
 //
 // Usage: npm run screenshots                  capture projects with no screenshots yet
 //        npm run screenshots -- --all         recapture everything
@@ -7,7 +10,7 @@
 //
 // Runs on the host (not in Docker) and drives your installed Google Chrome.
 // Retired projects are captured from their Wayback Machine snapshot.
-import { mkdir, access } from "node:fs/promises";
+import { mkdir, access, rm } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { chromium, type Browser, type BrowserContextOptions, type Page } from "playwright-core";
 import sharp from "sharp";
@@ -16,6 +19,7 @@ import { PROJECTS, type Project } from "../src/data/projects.ts";
 const OUT_DIR = fileURLToPath(new URL("../src/assets/screenshots/", import.meta.url));
 
 type View = "desktop" | "mobile";
+type Scheme = "light" | "dark";
 
 const VIEWS: Record<View, BrowserContextOptions & { viewport: { width: number; height: number } }> = {
   desktop: { viewport: { width: 1440, height: 900 } },
@@ -30,6 +34,12 @@ const VIEWS: Record<View, BrowserContextOptions & { viewport: { width: number; h
 
 // WebP can't encode images taller than this; longer pages are cropped.
 const WEBP_MAX_HEIGHT = 16383;
+
+// How different, on average, the dark capture's pixels must be from the
+// light one's (0–255) for the site to count as having a dark mode. Captures of
+// the same page differ a little anyway, from carousels and other changing
+// content; a dark mode changes far more than this.
+const DARK_MODE_THRESHOLD = 20;
 
 const args = process.argv.slice(2);
 const all = args.includes("--all");
@@ -51,7 +61,8 @@ function captureUrl(project: Project): string | undefined {
   return snapshot && `https://web.archive.org/web/${snapshot}if_/https://${project.url}/`;
 }
 
-const outPath = (project: Project, view: View) => `${OUT_DIR}${project.id}-${view}.webp`;
+const outPath = (project: Project, view: View, scheme: Scheme = "light") =>
+  `${OUT_DIR}${project.id}-${view}${scheme === "dark" ? "-dark" : ""}.webp`;
 const exists = (path: string) =>
   access(path).then(
     () => true,
@@ -107,6 +118,17 @@ async function hideOverlays(page: Page) {
   });
 }
 
+// Remove Google ad slots, including the ones AdSense auto ads inject into the
+// page. They don't fill in an automated browser, so they'd be captured as
+// empty blocks that push the content apart.
+async function hideAds(page: Page) {
+  await page.evaluate(() => {
+    for (const el of document.querySelectorAll<HTMLElement>("ins.adsbygoogle, .google-auto-placed")) {
+      el.style.setProperty("display", "none", "important");
+    }
+  });
+}
+
 // Pause every video on its final frame, where hero videos usually end on
 // their fully composed shot. Pausing before a video ends also stops video
 // carousels (which advance on "ended") from moving to the next slide.
@@ -130,8 +152,9 @@ async function freezeVideos(page: Page) {
   });
 }
 
-async function capture(browser: Browser, project: Project, view: View, url: string) {
-  const context = await browser.newContext({ ...VIEWS[view], reducedMotion: "reduce" });
+// Capture the page as a PNG, cropped to what will be saved.
+async function capture(browser: Browser, project: Project, view: View, scheme: Scheme, url: string) {
+  const context = await browser.newContext({ ...VIEWS[view], reducedMotion: "reduce", colorScheme: scheme });
   const page = await context.newPage();
   try {
     // The Wayback Machine is much slower than a live site.
@@ -140,6 +163,7 @@ async function capture(browser: Browser, project: Project, view: View, url: stri
     await scrollThrough(page);
     await page.waitForLoadState("networkidle", { timeout: 15_000 }).catch(() => {});
     await hideOverlays(page);
+    await hideAds(page);
     // Again, for any videos added while scrolling.
     await freezeVideos(page);
 
@@ -147,17 +171,29 @@ async function capture(browser: Browser, project: Project, view: View, url: stri
     const { width = 0, height = 0 } = await sharp(png).metadata();
     const crop = { width: Math.min(width, VIEWS[view].viewport.width), height: Math.min(height, WEBP_MAX_HEIGHT) };
     if (height > WEBP_MAX_HEIGHT) {
-      console.warn(`  ${view}: page is ${height}px tall, cropping to ${WEBP_MAX_HEIGHT}px`);
+      console.warn(`  ${view} (${scheme}): page is ${height}px tall, cropping to ${WEBP_MAX_HEIGHT}px`);
     }
     // Anything wider than the viewport is overflow the site would normally hide.
-    await sharp(png)
+    return await sharp(png)
       .extract({ left: 0, top: 0, ...crop })
-      .webp({ quality: 80 })
-      .toFile(outPath(project, view));
+      .png()
+      .toBuffer();
   } finally {
     await context.close();
   }
 }
+
+// Mean per-pixel difference (0–255) between two captures, compared as small
+// greyscale thumbnails so captures of slightly different heights still line up.
+async function difference(a: Buffer, b: Buffer) {
+  const thumbnail = (png: Buffer) => sharp(png).resize(64, 64, { fit: "fill" }).greyscale().raw().toBuffer();
+  const [x, y] = await Promise.all([thumbnail(a), thumbnail(b)]);
+  let total = 0;
+  for (let i = 0; i < x.length; i++) total += Math.abs(x[i] - y[i]);
+  return total / x.length;
+}
+
+const save = (png: Buffer, path: string) => sharp(png).webp({ quality: 80 }).toFile(path);
 
 const queue: Project[] = [];
 for (const project of PROJECTS) {
@@ -178,8 +214,19 @@ for (const project of queue) {
   console.log(`${project.name} (${url})`);
   for (const view of Object.keys(VIEWS) as View[]) {
     try {
-      await capture(browser, project, view, url);
-      console.log(`  ${view}: saved`);
+      // Capture both before saving either, so a failure leaves the existing
+      // pair untouched rather than a new light screenshot beside an old dark one.
+      const light = await capture(browser, project, view, "light", url);
+      const dark = await capture(browser, project, view, "dark", url);
+      const diff = await difference(light, dark);
+      await save(light, outPath(project, view));
+      if (diff > DARK_MODE_THRESHOLD) {
+        await save(dark, outPath(project, view, "dark"));
+        console.log(`  ${view}: saved light and dark (difference ${diff.toFixed(1)})`);
+      } else {
+        await rm(outPath(project, view, "dark"), { force: true });
+        console.log(`  ${view}: saved, no dark mode (difference ${diff.toFixed(1)})`);
+      }
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       console.error(`  ${view}: failed — ${message.split("\n")[0]}`);

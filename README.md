@@ -57,7 +57,7 @@ Absolute URLs in `src/index.html` (`og:url`, `og:image`) use `%VITE_SITE_URL%`, 
 `tests/` has Playwright smoke tests for the built site, run against `vite preview` (config in `playwright.config.ts`). `npm test` builds first; if `dist/` is already built, `npx playwright test` runs them alone. They cover:
 
 - **Consent:** nothing loads from Google Tag Manager until the visitor accepts, and Reject and Accept are both remembered.
-- **Project gallery:** project links, filters, the arrow keys and pager, both screenshots for every project, and the screen-reader announcement when the project changes.
+- **Project gallery:** project links, filters, the arrow keys and pager, both screenshots for every project, dark screenshots following the theme, and the screen-reader announcement when the project changes.
 - **Project pages:** every `/projects/<id>/` page loads without errors, with its title, canonical URL, preview image, screenshots and previous/next links. Scores appear only where a project has them, and the Details button, back link and sitemap all point to the right places.
 - **Theme:** the page follows the system setting until the visitor picks a theme, then keeps their choice.
 - **Pages:** `/`, `/privacy/` and `/404.html` load without console errors, and the hero stats and footer year are right with JavaScript turned off.
@@ -66,7 +66,7 @@ They use your installed Google Chrome, like the screenshot script, so there's no
 
 ## Adding a project
 
-Projects are listed in `src/data/projects.ts`. Each one gets a full-page desktop (1440px) and mobile (390px) screenshot, saved as `src/assets/screenshots/<id>-desktop.webp` and `<id>-mobile.webp`. Only these full-size captures are committed: at build time, [vite-imagetools](https://github.com/JonasKruckenberg/imagetools) resizes them into smaller copies (`SRCSETS` in `src/scripts/screenshots.ts`) and the browser picks the one that fits the screen.
+Projects are listed in `src/data/projects.ts`. Each one gets a full-page desktop (1440px) and mobile (390px) screenshot, saved as `src/assets/screenshots/<id>-desktop.webp` and `<id>-mobile.webp`. Each view is also captured with the browser in dark mode, and if the site looks different that way it's saved too, as `<id>-desktop-dark.webp` and `<id>-mobile-dark.webp`. While this site is in dark mode (the visitor's system setting, or the theme toggle), the gallery and project pages show the dark screenshots, falling back to the light ones for sites without a dark mode. Only these full-size captures are committed: at build time, [vite-imagetools](https://github.com/JonasKruckenberg/imagetools) resizes them into smaller copies (`SRCSETS` in `src/scripts/screenshots.ts`) and the browser picks the one that fits the screen.
 
 Add the project to `src/data/projects.ts`, then capture its screenshots:
 
@@ -82,6 +82,7 @@ A few things to know when a capture goes wrong:
 
 - If a site is down or times out (60s to load), that view is skipped, the rest carry on, and the script exits non-zero listing what failed. Any existing screenshot for the failed view is left untouched, so re-run with just those ids.
 - Pages taller than 16,383px (WebP's limit) are cropped at that height, with a warning.
+- A site counts as having a dark mode if its dark capture differs from the light one by more than `DARK_MODE_THRESHOLD` (an average per-pixel difference, printed for each view). Pages with lots of changing content, like carousels, differ a little anyway. If a site is saved with a dark screenshot it shouldn't have, or without one it should, adjust the threshold.
 - Videos are frozen on their last frame and the page is scrolled through first so lazy-loaded images appear. If a site still looks wrong, check it in Chrome with reduced motion turned on, because that's how it's captured.
 
 ### Retired projects

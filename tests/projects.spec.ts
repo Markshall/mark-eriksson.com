@@ -1,3 +1,4 @@
+import { existsSync } from "node:fs";
 import { test, expect } from "./fixtures.ts";
 import { PROJECTS, siteHref } from "../src/data/projects.ts";
 
@@ -105,6 +106,34 @@ test("every project has both screenshots", async ({ page }) => {
       ).toBeGreaterThan(0);
     }
     await page.getByRole("button", { name: "Next project" }).click();
+  }
+});
+
+const hasDarkShots = (id: string) =>
+  existsSync(new URL(`../src/assets/screenshots/${id}-desktop-dark.webp`, import.meta.url));
+
+test("screenshots follow the site's theme where the project has a dark capture", async ({ page }) => {
+  const withDark = PROJECTS.find(project => hasDarkShots(project.id));
+  const lightOnly = PROJECTS.find(project => !hasDarkShots(project.id));
+  test.skip(!withDark, "no project has dark screenshots");
+  await page.emulateMedia({ colorScheme: "dark" });
+
+  await page.goto(`/#projects/${withDark!.id}`);
+  for (const view of ["desktop", "mobile"]) {
+    await expect(page.locator(`[data-shot="${view}"]`)).toHaveAttribute("srcset", new RegExp(`-${view}-dark-`));
+  }
+  // Switching the site to light swaps them for the light captures.
+  await page.getByRole("button", { name: "Switch to light mode" }).click();
+  for (const view of ["desktop", "mobile"]) {
+    await expect(page.locator(`[data-shot="${view}"]`)).not.toHaveAttribute("srcset", /-dark-/);
+  }
+
+  // Projects without a dark mode show their light screenshots in dark mode.
+  if (lightOnly) {
+    await page.getByRole("button", { name: "Switch to dark mode" }).click();
+    await page.goto(`/#projects/${lightOnly.id}`);
+    await expect(page.locator('[data-shot="desktop"]')).toHaveAttribute("srcset", /\.webp \d+w/);
+    await expect(page.locator('[data-shot="desktop"]')).not.toHaveAttribute("srcset", /-dark-/);
   }
 });
 
