@@ -55,7 +55,15 @@ export interface Project {
    * screenshots (src/assets/videos/<id>-<view>.mp4). Keep it to 5
    * seconds or less, so it doesn't need a pause button.
    */
-  video?: { seconds: number };
+  video?: {
+    seconds: number;
+    /**
+     * A selector for something in the hero that reacts to hover. Once the
+     * page has loaded, the pointer sweeps across it from left to right,
+     * weaving up and down through its height, so the recording shows it off.
+     */
+    hover?: string;
+  };
 }
 
 /** Where a project links to: the live site, or its archived copy once retired (none if there isn't one). */
@@ -137,7 +145,8 @@ export const PROJECTS = (
       summary:
         "A standalone site setting out Speedy Fuels’ carbon-neutral certification and its path to Net Zero, with a carbon calculator showing the carbon saved by switching from diesel to HVO.",
       body: [EMBEDDED_TOOLS, GROUP_PLATFORM],
-      video: { seconds: 5 },
+      // The green triangles shimmer as the pointer passes over them.
+      video: { seconds: 5, hover: ".hero .triangle-illustration" },
     },
     {
       id: "crown-oil-sustainability",

@@ -139,13 +139,87 @@ async function setupEnd(frames: Frame[]): Promise<number> {
   return start;
 }
 
+// How long a hover sweep takes, in seconds.
+const SWEEP_DURATION = 2;
+
+// A pointer drawn into the page, since a screencast doesn't capture the real
+// one: the usual arrow, black with a white outline, with its tip (the
+// hotspot) at 1,1 in its 16×21 drawing.
+const CURSOR_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 16 21"><path d="M1 1v16l4.5-4.5 3 7 2.5-1-3-7H14z" fill="#000" stroke="#fff" stroke-width="1.25" stroke-linejoin="round"/></svg>`;
+
+// How tall the pointer is drawn, in CSS pixels: larger than life, since the
+// desktop video is shown at a fraction of its size. Phones have no pointer,
+// so the mobile video shows only what the sweep sets off.
+const CURSOR_HEIGHT: Record<View, number | undefined> = { desktop: 39, mobile: undefined };
+
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+// Sweep the pointer across the element `selector` matches, so whatever reacts
+// to hover there plays in the recording, with a drawn pointer (on desktop) to
+// show what set it off. The pointer comes in from off the left of the screen, weaves up
+// and down through the element's height (about one wave per 400px) and leaves
+// off the right, so it isn't left sitting in the final frame. It starts at
+// `from` (milliseconds since the epoch) and takes SWEEP_DURATION, easing in
+// and out like a hand would.
+async function sweep(page: Page, view: View, selector: string, from: number) {
+  const box = await page.locator(selector).first().boundingBox();
+  if (!box) throw new Error(`nothing matching ${selector} is showing to hover over`);
+  const { width } = page.viewportSize()!;
+  // From just past one edge of the screen to just past the other, so the
+  // drawn pointer is out of sight at both ends.
+  const height = CURSOR_HEIGHT[view];
+  const left = -(height ?? 0);
+  const right = width + 5;
+  const middle = box.y + box.height / 2;
+  const waves = Math.max(1, Math.round(Math.min(box.width, width) / 400));
+  const point = (progress: number) => ({
+    x: left + (right - left) * progress,
+    y: middle + box.height * 0.3 * Math.sin(progress * waves * 2 * Math.PI),
+  });
+
+  if (height) {
+    await page.evaluate(
+      ({ svg, height }) => {
+        const cursor = document.createElement("div");
+        cursor.id = "recording-cursor";
+        cursor.innerHTML = svg;
+        // Offset so the tip, not the corner, is at the pointer's position. It
+        // mustn't catch the pointer itself, or nothing under it would see it
+        // move.
+        const tip = height / 21;
+        cursor.style.cssText = `position: fixed; left: ${-tip}px; top: ${-tip}px; width: ${(height * 16) / 21}px; height: ${height}px; z-index: 2147483647; pointer-events: none; transform: translate(-1000px, -1000px)`;
+        document.documentElement.append(cursor);
+      },
+      { svg: CURSOR_SVG, height },
+    );
+  }
+
+  await sleep(from - Date.now());
+  const begin = Date.now();
+  for (;;) {
+    const t = Math.min((Date.now() - begin) / (SWEEP_DURATION * 1000), 1);
+    const { x, y } = point(t * t * (3 - 2 * t));
+    await Promise.all([
+      // The page only hears about the pointer while it's on screen.
+      x >= 0 && x < width && page.mouse.move(x, y),
+      height &&
+        page.evaluate(
+          ([x, y]) => (document.getElementById("recording-cursor")!.style.transform = `translate(${x}px, ${y}px)`),
+          [x, y],
+        ),
+    ]);
+    if (t === 1) break;
+    await sleep(1000 / 60);
+  }
+}
+
 // Record the page loading, from its first contentful paint (less any set-up)
-// until `seconds` later.
+// until `seconds` later, sweeping the pointer over `hover` if it's set.
 async function record(
   browser: Browser,
   view: View,
   url: string,
-  seconds: number,
+  { seconds, hover }: NonNullable<Project["video"]>,
 ): Promise<{ frames: Frame[]; skipped: number }> {
   const { viewport } = VIEWS[view];
   const context = await browser.newContext({ ...VIEWS[view], colorScheme: "light", reducedMotion: "no-preference" });
@@ -200,9 +274,16 @@ async function record(
           }).observe({ type: "paint", buffered: true });
         }),
     );
+    // The sweep starts once set-up can no longer be detected, so its changes
+    // aren't mistaken for set-up. That puts its start up to SETUP_WINDOW into
+    // the video, depending on how much set-up is skipped.
+    const sweeping = hover && sweep(page, view, hover, firstPaint + SETUP_WINDOW * 1000);
     // Allow for the set-up being skipped, and a little over, so there's a
     // frame to hold until the end.
-    await page.waitForTimeout(Math.max(firstPaint + (SETUP_WINDOW + seconds) * 1000 + 500 - Date.now(), 0));
+    await Promise.all([
+      page.waitForTimeout(Math.max(firstPaint + (SETUP_WINDOW + seconds) * 1000 + 500 - Date.now(), 0)),
+      sweeping,
+    ]);
     await cdp.send("Page.stopScreencast");
 
     const painted = frames.filter(frame => frame.time >= firstPaint / 1000);
@@ -285,7 +366,7 @@ for (const project of queue) {
   console.log(`${project.name} (${url})`);
   for (const view of Object.keys(VIEWS) as View[]) {
     try {
-      const { frames, skipped } = await record(browser, view, url, seconds);
+      const { frames, skipped } = await record(browser, view, url, project.video!);
       await encode(frames, seconds, outPath(project, view));
       const setup = skipped ? `, skipping ${Math.round(skipped * 1000)}ms of set-up` : "";
       console.log(`  ${view}: saved ${seconds}s from ${frames.length} frames${setup}`);
