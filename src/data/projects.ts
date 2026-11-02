@@ -50,6 +50,12 @@ export interface Project {
     replacedBy?: string;
   };
   /**
+   * Id of another project to use the favicon of, for sites in a group that
+   * share an icon: point them all at whichever has the sharpest copy, so the
+   * gallery loads it once. `npm run favicons` then skips this project.
+   */
+  favicon?: string;
+  /**
    * For sites whose hero animates on page load: record that many seconds of
    * the page loading with `npm run videos`, to play over the top of the
    * screenshots (src/assets/videos/<id>-<view>.mp4). Keep it to 5
@@ -111,6 +117,7 @@ export const PROJECTS = (
       name: "Crown Oil",
       role: "Lead developer",
       url: "www.crownoil.co.uk",
+      favicon: "crown-oil-sustainability",
       cat: "Work",
       year: 2019,
       stack: WP_STACK_WITH_TOOLS,
@@ -139,6 +146,7 @@ export const PROJECTS = (
       name: "Speedy Fuels Sustainability",
       role: "Lead developer",
       url: "sustainability.speedyfuels.co.uk",
+      favicon: "speedy-fuels",
       cat: "Work",
       year: 2023,
       stack: WP_STACK_WITH_TOOLS,
@@ -167,6 +175,7 @@ export const PROJECTS = (
       name: "Crown Oil Environmental",
       role: "Lead developer",
       url: "www.crownoilenvironmental.co.uk",
+      favicon: "crown-oil-sustainability",
       cat: "Work",
       year: 2022,
       stack: WP_STACK_WITH_TOOLS,
@@ -219,6 +228,7 @@ export const PROJECTS = (
       name: "Crown Oil Careers",
       role: "Lead developer",
       url: "www.crownoilcareers.co.uk",
+      favicon: "crown-oil-sustainability",
       cat: "Work",
       year: 2024,
       stack: WP_STACK,
@@ -292,6 +302,11 @@ export const PROJECTS = (
 export const previousVersions = (project: Project) => PROJECTS.filter(p => p.retired?.replacedBy === project.id);
 
 for (const project of PROJECTS) {
+  if (project.favicon && !PROJECTS.some(p => p.id === project.favicon && !p.favicon)) {
+    throw new Error(
+      `${project.id}: favicon names an unknown project, or one using another's favicon, "${project.favicon}"`,
+    );
+  }
   const replacedBy = project.retired?.replacedBy;
   if (replacedBy && !PROJECTS.some(p => p.id === replacedBy)) {
     throw new Error(`${project.id}: retired.replacedBy names an unknown project, "${replacedBy}"`);

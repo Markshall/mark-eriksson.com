@@ -5,7 +5,8 @@
   &.has-shots {
     padding-bottom: 15%;
 
-    .browser {
+    /* The browser, or the window holding it on the homepage. */
+    > :first-child {
       width: 97%;
     }
   }

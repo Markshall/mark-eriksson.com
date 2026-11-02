@@ -49,6 +49,7 @@ dist/                Build output, which is what goes on the server (git-ignored
 | `npm run lighthouse`   | Build, then audit the pages with Lighthouse |
 | `npm run screenshots`  | Capture project screenshots (see below)     |
 | `npm run videos`       | Record project hero videos (see below)      |
+| `npm run favicons`     | Save project favicons (see below)           |
 | `npm run deploy`       | Build and upload to the server (see below)  |
 
 Absolute URLs in `src/index.html` (`og:url`, `og:image`) use `%VITE_SITE_URL%`, which is set in `.env.development` (localhost) and `.env.production` (the live domain).
@@ -101,6 +102,20 @@ Each view is recorded at the same size as its screenshot, from the page's first 
 If something in the hero only animates on hover (like the shimmering triangles on Speedy Fuels Sustainability), set `video.hover` to a selector for it, and a pointer sweeps across it from left to right, weaving up and down through its height. A screencast doesn't capture the real pointer, so on desktop one is drawn into the page (phones have no pointer, so the mobile video shows only the effect); it comes in from off the left of the screen and leaves off the right over 2 seconds, so it isn't left sitting in the final frame. The sweep starts a second after the first paint, so it isn't mistaken for set-up, which means it starts up to a second into the video, so keep a hover video to at least 3 seconds.
 
 On the site, a project's video plays once over the top of its screenshot when the frame comes on screen, holds its last frame, and fades out for the hover scroll. It's never loaded for visitors who prefer reduced motion or are saving data or on a slow connection, nor in dark mode for projects with dark screenshots, and if the browser refuses to play it (iOS Low Power Mode, for one) the screenshot stays.
+
+### Favicons
+
+Each project's tab in the gallery shows the site's favicon, saved as `src/assets/favicons/<id>.webp` (48px square, so it stays sharp at 16px on screens up to 3x, while keeping the homepage within its image budget):
+
+```shell
+npm run favicons                  # save favicons for projects without one yet
+npm run favicons -- crown-oil     # save specific project ids again
+npm run favicons -- --all         # save them all again
+```
+
+Like the screenshot script, it runs on your machine and drives your installed Chrome. It loads the homepage and tries the icons it links to, best first: SVGs, then the largest declared size, then Apple touch icons (usually an opaque square, so a last resort), then `/favicon.ico`. Chrome draws the icon itself on a transparent background, so any format a browser shows works, ICO included. Retired projects' icons come from their Wayback Machine snapshot. A project without a favicon shows its number in the tab instead.
+
+Sites in a group often share an icon, at different qualities (one site's copy is 16px, another's 192px). Set `favicon` on the others to the id of the project with the sharpest copy, and they use its file instead of saving their own, so the gallery loads it once. The script skips them and removes any favicon they had saved.
 
 ### Retired projects
 

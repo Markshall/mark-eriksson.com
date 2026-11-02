@@ -13,7 +13,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lighthouse": "npm run build && npx -y @lhci/cli@0.15.1 autorun",
-    "videos": "node scripts/videos.ts"
+    "videos": "node scripts/videos.ts",
+    "favicons": "node scripts/favicons.ts"
   },
   "devDependencies": {
     "@playwright/test": "^1.64.1",

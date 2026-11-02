@@ -52,82 +52,210 @@
 
 .explorer {
   container-type: inline-size;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 32px;
-  align-items: flex-start;
-}
-
-.project-list {
-  flex: 1 1 340px;
-  min-width: 0;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  border-top: 1px solid var(--band-line);
-
-  li {
-    border-bottom: 1px solid var(--band-line);
-  }
-
-  button {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    width: 100%;
-    min-height: 60px;
-    padding: 0 16px;
-    border: none;
-    background: transparent;
-    color: var(--row-text);
-    text-align: left;
-    font-family: inherit;
-    cursor: pointer;
-
-    &[aria-current="true"] {
-      background: var(--row-active);
-      color: #fff;
-
-      .num,
-      .arrow {
-        color: var(--num-active);
-      }
-
-      .arrow {
-        visibility: visible;
-
-        /* Stacked below 340px list + 32px gap + 520px project: it's underneath. */
-        @container (width < 892px) {
-          rotate: 90deg;
-        }
-      }
-    }
-  }
-
-  .num {
-    flex-shrink: 0;
-    width: 28px;
-    font-family: var(--font-mono);
-    font-size: 13px;
-    color: var(--band-muted);
-  }
-
-  .name {
-    flex-grow: 1;
-    font-size: 19px;
-    font-weight: 500;
-    letter-spacing: -0.01em;
-  }
-
-  .arrow {
-    visibility: hidden;
-  }
 }
 
 .project {
-  flex: 999 1 520px;
-  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 20px;
+
+  /* Wide enough for the details to sit beside the JSON, under the window. */
+  @container (width >= 860px) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 400px);
+    grid-template-rows: auto auto 1fr auto;
+    grid-template-areas:
+      "stage stage"
+      "title json"
+      "meta json"
+      "actions json";
+    gap: 20px 48px;
+
+    .stage {
+      grid-area: stage;
+      margin-bottom: 12px;
+    }
+
+    .project-title {
+      grid-area: title;
+    }
+
+    .json {
+      grid-area: json;
+      align-self: start;
+    }
+
+    .meta {
+      grid-area: meta;
+    }
+
+    .project-actions {
+      grid-area: actions;
+    }
+  }
+}
+
+/* The browser window: a strip of tabs, one per project, over the browser
+   (screenshots.css), which loses its own frame to the window's. */
+.window {
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--band-line);
+  background: var(--panel);
+  box-shadow: 0 30px 60px rgb(0 0 0 / 0.35);
+
+  .browser {
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  /* Wider than a screenshot's 16:10, so the window fits on a laptop screen. */
+  .shot,
+  .canvas {
+    aspect-ratio: 16 / 9;
+  }
+}
+
+.explorer .stage.has-shots {
+  @container (width >= 860px) {
+    padding-bottom: 8%;
+
+    .phone {
+      width: 20%;
+    }
+  }
+}
+
+.tab-strip {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  padding: 8px 8px 0;
+  background: var(--band);
+
+  .dots {
+    align-self: center;
+    margin: 0 4px 0 8px;
+
+    @container (width < 600px) {
+      display: none;
+    }
+  }
+}
+
+/* Each tab fits its name, up to a maximum, as a browser's do. Past the
+   strip's width, it scrolls sideways (projects.ts maps a mouse wheel onto
+   it), fading out at whichever ends have more tabs. */
+.tabs {
+  --fade-before: 0px;
+  --fade-after: 0px;
+
+  position: relative;
+  display: flex;
+  flex-grow: 1;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 var(--fade-before),
+    #000 calc(100% - var(--fade-after)),
+    transparent
+  );
+
+  &[data-more-before] {
+    --fade-before: 32px;
+  }
+
+  &[data-more-after] {
+    --fade-after: 32px;
+  }
+
+  li {
+    flex: none;
+    min-width: 96px;
+    max-width: 220px;
+  }
+
+  button {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    height: 40px;
+    padding: 0 4px 0 14px;
+    border: none;
+    border-radius: 10px 10px 0 0;
+    background: transparent;
+    color: var(--band-muted);
+    font: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+    cursor: pointer;
+    outline-offset: -3px;
+
+    &:hover {
+      background: color-mix(in srgb, var(--panel) 55%, transparent);
+      color: var(--band-ink);
+    }
+
+    &[aria-current="true"] {
+      background: var(--panel);
+      color: var(--band-ink);
+
+      .num {
+        color: var(--num-active);
+      }
+    }
+
+    /* Retired sites' tabs are dimmed, like a tab that's gone to sleep. */
+    &.retired:not([aria-current="true"]) {
+      opacity: 0.6;
+    }
+  }
+
+  /* Dividers between tabs, except either side of the current one. */
+  li + li button::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 12px;
+    bottom: 12px;
+    width: 1px;
+    background: var(--band-control);
+  }
+
+  li:has([aria-current="true"]) + li button::before,
+  li:has(button:hover) + li button::before,
+  button:is([aria-current="true"], :hover)::before {
+    display: none;
+  }
+
+  .num {
+    font-family: var(--font-mono);
+    font-size: 12px;
+  }
+
+  .favicon {
+    flex-shrink: 0;
+    border-radius: 3px;
+  }
+
+  /* Names too long for their tab fade out, as a browser's do. */
+  .name {
+    flex-grow: 1;
+    min-width: 0;
+    overflow: hidden;
+    padding-right: 12px;
+    text-align: left;
+    mask-image: linear-gradient(to left, transparent, #000 16px);
+  }
 }

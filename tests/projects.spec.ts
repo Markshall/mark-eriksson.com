@@ -76,13 +76,13 @@ test("arrow keys step through projects and wrap around", async ({ page }) => {
   await page.goto("/");
   await page.locator("[data-list] button").first().focus();
 
-  await page.keyboard.press("ArrowDown");
+  await page.keyboard.press("ArrowRight");
   await expect(page.locator("[data-name]")).toHaveText(PROJECTS[1].name);
-  // Focus follows the selection, since the list is rebuilt.
+  // Focus follows the selection, since the tabs are rebuilt.
   await expect(page.locator('[data-list] [aria-current="true"]')).toBeFocused();
   await expect(page).toHaveURL(new RegExp(`#projects/${PROJECTS[1].id}$`));
 
-  await page.keyboard.press("ArrowUp");
+  await page.keyboard.press("ArrowLeft");
   await page.keyboard.press("ArrowLeft");
   await expect(page.locator("[data-name]")).toHaveText(PROJECTS.at(-1)!.name);
 });
@@ -107,6 +107,16 @@ test("every project has both screenshots", async ({ page }) => {
       ).toBeGreaterThan(0);
     }
     await page.getByRole("button", { name: "Next project" }).click();
+  }
+});
+
+test("every project's tab shows its favicon", async ({ page }) => {
+  await page.goto("/");
+  const icons = page.locator("[data-list] .favicon");
+  await expect(icons).toHaveCount(PROJECTS.length);
+  for (const icon of await icons.all()) {
+    await expect(icon).toHaveJSProperty("complete", true);
+    expect(await icon.evaluate((img: HTMLImageElement) => img.naturalWidth)).toBeGreaterThan(0);
   }
 });
 
