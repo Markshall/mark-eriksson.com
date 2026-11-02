@@ -2,10 +2,10 @@ import { PROJECTS, siteHref } from "../data/projects.ts";
 import { required } from "./dom.ts";
 import {
   onThemeChange,
+  scrollPreview,
   showScreenshot,
   showSkeletonWhileLoading,
   showVideo,
-  timeHoverScroll,
   type View,
 } from "./screenshots.ts";
 
@@ -279,7 +279,7 @@ export function initProjects(section: HTMLElement) {
     img.sizes = sizes;
     showSkeletonWhileLoading(img);
   }
-  for (const frame of section.querySelectorAll<HTMLElement>(".browser, .phone")) timeHoverScroll(frame);
+  for (const frame of section.querySelectorAll<HTMLElement>(".browser, .phone")) scrollPreview(frame);
   onThemeChange(() => renderShots(visible()[state.index]));
 
   const strip = $("[data-list]");

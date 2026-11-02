@@ -6,10 +6,10 @@
 import "./page.ts";
 import {
   onThemeChange,
+  scrollPreview,
   showScreenshot,
   showSkeletonWhileLoading,
   showVideo,
-  timeHoverScroll,
   type View,
 } from "./screenshots.ts";
 
@@ -25,4 +25,4 @@ for (const img of shots) showSkeletonWhileLoading(img);
 showShots();
 onThemeChange(showShots);
 
-for (const frame of document.querySelectorAll<HTMLElement>(".browser, .phone")) timeHoverScroll(frame);
+for (const frame of document.querySelectorAll<HTMLElement>(".browser, .phone")) scrollPreview(frame);

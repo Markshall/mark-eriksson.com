@@ -186,3 +186,54 @@ test("screen readers hear the newly selected project, but not on page load", asy
   // The live region replaced the project panel as the thing that's announced.
   await expect(page.locator(".project")).not.toHaveAttribute("aria-live");
 });
+
+test("the mouse wheel scrolls a screenshot, then the page once it reaches the end", async ({ page }) => {
+  await page.goto("/#projects/" + PROJECTS[0].id);
+  const shot = page.locator(".explorer .browser .shot");
+  const scrollTop = () => shot.evaluate(el => el.scrollTop);
+  await expect(page.locator('[data-shot="desktop"]')).toHaveJSProperty("complete", true);
+  await shot.hover();
+  const start = await page.evaluate(() => window.scrollY);
+
+  await page.mouse.wheel(0, 200);
+  await expect.poll(scrollTop).toBeGreaterThan(0);
+  await page.mouse.wheel(0, -2000);
+  await expect.poll(scrollTop).toBe(0);
+  expect(await page.evaluate(() => window.scrollY)).toBe(start);
+  await page.mouse.wheel(0, -200);
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBeLessThan(start);
+  await shot.hover();
+
+  // Leaving the frame scrolls it back to the top.
+  await page.mouse.wheel(0, 200);
+  await expect.poll(scrollTop).toBeGreaterThan(0);
+  await page.mouse.move(0, 0);
+  await expect.poll(scrollTop).toBe(0);
+});
+
+test("hovering a screenshot scrolls it, unless the visitor prefers reduced motion", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.goto("/#projects/" + PROJECTS[0].id);
+  const shot = page.locator(".explorer .browser .shot");
+  await expect(page.locator('[data-shot="desktop"]')).toHaveJSProperty("complete", true);
+  await shot.hover();
+  await expect.poll(() => shot.evaluate(el => el.scrollTop)).toBeGreaterThan(0);
+});
+
+test("on a touch screen, a tap scrolls a screenshot down and another brings it back up", async ({ browser }) => {
+  const context = await browser.newContext({ hasTouch: true, isMobile: true, reducedMotion: "no-preference" });
+  const page = await context.newPage();
+  await page.addInitScript(() => localStorage.setItem("consent", "denied"));
+  await page.goto("/#projects/" + PROJECTS[0].id);
+  const shot = page.locator(".explorer .browser .shot");
+  const scrollTop = () => shot.evaluate(el => el.scrollTop);
+  await expect(page.locator('[data-shot="desktop"]')).toHaveJSProperty("complete", true);
+
+  await shot.tap();
+  await expect.poll(scrollTop).toBeGreaterThan(0);
+  await expect(page.locator(".explorer .browser")).toHaveAttribute("data-scrolled", "");
+  await shot.tap();
+  await expect.poll(scrollTop).toBe(0);
+  await expect(page.locator(".explorer .browser")).not.toHaveAttribute("data-scrolled");
+  await context.close();
+});

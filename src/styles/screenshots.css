@@ -50,19 +50,30 @@
   }
 }
 
-/* A window onto a full-page screenshot that scrolls to the bottom on hover. */
+/* A window onto a full-page screenshot that scrolls to the bottom on hover,
+   or on a tap (scrollPreview, screenshots.ts). With a mouse or trackpad it scrolls like a
+   page too, handing over to the page at either end. Swiping
+   over it scrolls the page, as a frame can be as wide as the screen. */
 .shot {
   position: relative;
   aspect-ratio: 1440 / 900;
   overflow: hidden;
-  container-type: size;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    overflow-y: auto;
+  }
 }
 
 /* A recording of the page loading, over the top of the screenshot
    (screenshots.ts). It's the same size as the frame, so it covers just the
    top of the screenshot: hidden until it starts playing, then holding its
-   last frame. It fades out for the hover scroll, and back in once the
-   screenshot has scrolled back to the top. */
+   last frame. It fades out as the screenshot scrolls, and back in once
+   it's back at the top. */
 .shot-video {
   position: absolute;
   inset: 0;
@@ -90,8 +101,7 @@
   }
 }
 
-.browser:hover .shot-video,
-.phone:hover .shot-video {
+:is(.browser, .phone)[data-scrolled] .shot-video {
   opacity: 0;
   transition-delay: 0s;
 }
@@ -100,9 +110,7 @@
   display: block;
   width: 100%;
   height: auto;
-  transition:
-    opacity 0.3s ease,
-    transform 0.8s ease;
+  transition: opacity 0.3s ease;
 }
 
 /* A skeleton shimmers in the frame while its screenshot loads (projects.ts
@@ -133,20 +141,7 @@
   }
 }
 
-.browser:hover .shot-track,
-.phone:hover .shot-track {
-  transform: translateY(calc(-100% + 100cqh));
-  transition: transform var(--scroll-time, 9s) linear;
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .shot-track,
-  .browser:hover .shot-track,
-  .phone:hover .shot-track {
-    transform: none;
-    transition: none;
-  }
-
   .shot[data-loading] {
     animation: none;
     background-image: none;
