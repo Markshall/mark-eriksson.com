@@ -29,13 +29,7 @@
   overflow: hidden;
   border: 1px solid var(--band-line);
   background: var(--panel);
-  color: inherit;
-  text-decoration: none;
   box-shadow: 0 30px 60px rgb(0 0 0 / 0.35);
-
-  &:hover {
-    opacity: 1;
-  }
 }
 
 .phone {
@@ -96,7 +90,7 @@
   }
 }
 
-.browser:is(:hover, :focus-visible) .shot-video,
+.browser:hover .shot-video,
 .phone:hover .shot-video {
   opacity: 0;
   transition-delay: 0s;
@@ -139,7 +133,7 @@
   }
 }
 
-.browser:is(:hover, :focus-visible) .shot-track,
+.browser:hover .shot-track,
 .phone:hover .shot-track {
   transform: translateY(calc(-100% + 100cqh));
   transition: transform var(--scroll-time, 9s) linear;
@@ -147,7 +141,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .shot-track,
-  .browser:is(:hover, :focus-visible) .shot-track,
+  .browser:hover .shot-track,
   .phone:hover .shot-track {
     transform: none;
     transition: none;

@@ -219,10 +219,9 @@ export function initProjects(section: HTMLElement) {
 
     // Retired projects link to their archived copy, if they have one.
     const href = siteHref(project);
-    for (const link of [$<HTMLAnchorElement>("[data-href]"), $<HTMLAnchorElement>("[data-visit]")]) {
-      if (href) link.href = href;
-      else link.removeAttribute("href");
-    }
+    const visit = $<HTMLAnchorElement>("[data-visit]");
+    if (href) visit.href = href;
+    else visit.removeAttribute("href");
     $("[data-visit]").hidden = !href;
     $("[data-visit-label]").textContent = project.retired ? "View archived copy" : "Visit site";
     $("[data-position]").textContent = `${state.index + 1} / ${total}`;

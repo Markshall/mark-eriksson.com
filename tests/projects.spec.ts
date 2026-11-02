@@ -40,7 +40,7 @@ test("retired projects are listed last, labelled and linked to their archived co
   await expect(page.locator("[data-json]")).toContainText(`"retired": ${retired.retired!.year}`);
   await expect(page.locator("[data-visit]")).toHaveText("View archived copy");
   await expect(page.locator("[data-visit]")).toHaveAttribute("href", siteHref(retired)!);
-  await expect(page.locator("[data-href]")).toHaveAttribute("href", /^https:\/\/web\.archive\.org\/web\//);
+  await expect(page.locator("[data-visit]")).toHaveAttribute("href", /^https:\/\/web\.archive\.org\/web\//);
 
   await page.goto(`/#projects/${PROJECTS[0].id}`);
   await expect(page.locator("[data-retired]")).toBeHidden();
