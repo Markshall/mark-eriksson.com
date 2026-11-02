@@ -194,26 +194,31 @@
           <div class="filters" role="group" aria-label="Filter projects" data-filters></div>
 
           <div class="explorer">
-            <ol class="project-list" data-list></ol>
-
             <!-- Announces the newly selected project to screen readers, rather
                  than making the whole project panel a live region. -->
             <p class="visually-hidden" aria-live="polite" data-announce></p>
 
             <article class="project">
               <div class="stage" data-stage>
-                <a class="browser" data-href target="_blank" rel="noopener noreferrer">
-                  <div class="browser-bar">
+                <!-- A browser window with a tab for each project. The tabs sit
+                     above the link to the site, as they're buttons. -->
+                <div class="window">
+                  <div class="tab-strip">
                     <span class="dots" aria-hidden="true"><span></span><span></span><span></span></span>
-                    <span class="url mono" data-url></span>
+                    <ol class="tabs" aria-label="Projects" data-list></ol>
                   </div>
-                  <div class="shot">
-                    <img class="shot-track" data-shot="desktop" alt="" decoding="async" />
-                  </div>
-                  <div class="canvas" aria-hidden="true">
-                    <span class="big-num" data-num></span>
-                  </div>
-                </a>
+                  <a class="browser" data-href target="_blank" rel="noopener noreferrer">
+                    <div class="browser-bar">
+                      <span class="url mono" data-url></span>
+                    </div>
+                    <div class="shot">
+                      <img class="shot-track" data-shot="desktop" alt="" decoding="async" />
+                    </div>
+                    <div class="canvas" aria-hidden="true">
+                      <span class="big-num" data-num></span>
+                    </div>
+                  </a>
+                </div>
                 <div class="phone">
                   <div class="shot">
                     <img class="shot-track" data-shot="mobile" alt="" decoding="async" />

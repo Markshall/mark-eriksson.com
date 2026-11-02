@@ -14,12 +14,12 @@ type ListedProject = (typeof PROJECTS)[number];
 const FILTERS = ["All", ...new Set(PROJECTS.map(project => project.cat))];
 
 // How wide each screenshot is drawn (see .wrap, .explorer and .stage): the
-// browser is 97% of the project column and the phone 25.5% of it, at least
-// 96px. The column is 780px wide on wide screens, sits beside the list down
-// to 940px, then takes the full width less the page gutters.
+// browser window is 97% of the section's width, which is 1152px on wide
+// screens and the full width less the page gutters below that. The phone is
+// 20% of it from 908px (an 860px section), and 25.5% (at least 96px) below.
 const SIZES: Record<View, string> = {
-  desktop: "(min-width: 1200px) 757px, (min-width: 940px) calc(97vw - 408px), calc(97vw - 47px)",
-  mobile: "(min-width: 1200px) 199px, (min-width: 940px) calc(25.5vw - 107px), max(96px, calc(25.5vw - 12px))",
+  desktop: "(min-width: 1200px) 1117px, calc(97vw - 47px)",
+  mobile: "(min-width: 1200px) 231px, (min-width: 908px) calc(20vw - 10px), max(96px, calc(25.5vw - 12px))",
 };
 
 const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
@@ -50,13 +50,6 @@ function transition(update: () => void, ...types: string[]) {
       await Promise.race([decoded, new Promise(resolve => setTimeout(resolve, DECODE_WAIT))]);
     },
   });
-}
-
-/** How much of the element is on screen, relative to as much of it as could fit. */
-function visibleFraction(el: HTMLElement): number {
-  const { top, bottom, height } = el.getBoundingClientRect();
-  const visible = Math.min(bottom, innerHeight) - Math.max(top, 0);
-  return Math.max(0, visible) / Math.min(height, innerHeight);
 }
 
 // The project's details shown as JSON under its title, minus unfilled fields.
@@ -109,8 +102,6 @@ export function initProjects(section: HTMLElement) {
     state.index = visible().indexOf(project);
   };
 
-  const stacked = () => $(".project").offsetTop >= $("[data-list]").offsetTop + $("[data-list]").offsetHeight;
-
   const visible = () => (state.filter === "All" ? PROJECTS : PROJECTS.filter(p => p.cat === state.filter));
 
   const filterButtons = FILTERS.map(filter => {
@@ -130,27 +121,24 @@ export function initProjects(section: HTMLElement) {
     return [filter, button] as const;
   });
 
+  // A tab for each project, in the browser window's tab strip. They're only
+  // rebuilt when the filter changes: switching project just moves
+  // aria-current (markTab), as Safari can leave freshly built tabs blank
+  // through a view transition.
+  let tabsFilter: string | undefined;
+
   function renderList(projects: ListedProject[]) {
+    tabsFilter = state.filter;
     const rows = projects.map((project, i) => {
       const button = document.createElement("button");
       button.type = "button";
-      button.innerHTML =
-        '<span class="num"></span><span class="name"></span><span class="arrow arrow-icon" aria-hidden="true"></span>';
+      button.title = project.name;
+      button.classList.toggle("retired", Boolean(project.retired));
+      button.innerHTML = '<span class="num"></span><span class="name"></span>';
       required(button, ".num").textContent = project.num;
       required(button, ".name").textContent = project.name;
-      if (i === state.index) button.setAttribute("aria-current", "true");
       button.addEventListener("click", () => {
         if (i === state.index) return;
-        // When the list stacks above the project, the project may be off
-        // screen: if it's mostly out of view, skip the unseen transition and
-        // bring it into view instead. If it's mostly visible, leave the
-        // scroll position alone and animate as usual.
-        if (stacked() && visibleFraction($(".project")) < 0.5) {
-          state.index = i;
-          render();
-          $(".project").scrollIntoView({ behavior: reducedMotion.matches ? "instant" : "smooth", block: "start" });
-          return;
-        }
         transition(
           () => {
             state.index = i;
@@ -165,6 +153,34 @@ export function initProjects(section: HTMLElement) {
       return li;
     });
     $("[data-list]").replaceChildren(...rows);
+  }
+
+  function markTab() {
+    for (const [i, tab] of $("[data-list]").querySelectorAll("button").entries()) {
+      if (i === state.index) tab.setAttribute("aria-current", "true");
+      else tab.removeAttribute("aria-current");
+    }
+  }
+
+  // If the current tab is out of view in the tab strip (after the pager or
+  // arrow keys), scroll the strip to centre it. Only the strip scrolls, never
+  // the page.
+  function revealTab(behavior: ScrollBehavior) {
+    const strip = $("[data-list]");
+    const tab = $('[data-list] [aria-current="true"]');
+    const left = tab.offsetLeft - strip.scrollLeft;
+    if (left < 0 || left + tab.offsetWidth > strip.clientWidth) {
+      strip.scrollTo({ left: tab.offsetLeft - (strip.clientWidth - tab.offsetWidth) / 2, behavior });
+    }
+    markOverflow();
+  }
+
+  // Mark which ends of the tab strip have tabs scrolled out of view, to fade them.
+  function markOverflow() {
+    const strip = $("[data-list]");
+    const end = strip.scrollWidth - strip.clientWidth;
+    strip.toggleAttribute("data-more-before", strip.scrollLeft > 1);
+    strip.toggleAttribute("data-more-after", strip.scrollLeft < end - 1);
   }
 
   // The project's screenshots in the current theme, and its videos. Called
@@ -218,12 +234,13 @@ export function initProjects(section: HTMLElement) {
       button.setAttribute("aria-pressed", String(filter === state.filter));
     }
     $("[data-count]").textContent = `showing ${projects.length} of ${PROJECTS.length}`;
-    // The list is rebuilt, so keep keyboard focus on it by moving it to the
-    // new current row.
-    const listFocused = $("[data-list]").contains(document.activeElement);
-    renderList(projects);
-    if (listFocused) $('[data-list] [aria-current="true"]').focus({ preventScroll: true });
+    if (state.filter !== tabsFilter) renderList(projects);
+    markTab();
+    // Keep keyboard focus in the tab strip on the new current tab.
+    if ($("[data-list]").contains(document.activeElement))
+      $('[data-list] [aria-current="true"]').focus({ preventScroll: true });
     renderCurrent(projects[state.index], projects.length);
+    revealTab(announce && !reducedMotion.matches ? "smooth" : "instant");
     if (announce) {
       $("[data-announce]").textContent = `${projects[state.index].name}, ${state.index + 1} of ${projects.length}`;
     }
@@ -253,20 +270,31 @@ export function initProjects(section: HTMLElement) {
   for (const frame of section.querySelectorAll<HTMLElement>(".browser, .phone")) timeHoverScroll(frame);
   onThemeChange(() => renderShots(visible()[state.index]));
 
+  const strip = $("[data-list]");
+  strip.addEventListener("scroll", markOverflow, { passive: true });
+  new ResizeObserver(markOverflow).observe(strip);
+  // A mouse wheel scrolls the tab strip sideways, as long as there's further
+  // to go: at either end, it scrolls the page as usual.
+  strip.addEventListener(
+    "wheel",
+    event => {
+      if (event.ctrlKey || Math.abs(event.deltaX) >= Math.abs(event.deltaY)) return;
+      const end = strip.scrollWidth - strip.clientWidth;
+      if ((event.deltaY < 0 && strip.scrollLeft <= 0) || (event.deltaY > 0 && strip.scrollLeft >= end - 1)) return;
+      event.preventDefault();
+      strip.scrollLeft += event.deltaY;
+    },
+    { passive: false },
+  );
+
   $("[data-prev]").addEventListener("click", () => step(-1));
   $("[data-next]").addEventListener("click", () => step(1));
 
-  // Left/right arrows step through projects from anywhere in the explorer;
-  // up/down do the same within the list, where focus follows the selection.
+  // Left/right arrows step through projects from anywhere in the explorer.
+  // In the tab strip, focus follows the selection.
   $(".explorer").addEventListener("keydown", event => {
     if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
-    const inList = $("[data-list]").contains(event.target as Node);
-    const delta =
-      event.key === "ArrowRight" || (inList && event.key === "ArrowDown")
-        ? 1
-        : event.key === "ArrowLeft" || (inList && event.key === "ArrowUp")
-          ? -1
-          : 0;
+    const delta = event.key === "ArrowRight" ? 1 : event.key === "ArrowLeft" ? -1 : 0;
     if (!delta) return;
     event.preventDefault();
     step(delta);
