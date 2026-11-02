@@ -129,6 +129,21 @@ async function hideAds(page: Page) {
   });
 }
 
+// The Wayback Machine rewrites an SVG <use> reference to a shape in the same
+// page (href="#arrow") into a link to another URL ("/#arrow"), so the shape
+// isn't drawn. Point each one back at the page's own copy of the shape.
+async function fixArchivedSvgRefs(page: Page) {
+  await page.evaluate(() => {
+    const XLINK = "http://www.w3.org/1999/xlink";
+    for (const use of document.querySelectorAll("use")) {
+      for (const ns of [null, XLINK]) {
+        const id = use.getAttributeNS(ns, "href")?.split("#")[1];
+        if (id && document.getElementById(id)) use.setAttributeNS(ns, ns ? "xlink:href" : "href", `#${id}`);
+      }
+    }
+  });
+}
+
 // Pause every video on its final frame, where hero videos usually end on
 // their fully composed shot. Pausing before a video ends also stops video
 // carousels (which advance on "ended") from moving to the next slide.
@@ -164,6 +179,7 @@ async function capture(browser: Browser, project: Project, view: View, scheme: S
     await page.waitForLoadState("networkidle", { timeout: 15_000 }).catch(() => {});
     await hideOverlays(page);
     await hideAds(page);
+    if (project.retired) await fixArchivedSvgRefs(page);
     // Again, for any videos added while scrolling.
     await freezeVideos(page);
 
