@@ -48,6 +48,7 @@ dist/                Build output, which is what goes on the server (git-ignored
 | `npm run preview`      | Serve `dist/` locally                       |
 | `npm run lighthouse`   | Build, then audit the pages with Lighthouse |
 | `npm run screenshots`  | Capture project screenshots (see below)     |
+| `npm run videos`       | Record project hero videos (see below)      |
 | `npm run deploy`       | Build and upload to the server (see below)  |
 
 Absolute URLs in `src/index.html` (`og:url`, `og:image`) use `%VITE_SITE_URL%`, which is set in `.env.development` (localhost) and `.env.production` (the live domain).
@@ -84,6 +85,20 @@ A few things to know when a capture goes wrong:
 - Pages taller than 16,383px (WebP's limit) are cropped at that height, with a warning.
 - A site counts as having a dark mode if its dark capture differs from the light one by more than `DARK_MODE_THRESHOLD` (an average per-pixel difference, printed for each view). Pages with lots of changing content, like carousels, differ a little anyway. If a site is saved with a dark screenshot it shouldn't have, or without one it should, adjust the threshold.
 - Videos are frozen on their last frame and the page is scrolled through first so lazy-loaded images appear. If a site still looks wrong, check it in Chrome with reduced motion turned on, because that's how it's captured.
+
+### Videos
+
+For sites whose hero animates on page load, set the project's `video` field to how many seconds to record (5 or less, so it doesn't need a pause button), then record it:
+
+```shell
+npm run videos                                  # record projects with `video` set and no videos yet
+npm run videos -- speedy-fuels-sustainability   # re-record specific project ids
+npm run videos -- --all                         # re-record all of them
+```
+
+Each view is recorded at the same size as its screenshot, from the page's first contentful paint, and saved as `src/assets/videos/<id>-desktop.mp4` and `<id>-mobile.mp4` (H.264, which every browser plays with hardware decoding; AV1 was tried and barely saved anything on these clips). Like the screenshot script, it runs on your machine and drives your installed Chrome; it also needs `ffmpeg` with libx264 (`brew install ffmpeg`). The page is loaded once before the recorded load, so fonts and images come from the cache instead of popping in, and the overlays found on that first load (cookie banners and the like) are hidden by a stylesheet from the start of the recorded one. Video posters are removed too, so a hero video starts on its own first frame instead of showing its poster (often the finished scene) and then jumping back to the start. Pages often paint once before their scripts set up the hero, then jump (a carousel laying itself out, say), so a sudden change in the first second counts as set-up and the video starts after the last one; the script prints how much it skipped. Animation changes the page a little each frame, so it isn't mistaken for set-up, but a set-up step that fades or slides rather than jumping isn't caught either, and shows for its first moment. The site fades each video in over a quarter of a second, which covers a short one, and covers the switch for heroes that start empty and build up. Videos are recorded in the light theme, and only of live sites.
+
+On the site, a project's video plays once over the top of its screenshot when the frame comes on screen, holds its last frame, and fades out for the hover scroll. It's never loaded for visitors who prefer reduced motion or are saving data or on a slow connection, nor in dark mode for projects with dark screenshots, and if the browser refuses to play it (iOS Low Power Mode, for one) the screenshot stays.
 
 ### Retired projects
 

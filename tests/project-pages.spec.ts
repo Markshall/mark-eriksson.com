@@ -55,6 +55,18 @@ test("scores show only for projects that have them", async ({ page }) => {
   await expect(page.locator(".case-scores")).toHaveCount(0);
 });
 
+test("a project's page plays its videos over the screenshots", async ({ page }) => {
+  const withVideo = PROJECTS.find(project => project.video);
+  test.skip(!withVideo, "no project has a video");
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.goto(`/projects/${withVideo!.id}/`);
+  for (const view of ["desktop", "mobile"]) {
+    const video = page.locator(`.shot:has([data-shot="${view}"]) video`);
+    await video.scrollIntoViewIfNeeded();
+    await expect(video).toHaveAttribute("data-playing", "");
+  }
+});
+
 test("a retired project's page links to its archived copy and its replacement, and back", async ({ page }) => {
   const retired = PROJECTS.find(project => project.retired?.replacedBy)!;
   const replacement = PROJECTS.find(project => project.id === retired.retired!.replacedBy)!;

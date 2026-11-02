@@ -12,7 +12,8 @@
     "test": "npm run build && playwright test",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "lighthouse": "npm run build && npx -y @lhci/cli@0.15.1 autorun"
+    "lighthouse": "npm run build && npx -y @lhci/cli@0.15.1 autorun",
+    "videos": "node scripts/videos.ts"
   },
   "devDependencies": {
     "@playwright/test": "^1.64.1",
