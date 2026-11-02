@@ -244,9 +244,9 @@
     font-size: 12px;
   }
 
-  /* Only the current tab is numbered, leaving the others room for their names. */
-  button:not([aria-current="true"]) .num {
-    display: none;
+  .favicon {
+    flex-shrink: 0;
+    border-radius: 3px;
   }
 
   /* Names too long for their tab fade out, as a browser's do. */

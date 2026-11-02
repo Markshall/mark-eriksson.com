@@ -110,6 +110,16 @@ test("every project has both screenshots", async ({ page }) => {
   }
 });
 
+test("every project's tab shows its favicon", async ({ page }) => {
+  await page.goto("/");
+  const icons = page.locator("[data-list] .favicon");
+  await expect(icons).toHaveCount(PROJECTS.length);
+  for (const icon of await icons.all()) {
+    await expect(icon).toHaveJSProperty("complete", true);
+    expect(await icon.evaluate((img: HTMLImageElement) => img.naturalWidth)).toBeGreaterThan(0);
+  }
+});
+
 const hasDarkShots = (id: string) =>
   existsSync(new URL(`../src/assets/screenshots/${id}-desktop-dark.webp`, import.meta.url));
 
