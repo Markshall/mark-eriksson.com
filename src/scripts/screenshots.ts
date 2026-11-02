@@ -142,15 +142,63 @@ export function showSkeletonWhileLoading(img: HTMLImageElement) {
 const SCROLL_SPEED = 130;
 
 /**
- * Time a frame's hover scroll (.browser or .phone) to its screenshot's
- * rendered length, so long and short pages scroll at the same speed.
+ * Scroll a frame's screenshot (.browser or .phone, around a .shot) to the
+ * bottom while a mouse hovers it, at the same speed however long the page,
+ * and back to the top when the mouse leaves or a new screenshot arrives.
+ * Touch has no hover to leave, so there a tap scrolls it down and another
+ * brings it back up. The .shot is a real scroll container for mice and
+ * trackpads (see .shot), so the wheel scrolls it with the browser's own
+ * momentum and stops the hover scroll where it's got to. While it's off the
+ * top, the frame has data-scrolled (which hides its video).
  */
-export function timeHoverScroll(frame: HTMLElement) {
-  const set = () => {
-    const track = required(frame, ".shot-track");
-    const distance = track.offsetHeight - (track.parentElement?.clientHeight ?? 0);
-    frame.style.setProperty("--scroll-time", `${Math.max(distance / SCROLL_SPEED, 1)}s`);
+export function scrollPreview(frame: HTMLElement) {
+  const shot = required(frame, ".shot");
+  let frameId: number | undefined;
+  const stop = () => {
+    if (frameId !== undefined) cancelAnimationFrame(frameId);
+    frameId = undefined;
   };
-  frame.addEventListener("pointerenter", set);
-  frame.addEventListener("focusin", set);
+  const bottom = () => shot.scrollHeight - shot.clientHeight;
+
+  const scrollDown = () => {
+    stop();
+    if (reducedMotion.matches) return;
+    // Tracked here rather than read back, as browsers may round scrollTop.
+    let top = shot.scrollTop;
+    let last = performance.now();
+    const tick = (now: number) => {
+      top = Math.min(top + ((now - last) / 1000) * SCROLL_SPEED, bottom());
+      last = now;
+      shot.scrollTop = top;
+      frameId = top < bottom() ? requestAnimationFrame(tick) : undefined;
+    };
+    frameId = requestAnimationFrame(tick);
+  };
+  const scrollUp = () => {
+    stop();
+    shot.scrollTo({ top: 0, behavior: reducedMotion.matches ? "instant" : "smooth" });
+  };
+
+  frame.addEventListener("pointerenter", event => {
+    if (event.pointerType !== "touch") scrollDown();
+  });
+  frame.addEventListener("pointerleave", event => {
+    if (event.pointerType !== "touch") scrollUp();
+  });
+  // A tap (a click straight after a touch) starts or reverses the scroll.
+  let touched = false;
+  frame.addEventListener("pointerdown", event => (touched = event.pointerType === "touch"));
+  frame.addEventListener("click", () => {
+    if (!touched) return;
+    if (frameId !== undefined || shot.scrollTop > 0) scrollUp();
+    else scrollDown();
+  });
+  frame.addEventListener("wheel", stop, { passive: true });
+  shot.addEventListener("scroll", () => frame.toggleAttribute("data-scrolled", shot.scrollTop > 0), {
+    passive: true,
+  });
+  required(frame, ".shot-track").addEventListener("load", () => {
+    stop();
+    shot.scrollTop = 0;
+  });
 }

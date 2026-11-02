@@ -186,11 +186,8 @@ function versionNote(project: Project): Raw | false {
   </p>`;
 }
 
-// The screenshot frame links to the site, unless a retired one has no archived copy.
-const browserFrame = (href: string | undefined, content: Raw) =>
-  href
-    ? html`<a class="browser" href="${href}" target="_blank" rel="noopener noreferrer">${content}</a>`
-    : html`<div class="browser">${content}</div>`;
+// The screenshot frame is only a preview: the button below it links to the site.
+const browserFrame = (content: Raw) => html`<div class="browser">${content}</div>`;
 
 function projectMain(project: Project, i: number): Raw {
   const href = siteHref(project);
@@ -244,7 +241,6 @@ function projectMain(project: Project, i: number): Raw {
         <div class="wrap">
           <div class="stage case-stage${shots ? " has-shots" : ""}">
             ${browserFrame(
-              href,
               html`<div class="browser-bar">
                   <span class="dots" aria-hidden="true"><span></span><span></span><span></span></span>
                   <span class="url mono">https://${project.url}</span>
