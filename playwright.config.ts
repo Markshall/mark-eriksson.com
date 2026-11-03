@@ -1,7 +1,7 @@
 import { defineConfig } from "@playwright/test";
 
 // Smoke tests for the built site (tests/*.spec.ts). They run against
-// `vite preview`, so build first: `npm test` does both. They drive the
+// `astro preview`, so build first: `npm test` does both. They drive the
 // installed Google Chrome, like the screenshot script, so there's no browser
 // download; GitHub's Ubuntu runners have Chrome preinstalled.
 const PORT = 4173;
@@ -18,7 +18,10 @@ export default defineConfig({
     reducedMotion: "reduce",
   },
   webServer: {
-    command: `npx vite preview --port ${PORT} --strictPort`,
+    // --ignore-lock keeps the server in the foreground, where Playwright can
+    // manage it: Astro otherwise starts it in the background when it detects
+    // a coding agent running the command.
+    command: `npx astro preview --port ${PORT} --ignore-lock`,
     port: PORT,
     reuseExistingServer: !process.env.CI,
   },

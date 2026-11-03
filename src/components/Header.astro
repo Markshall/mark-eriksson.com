@@ -1,0 +1,80 @@
+---
+// The site header: the logo, the main navigation and the theme toggle.
+import Arrow from "./Arrow.astro";
+
+interface Props {
+  /**
+   * "home" links to the homepage's sections in place. "page" links to them
+   * from another page, without the scroll spy. Leave out for no navigation.
+   */
+  nav?: "home" | "page";
+  /** "home" on pages with the full footer, as its "back to top" link's target. */
+  id?: "home";
+}
+
+const { nav, id } = Astro.props;
+const home = nav === "home" ? "" : "/";
+---
+
+<header id={id} class="site-header wrap">
+  <a href="/" class="brand" aria-label="Mark Eriksson, home">
+    <svg aria-hidden="true" width="52" height="28" viewBox="0 0 130 70" shape-rendering="crispEdges">
+      <path
+        fill="currentColor"
+        d="M0 0h10v70h-10z M10 10h10v10h-10z M20 20h10v10h-10z M30 30h10v10h-10z M40 20h10v10h-10z M50 10h10v10h-10z M60 0h10v70h-10z M70 0h30v10h-30z M70 30h20v10h-20z M70 60h30v10h-30z"
+      ></path>
+      <path class="blink accent-fill" d="M110 60h20v10h-20z"></path>
+    </svg>
+    <span class="brand-name mono">Mark Eriksson</span>
+  </a>
+
+  {nav && (
+    <nav class:list={["site-nav", "mono", { "no-spy": nav === "page" }]} aria-label="Main">
+      <a href={`${home}#resume`}>/résumé</a>
+      <a href={`${home}#projects`}>/projects</a>
+      <a href="#contact">/contact</a>
+      <a href="https://github.com/Markshall" target="_blank" rel="noopener noreferrer">
+        github
+        <Arrow direction="up-right" />
+      </a>
+    </nav>
+  )}
+
+  <button
+    type="button"
+    class="icon-btn theme-toggle"
+    data-theme-toggle
+    aria-label="Switch to dark mode"
+    aria-pressed="false"
+  >
+    <svg
+      class="icon-sun"
+      aria-hidden="true"
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <circle cx="12" cy="12" r="4"></circle>
+      <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path>
+    </svg>
+    <svg
+      class="icon-moon"
+      aria-hidden="true"
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path>
+    </svg>
+  </button>
+</header>

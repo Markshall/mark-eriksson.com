@@ -44,7 +44,7 @@ for (const [path, heading] of [
 test.describe("without JavaScript", () => {
   test.use({ javaScriptEnabled: false });
 
-  // The build writes the stats into the HTML (the page-stats plugin), so
+  // The build writes the stats into the HTML (src/data/stats.ts), so
   // they're right before, or without, the page's scripts.
   test("the hero stats and footer year are already in the HTML", async ({ page }) => {
     const stats = pageStats();

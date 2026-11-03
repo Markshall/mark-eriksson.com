@@ -1,4 +1,5 @@
-import { PROJECTS, siteHref } from "../data/projects.ts";
+import { countLabel, FILTERS, filtered, positionLabel, projectDetails } from "../data/gallery.ts";
+import { PROJECTS } from "../data/projects.ts";
 import { required } from "./dom.ts";
 import {
   onThemeChange,
@@ -10,15 +11,6 @@ import {
 } from "./screenshots.ts";
 
 type ListedProject = (typeof PROJECTS)[number];
-
-// Each project's favicon for its tab, saved by `npm run favicons`.
-const FAVICONS = import.meta.glob<string>("../assets/favicons/*.webp", {
-  eager: true,
-  query: "?url",
-  import: "default",
-});
-
-const FILTERS = ["All", ...new Set(PROJECTS.map(project => project.cat))];
 
 // How wide each screenshot is drawn (see .wrap, .explorer and .stage): the
 // browser window is 97% of the section's width, which is 1152px on wide
@@ -62,36 +54,8 @@ function transition(update: () => void, ...types: string[]) {
   });
 }
 
-// The project's details shown as JSON under its title, minus unfilled fields.
-const metadata = (project: ListedProject) =>
-  Object.fromEntries(
-    Object.entries({
-      role: project.role,
-      year: project.year,
-      retired: project.retired?.year,
-      stack: project.stack,
-    }).filter(([, value]) => value !== undefined),
-  );
-
 const token = (kind: string, text: string) =>
   Object.assign(document.createElement("span"), { className: `json-${kind}`, textContent: text });
-
-// Pretty-print a flat object as syntax-highlighted JSON, with arrays on one line.
-function renderJson(data: Record<string, unknown>): (Node | string)[] {
-  const value = (v: unknown): (Node | string)[] =>
-    Array.isArray(v)
-      ? ["[", ...v.flatMap((item, i) => [...(i ? [", "] : []), ...value(item)]), "]"]
-      : [token(typeof v === "string" ? "string" : "number", JSON.stringify(v))];
-
-  const entries = Object.entries(data).flatMap(([key, v], i, all) => [
-    "\n  ",
-    token("key", JSON.stringify(key)),
-    ": ",
-    ...value(v),
-    ...(i < all.length - 1 ? [","] : []),
-  ]);
-  return ["{", ...entries, "\n}"];
-}
 
 // Each project has its own link, #projects/<id>, kept in the address bar as
 // the visitor browses so it can be copied and shared.
@@ -102,6 +66,9 @@ const linkedProject = () =>
     ? PROJECTS.find(project => project.id === decodeURIComponent(location.hash.slice(HASH_PREFIX.length)))
     : undefined;
 
+// The gallery's markup, showing the first project, is rendered at build time
+// (src/components/ProjectGallery.astro). This keeps its filter buttons and
+// tabs, and updates the rest as the visitor browses.
 export function initProjects(section: HTMLElement) {
   const $ = <T extends Element = HTMLElement>(selector: string) => required<T>(section, selector);
   const state = { filter: "All", index: 0 };
@@ -112,13 +79,10 @@ export function initProjects(section: HTMLElement) {
     state.index = visible().indexOf(project);
   };
 
-  const visible = () => (state.filter === "All" ? PROJECTS : PROJECTS.filter(p => p.cat === state.filter));
+  const visible = () => filtered(state.filter);
 
   const filterButtons = FILTERS.map(filter => {
-    const count = filter === "All" ? PROJECTS.length : PROJECTS.filter(p => p.cat === filter).length;
-    const button = document.createElement("button");
-    button.type = "button";
-    button.append(`${filter} `, Object.assign(document.createElement("span"), { textContent: String(count) }));
+    const button = $<HTMLButtonElement>(`[data-filter="${CSS.escape(filter)}"]`);
     button.addEventListener("click", () => {
       if (filter === state.filter) return;
       transition(() => {
@@ -127,48 +91,20 @@ export function initProjects(section: HTMLElement) {
         render();
       }, "filter");
     });
-    $("[data-filters]").append(button);
     return [filter, button] as const;
   });
 
-  // A tab for each project, in the browser window's tab strip. They're only
-  // rebuilt when the filter changes: switching project just moves
-  // aria-current (markTab), as Safari can leave freshly built tabs blank
-  // through a view transition.
-  let tabsFilter: string | undefined;
+  // A tab for each project, in the browser window's tab strip, each in an
+  // <li data-project>. The tab strip is only refilled when the filter changes:
+  // switching project just moves aria-current (markTab), as Safari can leave
+  // freshly inserted tabs blank through a view transition. The page starts
+  // with every project's tab, for the "All" filter.
+  const tabs = new Map([...$("[data-list]").children].map(li => [(li as HTMLElement).dataset.project, li]));
+  let tabsFilter = "All";
 
   function renderList(projects: ListedProject[]) {
     tabsFilter = state.filter;
-    const rows = projects.map((project, i) => {
-      const button = document.createElement("button");
-      button.type = "button";
-      button.title = project.name;
-      button.classList.toggle("retired", Boolean(project.retired));
-      // The site's favicon (or the one it shares), or its number if it hasn't got one.
-      const favicon = FAVICONS[`../assets/favicons/${project.favicon ?? project.id}.webp`];
-      const icon = favicon
-        ? Object.assign(new Image(16, 16), { className: "favicon", src: favicon, alt: "", decoding: "async" })
-        : Object.assign(document.createElement("span"), { className: "num", textContent: project.num });
-      button.append(
-        icon,
-        Object.assign(document.createElement("span"), { className: "name", textContent: project.name }),
-      );
-      button.addEventListener("click", () => {
-        if (i === state.index) return;
-        transition(
-          () => {
-            state.index = i;
-            render();
-          },
-          i > state.index ? "next" : "prev",
-        );
-      });
-
-      const li = document.createElement("li");
-      li.append(button);
-      return li;
-    });
-    $("[data-list]").replaceChildren(...rows);
+    $("[data-list]").replaceChildren(...projects.map(project => tabs.get(project.id)!));
   }
 
   function markTab() {
@@ -202,35 +138,36 @@ export function initProjects(section: HTMLElement) {
   // The project's screenshots in the current theme, and its videos. Called
   // again when the theme changes, to swap between light and dark captures.
   function renderShots(project: ListedProject) {
+    const { alt } = projectDetails(project);
     const shown = (["desktop", "mobile"] as const).map(view => {
       const img = $<HTMLImageElement>(`[data-shot="${view}"]`);
-      img.alt = `${project.name} ${view === "desktop" ? "homepage" : "on mobile"}, full page`;
+      img.alt = alt[view];
       showVideo(img.parentElement!, project.id, view);
       return showScreenshot(img, project.id, view);
     });
     $("[data-stage]").classList.toggle("has-shots", shown.every(Boolean));
   }
 
+  // The same fields as ProjectGallery.astro renders at build time.
   function renderCurrent(project: ListedProject, total: number) {
-    $("[data-url]").textContent = `https://${project.url}`;
+    const details = projectDetails(project);
+    $("[data-url]").textContent = details.url;
     $("[data-num]").textContent = project.num;
     $("[data-cat]").textContent = project.cat;
     $("[data-name]").textContent = project.name;
-    $("[data-json]").replaceChildren(...renderJson(metadata(project)));
+    $("[data-json]").replaceChildren(...details.json.map(part => (typeof part === "string" ? part : token(...part))));
     $("[data-retired]").hidden = !project.retired;
     $("[data-retired]").textContent = project.retired ? "retired" : "";
 
-    // Retired projects link to their archived copy, if they have one.
-    const href = siteHref(project);
     const visit = $<HTMLAnchorElement>("[data-visit]");
-    if (href) visit.href = href;
+    if (details.href) visit.href = details.href;
     else visit.removeAttribute("href");
-    $("[data-visit]").hidden = !href;
-    $("[data-visit-label]").textContent = project.retired ? "View archived copy" : "Visit site";
-    $("[data-position]").textContent = `${state.index + 1} / ${total}`;
-    const details = $<HTMLAnchorElement>("[data-details]");
-    details.href = `/projects/${project.id}/`;
-    details.setAttribute("aria-label", `${project.name} details`);
+    visit.hidden = !details.href;
+    $("[data-visit-label]").textContent = details.visitLabel;
+    $("[data-position]").textContent = positionLabel(state.index, total);
+    const link = $<HTMLAnchorElement>("[data-details]");
+    link.href = details.detailsHref;
+    link.setAttribute("aria-label", details.detailsLabel);
 
     renderShots(project);
 
@@ -248,7 +185,7 @@ export function initProjects(section: HTMLElement) {
     for (const [filter, button] of filterButtons) {
       button.setAttribute("aria-pressed", String(filter === state.filter));
     }
-    $("[data-count]").textContent = `showing ${projects.length} of ${PROJECTS.length}`;
+    $("[data-count]").textContent = countLabel(projects.length);
     if (state.filter !== tabsFilter) renderList(projects);
     markTab();
     // Keep keyboard focus in the tab strip on the new current tab.
@@ -301,6 +238,21 @@ export function initProjects(section: HTMLElement) {
     },
     { passive: false },
   );
+
+  // Clicking a tab shows its project.
+  strip.addEventListener("click", event => {
+    const tab = (event.target as Element).closest("button");
+    if (!tab) return;
+    const i = [...strip.querySelectorAll("button")].indexOf(tab);
+    if (i === state.index) return;
+    transition(
+      () => {
+        state.index = i;
+        render();
+      },
+      i > state.index ? "next" : "prev",
+    );
+  });
 
   // Dragging with a mouse scrolls the tab strip too, for mice without a
   // sideways wheel. Touch screens already swipe it natively. A press only

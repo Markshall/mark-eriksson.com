@@ -1,0 +1,183 @@
+---
+// The homepage project gallery (#projects). The build renders it showing the
+// first project, so search engines and visitors without JavaScript see the
+// projects; src/scripts/projects.ts then keeps its filter buttons and tabs,
+// and updates the rest as the visitor browses. The screenshots stay as
+// skeletons (data-loading) until the script loads them, as Vite only resizes
+// images imported by a script.
+import type { ImageMetadata } from "astro";
+import { countLabel, FILTERS, filtered, positionLabel, projectDetails } from "../data/gallery.ts";
+import { PROJECTS } from "../data/projects.ts";
+import { hasScreenshots } from "../lib/site.ts";
+
+// Each project's favicon for its tab, saved by `npm run favicons`.
+const FAVICONS = import.meta.glob<ImageMetadata>("../assets/favicons/*.webp", { eager: true, import: "default" });
+
+const [project] = PROJECTS;
+const details = projectDetails(project);
+---
+
+<section id="projects" class="band" aria-labelledby="projects-h">
+  <div class="wrap band-inner">
+    <div class="section-head">
+      <div class="section-title">
+        <p class="eyebrow mono">~/projects</p>
+        <h2 id="projects-h">Selected work</h2>
+      </div>
+      <p class="eyebrow mono" data-count>
+        {countLabel(PROJECTS.length)}
+      </p>
+    </div>
+
+    <div class="filters" role="group" aria-label="Filter projects" data-filters>
+      {FILTERS.map(filter => (
+        <button type="button" data-filter={filter} aria-pressed={String(filter === "All")}>
+          {filter} <span>{filtered(filter).length}</span>
+        </button>
+      ))}
+    </div>
+
+    <div class="explorer">
+      <!-- Announces the newly selected project to screen readers, rather
+           than making the whole project panel a live region. -->
+      <p class="visually-hidden" aria-live="polite" data-announce></p>
+
+      <article class="project">
+        <div class:list={["stage", { "has-shots": hasScreenshots(project.id) }]} data-stage>
+          <!-- A browser window with a tab for each project. The tabs sit
+               above the link to the site, as they're buttons. -->
+          <div class="window">
+            <div class="tab-strip">
+              <span class="dots" aria-hidden="true">
+                <span></span>
+                <span></span>
+                <span></span>
+              </span>
+              <ol class="tabs" aria-label="Projects" data-list>
+                {PROJECTS.map((p, i) => {
+                  // The site's favicon (or the one it shares), or its number if it hasn't got one.
+                  const favicon = FAVICONS[`../assets/favicons/${p.favicon ?? p.id}.webp`];
+                  return (
+                    <li data-project={p.id}>
+                      <button
+                        type="button"
+                        title={p.name}
+                        class:list={{ retired: p.retired }}
+                        aria-current={i === 0 ? "true" : undefined}
+                      >
+                        {favicon ? (
+                          <img class="favicon" src={favicon.src} width="16" height="16" alt="" decoding="async" />
+                        ) : (
+                          <span class="num">{p.num}</span>
+                        )}
+                        <span class="name">{p.name}</span>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ol>
+            </div>
+            <div class="browser">
+              <div class="browser-bar">
+                <span class="url mono" data-url>
+                  {details.url}
+                </span>
+              </div>
+              <div class="shot" data-loading>
+                <img class="shot-track" data-shot="desktop" alt={details.alt.desktop} decoding="async" />
+              </div>
+              <div class="canvas" aria-hidden="true">
+                <span class="big-num" data-num>
+                  {project.num}
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="phone">
+            <div class="shot" data-loading>
+              <img class="shot-track" data-shot="mobile" alt={details.alt.mobile} decoding="async" />
+            </div>
+          </div>
+        </div>
+
+        <div class="project-title">
+          <p class="project-name" data-name>
+            {project.name}
+          </p>
+          <span class="pill mono" data-cat>
+            {project.cat}
+          </span>
+          <span class="pill pill-outline mono" data-retired hidden={!project.retired}>
+            {project.retired ? "retired" : ""}
+          </span>
+        </div>
+
+        <pre
+          class="json mono"
+          data-json
+        >{details.json.map(part => (typeof part === "string" ? part : <span class={`json-${part[0]}`}>{part[1]}</span>))}</pre>
+
+        <dl class="meta" data-optional="summary" hidden={!project.summary}>
+          <div>
+            <dt class="mono">what I built</dt>
+            <dd data-summary>{project.summary}</dd>
+          </div>
+        </dl>
+
+        <div class="project-actions">
+          <div class="project-links">
+            <a
+              class="btn btn-light"
+              data-visit
+              href={details.href}
+              hidden={!details.href}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <span data-visit-label>{details.visitLabel}</span>
+              <span class="arrow-icon up-right" aria-hidden="true"></span>
+            </a>
+            <a class="btn btn-ghost" data-details href={details.detailsHref} aria-label={details.detailsLabel}>
+              Details
+            </a>
+          </div>
+          <div class="pager">
+            <button type="button" class="icon-btn" data-prev aria-label="Previous project">
+              <svg
+                aria-hidden="true"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M15 18l-6-6 6-6"></path>
+              </svg>
+            </button>
+            <span class="position mono" data-position>
+              {positionLabel(0, PROJECTS.length)}
+            </span>
+            <button type="button" class="icon-btn" data-next aria-label="Next project">
+              <svg
+                aria-hidden="true"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M9 18l6-6-6-6"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>

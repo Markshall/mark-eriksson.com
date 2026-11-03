@@ -1,0 +1,253 @@
+---
+// A page per project, /projects/<id>/, from src/data/projects.ts.
+import type { GetStaticPaths } from "astro";
+import Arrow from "../../components/Arrow.astro";
+import Footer from "../../components/Footer.astro";
+import Header from "../../components/Header.astro";
+import Layout from "../../layouts/Layout.astro";
+import { liveYears, previousVersions, PROJECTS, SCORES_MEASURED, siteHref } from "../../data/projects.ts";
+import { hasScreenshots, projectOgImage, SITE } from "../../lib/site.ts";
+
+export const getStaticPaths = (() =>
+  PROJECTS.map((project, i) => ({
+    params: { id: project.id },
+    props: {
+      project,
+      prev: PROJECTS[(i - 1 + PROJECTS.length) % PROJECTS.length],
+      next: PROJECTS[(i + 1) % PROJECTS.length],
+    },
+  }))) satisfies GetStaticPaths;
+
+type Project = (typeof PROJECTS)[number];
+
+interface Props {
+  project: Project;
+  prev: Project;
+  next: Project;
+}
+
+const { project, prev, next } = Astro.props;
+const path = `/projects/${project.id}/`;
+const href = siteHref(project);
+const shots = hasScreenshots(project.id);
+const description = project.summary ?? `${project.name}, a ${project.cat.toLowerCase()} project by Mark Eriksson.`;
+
+const facts = (
+  [
+    ["role", project.role],
+    ["year", liveYears(project)],
+    ["stack", project.stack?.join(" · ")],
+    ["category", project.cat],
+  ] as const
+).filter(([, value]) => value !== undefined);
+
+// The site's GTmetrix results, laid out like the homepage's hero stats.
+const scores = project.scores && [
+  { value: `${project.scores.performance}%`, label: "performance" },
+  { value: `${project.scores.structure}%`, label: "structure" },
+  { value: `${project.scores.lcp} ms`, label: "LCP", title: "Largest Contentful Paint" },
+  { value: `${project.scores.tbt} ms`, label: "TBT", title: "Total Blocking Time" },
+  { value: String(project.scores.cls), label: "CLS", title: "Cumulative Layout Shift" },
+];
+
+// Links between a retired project and the project that replaced it.
+const replacement = PROJECTS.find(p => p.id === project.retired?.replacedBy);
+const previous = previousVersions(project);
+
+// The srcset is filled in by src/scripts/project-page.ts, from the same
+// resized files as the homepage gallery (Vite only resizes images imported by
+// a script). The stage is at most 960px wide (.case-stage): the browser is 97%
+// of it and the phone 25.5%, at least 96px.
+const SIZES = {
+  desktop: "(min-width: 1008px) 931px, calc(97vw - 47px)",
+  mobile: "(min-width: 1008px) 245px, max(96px, calc(25.5vw - 12px))",
+};
+
+const breadcrumbs = [
+  ["Home", "/"],
+  ["Projects", "/#projects"],
+  [project.name, path],
+];
+---
+
+<Layout
+  title={`${project.name} — Mark Eriksson`}
+  description={description}
+  path={path}
+  og={{ title: project.name, type: "article", image: shots ? projectOgImage(project.id) : "/img/og-image.png" }}
+  jsonLd={{
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "CreativeWork",
+        name: project.name,
+        description,
+        url: `${SITE}${path}`,
+        about: { "@type": "WebSite", name: project.name, ...(href && { url: href }) },
+        creator: { "@type": "Person", name: "Mark Eriksson", url: `${SITE}/` },
+        ...(project.year && { dateCreated: String(project.year) }),
+        ...(project.stack && { keywords: project.stack.join(", ") }),
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: breadcrumbs.map(([name, itemPath], i) => ({
+          "@type": "ListItem",
+          position: i + 1,
+          name,
+          item: `${SITE}${itemPath}`,
+        })),
+      },
+    ],
+  }}
+>
+  <Header id="home" nav="page" />
+
+  <main>
+    <article class="case">
+      <div class="wrap case-head">
+        <a class="case-back mono" href={`/#projects/${project.id}`}>
+          <Arrow direction="left" /> ~/projects
+        </a>
+        <div class="section-title">
+          <p class="eyebrow mono">
+            // {project.num} · {project.cat.toLowerCase()}
+            {project.retired && " · retired"}
+          </p>
+          <h1>
+            {project.name}
+            <span class="accent">_</span>
+          </h1>
+        </div>
+        {project.summary && <p class="lede">{project.summary}</p>}
+        {href && (
+          <div class="actions">
+            <a class="btn btn-solid" href={href} target="_blank" rel="noopener noreferrer">
+              {project.retired ? "View archived copy" : `Visit ${project.url.replace(/^www\./, "").replace(/\/$/, "")}`}
+              <Arrow direction="up-right" />
+            </a>
+          </div>
+        )}
+        {project.retired ? (
+          <p class="case-note">
+            Retired in {project.retired.year}
+            {replacement && (
+              <>
+                , replaced by <a href={`/projects/${replacement.id}/`}>{replacement.name}</a>
+              </>
+            )}
+            .{project.retired.snapshot && " The screenshots and link are from the Wayback Machine’s copy."}
+          </p>
+        ) : (
+          previous.length > 0 && (
+            <p class="case-note">
+              Previous version{previous.length > 1 && "s"}:{" "}
+              {previous.map((p, i) => (
+                <>
+                  {i > 0 && ", "}
+                  <a href={`/projects/${p.id}/`}>{p.name}</a> ({liveYears(p)})
+                </>
+              ))}
+              .
+            </p>
+          )
+        )}
+        <dl class="case-facts">
+          {facts.map(([term, value]) => (
+            <div>
+              <dt class="eyebrow mono">{term}</dt>
+              <dd>{value}</dd>
+            </div>
+          ))}
+        </dl>
+        {scores && (
+          <section class="case-scores" aria-labelledby="scores-h">
+            <h2 class="eyebrow mono" id="scores-h">
+              // GTmetrix, {SCORES_MEASURED}
+            </h2>
+            <div class="stats">
+              {scores.map(({ value, label, title }) => (
+                <div>
+                  <p class="stat">{value}</p>
+                  <p>{title ? <abbr title={title}>{label}</abbr> : label}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+      </div>
+
+      <section class="band" aria-label="Screenshots">
+        <div class="wrap">
+          <div class:list={["stage", "case-stage", { "has-shots": shots }]}>
+            <!-- The screenshot frame is only a preview: the button above links to the site. -->
+            <div class="browser">
+              <div class="browser-bar">
+                <span class="dots" aria-hidden="true">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </span>
+                <span class="url mono">https://{project.url}</span>
+              </div>
+              {shots ? (
+                <div class="shot">
+                  <img
+                    class="shot-track"
+                    data-shot="desktop"
+                    data-project={project.id}
+                    sizes={SIZES.desktop}
+                    alt={`${project.name} homepage, full page`}
+                    decoding="async"
+                  />
+                </div>
+              ) : (
+                <div class="canvas" aria-hidden="true">
+                  <span class="big-num">{project.num}</span>
+                </div>
+              )}
+            </div>
+            {shots && (
+              <div class="phone">
+                <div class="shot">
+                  <img
+                    class="shot-track"
+                    data-shot="mobile"
+                    data-project={project.id}
+                    sizes={SIZES.mobile}
+                    alt={`${project.name} on mobile, full page`}
+                    decoding="async"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {project.body?.length ? (
+        <div class="wrap">
+          <div class="prose case-body">
+            {project.body.map(paragraph => (
+              <p>{paragraph}</p>
+            ))}
+          </div>
+        </div>
+      ) : null}
+    </article>
+
+    <nav class="wrap case-pager mono" aria-label="More projects">
+      <a href={`/projects/${prev.id}/`} rel="prev">
+        <Arrow direction="left" /> {prev.name}
+      </a>
+      <a href={`/projects/${next.id}/`} rel="next">
+        {next.name} <Arrow />
+      </a>
+    </nav>
+  </main>
+
+  <Footer />
+</Layout>
+
+<script>
+  import "../../scripts/project-page.ts";
+</script>

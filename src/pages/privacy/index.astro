@@ -1,0 +1,121 @@
+---
+import Arrow from "../../components/Arrow.astro";
+import Header from "../../components/Header.astro";
+import Layout from "../../layouts/Layout.astro";
+import { pageStats } from "../../data/stats.ts";
+
+const { "data-year": year } = pageStats();
+---
+
+<Layout
+  title="Privacy and cookies — Mark Eriksson"
+  description="What data mark-eriksson.com collects, the Google Analytics cookies it sets only if you accept, and how to change your choice."
+  path="/privacy/"
+>
+  <Header />
+
+  <main class="wrap">
+    <div class="prose">
+      <div class="section-title">
+        <p class="eyebrow mono">~/privacy</p>
+        <h1>Privacy and cookies</h1>
+      </div>
+      <p class="eyebrow mono">last updated 1 November 2026</p>
+
+      <p>
+        This site is run by me, Mark Eriksson, and I’m responsible for the data it collects. If you have a question
+        about it, email <a href="mailto:me@mark-eriksson.com">me@mark-eriksson.com</a>.
+      </p>
+
+      <h2>Analytics cookies, only if you accept</h2>
+      <p>
+        If you accept cookies, the site loads Google Tag Manager, which runs Google Analytics. Google Analytics records
+        which pages you visit, the site that sent you, your device and browser, and roughly where you are, worked out
+        from your IP address. I use it only to see how people find the site and what they look at. It sets these
+        cookies:
+      </p>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Cookie</th>
+              <th>What it’s for</th>
+              <th>Lasts</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="mono">_ga</td>
+              <td>Tells visitors apart</td>
+              <td>2 years</td>
+            </tr>
+            <tr>
+              <td class="mono">_ga_&lt;id&gt;</td>
+              <td>Keeps track of your visit</td>
+              <td>2 years</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Google processes this data under its own{" "}
+        <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">
+          privacy policy
+        </a>{" "}
+        and may store it outside the UK. Analytics data is kept for no more than 14 months.
+      </p>
+      <p>If you reject cookies, Google Tag Manager isn’t loaded at all and none of this happens.</p>
+
+      <h2>Changing your mind</h2>
+      <p>
+        Use{" "}
+        <button type="button" class="link-btn" data-consent-open>
+          cookie settings
+        </button>{" "}
+        here or at the bottom of any page. If you withdraw consent, the site stops sending data to Google and deletes
+        the Google cookies it can reach.
+      </p>
+
+      <h2>Other data</h2>
+      <ul>
+        <li>
+          Your browser’s local storage keeps your light or dark theme and your cookie choice. They stay on your device
+          and aren’t sent anywhere.
+        </li>
+        <li>
+          The site is served through Cloudflare. Cloudflare and my web server keep standard logs (IP address, page
+          requested, browser) for security and to keep the site running. Cloudflare may set a security cookie such as{" "}
+          <span class="mono">__cf_bm</span> if it needs to check for bots. That cookie is strictly necessary, so it
+          doesn’t need consent.
+        </li>
+        <li>If you email me, I keep the email so I can reply.</li>
+      </ul>
+
+      <h2>Your rights</h2>
+      <p>
+        You can ask to see, correct or delete personal data I hold about you by emailing me. You can also complain to
+        the{" "}
+        <a href="https://ico.org.uk/make-a-complaint/" target="_blank" rel="noopener noreferrer">
+          Information Commissioner’s Office
+        </a>
+        .
+      </p>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-base mono">
+      <span>
+        © <span data-year>{year}</span> Mark Eriksson
+      </span>
+      <a href="/">
+        <Arrow direction="left" />
+        homepage
+      </a>
+    </div>
+  </footer>
+</Layout>
+
+<script>
+  import "../../scripts/page.ts";
+</script>

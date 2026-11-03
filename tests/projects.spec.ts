@@ -12,6 +12,29 @@ test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem("consent", "denied"));
 });
 
+test.describe("without JavaScript", () => {
+  test.use({ javaScriptEnabled: false });
+
+  test("the build writes the gallery into the page, for search engines", async ({ page }) => {
+    const [project] = PROJECTS;
+    await page.goto("/");
+
+    await expect(page.locator("[data-list] li")).toHaveCount(PROJECTS.length);
+    for (const [i, { name }] of PROJECTS.entries()) {
+      await expect(page.locator("[data-list] button").nth(i)).toHaveText(name);
+    }
+    await expect(page.locator('[data-list] [aria-current="true"]')).toHaveText(project.name);
+    await expect(page.getByRole("button", { name: /^All/ })).toHaveAttribute("aria-pressed", "true");
+    await expect(page.locator("[data-count]")).toHaveText(`showing ${PROJECTS.length} of ${PROJECTS.length}`);
+    await expect(page.locator("[data-name]")).toHaveText(project.name);
+    await expect(page.locator("[data-summary]")).toHaveText(project.summary!);
+    await expect(page.locator("[data-json]")).toContainText(`"role": "${project.role}"`);
+    await expect(page.locator("[data-visit]")).toHaveAttribute("href", siteHref(project)!);
+    await expect(page.locator("[data-details]")).toHaveAttribute("href", `/projects/${project.id}/`);
+    await expect(page.locator("[data-position]")).toHaveText(`1 / ${PROJECTS.length}`);
+  });
+});
+
 test("opening the page doesn't rewrite the address", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator("[data-name]")).toHaveText(PROJECTS[0].name);
@@ -131,12 +154,12 @@ test("screenshots follow the site's theme where the project has a dark capture",
 
   await page.goto(`/#projects/${withDark!.id}`);
   for (const view of ["desktop", "mobile"]) {
-    await expect(page.locator(`[data-shot="${view}"]`)).toHaveAttribute("srcset", new RegExp(`-${view}-dark-`));
+    await expect(page.locator(`[data-shot="${view}"]`)).toHaveAttribute("srcset", new RegExp(`-${view}-dark\\.`));
   }
   // Switching the site to light swaps them for the light captures.
   await page.getByRole("button", { name: "Switch to light mode" }).click();
   for (const view of ["desktop", "mobile"]) {
-    await expect(page.locator(`[data-shot="${view}"]`)).not.toHaveAttribute("srcset", /-dark-/);
+    await expect(page.locator(`[data-shot="${view}"]`)).not.toHaveAttribute("srcset", /-dark\./);
   }
 
   // Projects without a dark mode show their light screenshots in dark mode.
@@ -144,7 +167,7 @@ test("screenshots follow the site's theme where the project has a dark capture",
     await page.getByRole("button", { name: "Switch to dark mode" }).click();
     await page.goto(`/#projects/${lightOnly.id}`);
     await expect(page.locator('[data-shot="desktop"]')).toHaveAttribute("srcset", /\.webp \d+w/);
-    await expect(page.locator('[data-shot="desktop"]')).not.toHaveAttribute("srcset", /-dark-/);
+    await expect(page.locator('[data-shot="desktop"]')).not.toHaveAttribute("srcset", /-dark\./);
   }
 });
 

@@ -1,0 +1,32 @@
+---
+// Served for any missing URL (ErrorDocument in public/.htaccess). Astro links
+// assets from the site root, so they load whatever the URL.
+import Header from "../components/Header.astro";
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="Page not found — Mark Eriksson" noindex>
+  <Header />
+
+  <main>
+    <section class="hero wrap">
+      <p class="eyebrow mono">// error 404 · not found</p>
+      <h1>
+        Nothing here<span class="blink accent">_</span>
+      </h1>
+      <p class="lede">That page doesn’t exist, or it’s moved. The rest of the site is one click away.</p>
+      <div class="actions">
+        <a href="/" class="btn btn-solid">
+          Go to the homepage
+        </a>
+        <a href="/#projects" class="btn btn-outline">
+          See my work
+        </a>
+      </div>
+    </section>
+  </main>
+</Layout>
+
+<script>
+  import "../scripts/page.ts";
+</script>

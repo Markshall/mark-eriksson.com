@@ -1,0 +1,262 @@
+---
+import Footer from "../components/Footer.astro";
+import Header from "../components/Header.astro";
+import ProjectGallery from "../components/ProjectGallery.astro";
+import Layout from "../layouts/Layout.astro";
+import { pageStats } from "../data/stats.ts";
+import { SITE } from "../lib/site.ts";
+// The Latin subsets of both fonts are used above the fold, so they're
+// preloaded below. These are the same files the stylesheet's @font-face rules
+// use, so the browser reuses the preloaded copies.
+import spaceGrotesk from "@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2?url";
+import jetbrainsMono from "@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-wght-normal.woff2?url";
+
+const description =
+  "Mark Eriksson, senior full-stack developer in the UK. Websites and internal systems built end to end, from the database to the last pixel of CSS.";
+
+// The hero stats and footer year are worked out at build time (src/data/stats.ts).
+const stats = pageStats();
+---
+
+<Layout
+  title="Mark Eriksson — Full-stack developer"
+  description={description}
+  path="/"
+  og={{ title: "Mark Eriksson", type: "website", image: "/img/og-image.png" }}
+  jsonLd={{
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: "Mark Eriksson",
+    jobTitle: "Senior Full-Stack Developer",
+    url: `${SITE}/`,
+    email: "mailto:me@mark-eriksson.com",
+    address: { "@type": "PostalAddress", addressCountry: "GB" },
+    worksFor: { "@type": "Organization", name: "Crown Oil Ltd", url: "https://www.crownoil.co.uk/" },
+    knowsAbout: [
+      "PHP",
+      "Laravel",
+      "Node.js",
+      "MySQL",
+      "WordPress",
+      "Vue",
+      "React",
+      "TypeScript",
+      "Web Components",
+      "CSS",
+      "AWS",
+      "Docker",
+    ],
+    sameAs: [
+      "https://github.com/Markshall",
+      "https://www.linkedin.com/in/markeriksson/",
+      "https://codepen.io/Markshall",
+    ],
+  }}
+>
+  <Fragment slot="head">
+    <meta name="google-site-verification" content="8Jc4FewGXJAlAyUQ8x7ri_KQMPFXXySugqH5IA_BgGQ" />
+    <link rel="preload" href={spaceGrotesk} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={jetbrainsMono} as="font" type="font/woff2" crossorigin />
+  </Fragment>
+
+  <Header id="home" nav="home" />
+
+  <main>
+    <section class="hero wrap">
+      <p class="eyebrow mono">// senior full-stack developer · UK</p>
+      <h1>
+        Mark Eriksson<span class="blink accent">_</span>
+      </h1>
+      <p class="lede">
+        I build and look after websites and internal systems end to end — from database and back end to the last pixel
+        of CSS. Since 2018 I’ve been the sole lead developer for Crown Oil and its sister companies.
+      </p>
+      <div class="actions">
+        <a href="#projects" class="btn btn-solid">
+          See my work
+        </a>
+        <a href="#resume" class="btn btn-outline">
+          Résumé
+        </a>
+      </div>
+      <div class="stats">
+        <div>
+          <p class="stat">
+            <span data-years>{stats["data-years"]}</span> yrs
+          </p>
+          <p>leading development at Crown Oil</p>
+        </div>
+        <div>
+          <p class="stat" data-project-total>
+            {stats["data-project-total"]}
+          </p>
+          <p>live sites shipped</p>
+        </div>
+        <div>
+          <p class="stat" data-personal-total>
+            {stats["data-personal-total"]}
+          </p>
+          <p>products of my own</p>
+        </div>
+      </div>
+    </section>
+
+    <ProjectGallery />
+
+    <section id="resume" class="resume wrap" aria-labelledby="resume-h">
+      <div class="section-title">
+        <p class="eyebrow mono">~/résumé</p>
+        <h2 id="resume-h">Experience</h2>
+      </div>
+      <div class="resume-body">
+        <div class="job-head">
+          <h3>Senior Full-Stack Developer · Crown Oil Ltd</h3>
+          <p class="eyebrow mono">Jul 2018 — now</p>
+        </div>
+        <p class="job-desc">
+          Sole lead developer for the company’s main website and its sister companies, plus several internal systems. I
+          build every site from scratch as a custom WordPress theme, on a shared back-end library I wrote for form
+          handling, phone and email verification and common utilities. Calculators and converters are HTML custom
+          elements that any of the sites can embed in their own colours. Quote requests flow into the company’s CRMs. I
+          moved the whole group onto Cloudflare, in front of AWS, and tuned its caching, which made the sites far more
+          reliable.
+        </p>
+        <dl class="skills">
+          <div>
+            <dt class="eyebrow mono">back end</dt>
+            <dd>
+              <ul class="chips mono">
+                <li>
+                  <span class="skill-icon php" aria-hidden="true"></span>PHP
+                </li>
+                <li>
+                  <span class="skill-icon laravel" aria-hidden="true"></span>Laravel
+                </li>
+                <li>
+                  <span class="skill-icon wordpress" aria-hidden="true"></span>WordPress
+                </li>
+                <li>
+                  <span class="skill-icon database" aria-hidden="true"></span>MySQL
+                </li>
+                <li>
+                  <span class="skill-icon nodedotjs" aria-hidden="true"></span>Node.js
+                </li>
+                <li>
+                  <span class="skill-icon api" aria-hidden="true"></span>REST APIs
+                </li>
+                <li>
+                  <span class="skill-icon redis" aria-hidden="true"></span>Redis
+                </li>
+                <li>
+                  <span class="skill-icon postgresql" aria-hidden="true"></span>PostgreSQL
+                </li>
+              </ul>
+            </dd>
+          </div>
+          <div>
+            <dt class="eyebrow mono">front end</dt>
+            <dd>
+              <ul class="chips mono">
+                <li>
+                  <span class="skill-icon typescript" aria-hidden="true"></span>TypeScript
+                </li>
+                <li>
+                  <span class="skill-icon javascript" aria-hidden="true"></span>JavaScript
+                </li>
+                <li>
+                  <span class="skill-icon vuedotjs" aria-hidden="true"></span>Vue
+                </li>
+                <li>
+                  <span class="skill-icon react" aria-hidden="true"></span>React
+                </li>
+                <li>
+                  <span class="skill-icon html5" aria-hidden="true"></span>HTML
+                </li>
+                <li>
+                  <span class="skill-icon css" aria-hidden="true"></span>CSS
+                </li>
+                <li>
+                  <span class="skill-icon sass" aria-hidden="true"></span>Sass
+                </li>
+                <li>
+                  <span class="skill-icon tailwindcss" aria-hidden="true"></span>Tailwind CSS
+                </li>
+                <li>
+                  <span class="skill-icon pwa" aria-hidden="true"></span>PWA / Web Push
+                </li>
+                <li>
+                  <span class="skill-icon jquery" aria-hidden="true"></span>jQuery
+                </li>
+              </ul>
+            </dd>
+          </div>
+          <div>
+            <dt class="eyebrow mono">infra &amp; tooling</dt>
+            <dd>
+              <ul class="chips mono">
+                <li>
+                  <span class="skill-icon docker" aria-hidden="true"></span>Docker
+                </li>
+                <li>
+                  <span class="skill-icon cloud" aria-hidden="true"></span>AWS
+                </li>
+                <li>
+                  <span class="skill-icon cloudflare" aria-hidden="true"></span>Cloudflare
+                </li>
+                <li>
+                  <span class="skill-icon githubactions" aria-hidden="true"></span>CI/CD
+                </li>
+                <li>
+                  <span class="skill-icon git" aria-hidden="true"></span>Git
+                </li>
+                <li>
+                  <span class="skill-icon github" aria-hidden="true"></span>GitHub
+                </li>
+                <li>
+                  <span class="skill-icon vite" aria-hidden="true"></span>Vite
+                </li>
+                <li>
+                  <span class="skill-icon composer" aria-hidden="true"></span>Composer
+                </li>
+                <li>
+                  <span class="skill-icon npm" aria-hidden="true"></span>npm
+                </li>
+                <li>
+                  <span class="skill-icon nginx" aria-hidden="true"></span>Nginx
+                </li>
+                <li>
+                  <span class="skill-icon apache" aria-hidden="true"></span>Apache
+                </li>
+                <li>
+                  <span class="skill-icon caddy" aria-hidden="true"></span>Caddy
+                </li>
+              </ul>
+            </dd>
+          </div>
+          <div>
+            <dt class="eyebrow mono">testing</dt>
+            <dd>
+              <ul class="chips mono">
+                <li>
+                  <span class="skill-icon phpunit" aria-hidden="true"></span>PHPUnit
+                </li>
+                <li>
+                  <span class="skill-icon vitest" aria-hidden="true"></span>Vitest
+                </li>
+                <li>
+                  <span class="skill-icon playwright" aria-hidden="true"></span>Playwright
+                </li>
+              </ul>
+            </dd>
+          </div>
+        </dl>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</Layout>
+
+<script>
+  import "../scripts/main.ts";
+</script>
