@@ -145,8 +145,8 @@
 }
 
 /* Each tab fits its name, up to a maximum, as a browser's do. Past the
-   strip's width, it scrolls sideways (projects.ts maps a mouse wheel onto
-   it), fading out at whichever ends have more tabs. */
+   strip's width, it scrolls sideways (projects.ts maps a mouse wheel and
+   dragging onto it), fading out at whichever ends have more tabs. */
 .tabs {
   --fade-before: 0px;
   --fade-after: 0px;
@@ -175,6 +175,16 @@
 
   &[data-more-after] {
     --fade-after: 32px;
+  }
+
+  /* While it's dragged with a mouse (projects.ts). */
+  &.dragging {
+    cursor: grabbing;
+    user-select: none;
+
+    button {
+      cursor: inherit;
+    }
   }
 
   li {

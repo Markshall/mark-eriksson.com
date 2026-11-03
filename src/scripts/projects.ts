@@ -34,6 +34,9 @@ const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
 // How long a project transition waits for its screenshots, in milliseconds.
 const DECODE_WAIT = 400;
 
+// How far, in pixels, a mouse press moves before it drags the tab strip.
+const DRAG_THRESHOLD = 5;
+
 // Animate a DOM update as a view transition, typed so CSS can scope its
 // animations with :active-view-transition-type(). Browsers without typed view
 // transitions (or visitors who prefer reduced motion) just get the update.
@@ -298,6 +301,47 @@ export function initProjects(section: HTMLElement) {
     },
     { passive: false },
   );
+
+  // Dragging with a mouse scrolls the tab strip too, for mice without a
+  // sideways wheel. Touch screens already swipe it natively. A press only
+  // becomes a drag once it's moved a few pixels, so a click still picks a tab,
+  // and a drag doesn't pick the tab it started on.
+  let drag: { x: number; left: number; moved: boolean } | undefined;
+  let dragged = false;
+  strip.addEventListener("pointerdown", event => {
+    dragged = false;
+    if (event.pointerType !== "mouse" || event.button !== 0) return;
+    drag = { x: event.clientX, left: strip.scrollLeft, moved: false };
+  });
+  strip.addEventListener("pointermove", event => {
+    if (!drag) return;
+    const dx = event.clientX - drag.x;
+    if (!drag.moved) {
+      if (Math.abs(dx) < DRAG_THRESHOLD) return;
+      drag.moved = true;
+      strip.setPointerCapture(event.pointerId);
+      strip.classList.add("dragging");
+    }
+    strip.scrollLeft = drag.left - dx;
+  });
+  const endDrag = () => {
+    dragged = Boolean(drag?.moved);
+    drag = undefined;
+    strip.classList.remove("dragging");
+  };
+  strip.addEventListener("pointerup", endDrag);
+  strip.addEventListener("pointercancel", endDrag);
+  strip.addEventListener(
+    "click",
+    event => {
+      if (!dragged) return;
+      dragged = false;
+      event.stopPropagation();
+    },
+    { capture: true },
+  );
+  // Stop the browser dragging a favicon away instead.
+  strip.addEventListener("dragstart", event => event.preventDefault());
 
   $("[data-prev]").addEventListener("click", () => step(-1));
   $("[data-next]").addEventListener("click", () => step(1));
