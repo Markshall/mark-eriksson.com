@@ -211,6 +211,29 @@ test("the mouse wheel scrolls a screenshot, then the page once it reaches the en
   await expect.poll(scrollTop).toBe(0);
 });
 
+test("dragging the tab strip with a mouse scrolls it without picking a tab", async ({ page }) => {
+  await page.setViewportSize({ width: 900, height: 800 });
+  await page.goto("/");
+  const strip = page.locator("[data-list]");
+  const scrollLeft = () => strip.evaluate(el => el.scrollLeft);
+  expect(await strip.evaluate(el => el.scrollWidth > el.clientWidth), "tabs overflowing the strip").toBe(true);
+  await strip.scrollIntoViewIfNeeded();
+
+  const box = (await page.locator("[data-list] li").nth(1).boundingBox())!;
+  const y = box.y + box.height / 2;
+  await page.mouse.move(box.x + box.width / 2, y);
+  await page.mouse.down();
+  await page.mouse.move(box.x - 200, y, { steps: 10 });
+  await page.mouse.up();
+
+  await expect.poll(scrollLeft).toBeGreaterThan(0);
+  await expect(page.locator("[data-name]")).toHaveText(PROJECTS[0].name);
+
+  // A plain click still picks a tab.
+  await page.locator("[data-list] li").nth(2).click();
+  await expect(page.locator("[data-name]")).toHaveText(PROJECTS[2].name);
+});
+
 test("hovering a screenshot scrolls it, unless the visitor prefers reduced motion", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/#projects/" + PROJECTS[0].id);
