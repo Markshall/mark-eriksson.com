@@ -269,3 +269,9 @@
     mask-image: linear-gradient(to left, transparent, #000 16px);
   }
 }
+
+/* One per project, all but the selected one hidden (projects.ts). Its
+   children take their places in the .project grid as if it weren't there. */
+.project-panel {
+  display: contents;
+}

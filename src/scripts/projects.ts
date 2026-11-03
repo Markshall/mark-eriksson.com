@@ -54,9 +54,6 @@ function transition(update: () => void, ...types: string[]) {
   });
 }
 
-const token = (kind: string, text: string) =>
-  Object.assign(document.createElement("span"), { className: `json-${kind}`, textContent: text });
-
 // Each project has its own link, #projects/<id>, kept in the address bar as
 // the visitor browses so it can be copied and shared.
 const HASH_PREFIX = "#projects/";
@@ -66,9 +63,10 @@ const linkedProject = () =>
     ? PROJECTS.find(project => project.id === decodeURIComponent(location.hash.slice(HASH_PREFIX.length)))
     : undefined;
 
-// The gallery's markup, showing the first project, is rendered at build time
-// (src/components/ProjectGallery.astro). This keeps its filter buttons and
-// tabs, and updates the rest as the visitor browses.
+// The gallery's markup is rendered at build time
+// (src/components/ProjectGallery.astro), with every project's details in its
+// own panel. This keeps its filter buttons and tabs, shows the selected
+// project's panel, and updates the browser window around the screenshots.
 export function initProjects(section: HTMLElement) {
   const $ = <T extends Element = HTMLElement>(selector: string) => required<T>(section, selector);
   const state = { filter: "All", index: 0 };
@@ -148,31 +146,17 @@ export function initProjects(section: HTMLElement) {
     $("[data-stage]").classList.toggle("has-shots", shown.every(Boolean));
   }
 
-  // The same fields as ProjectGallery.astro renders at build time.
+  // Each project's details and links, in elements marked data-panel="<id>".
+  const panels = section.querySelectorAll<HTMLElement>("[data-panel]");
+
+  // Show the project's panels, and fill in the browser window and pager,
+  // which all projects share.
   function renderCurrent(project: ListedProject, total: number) {
-    const details = projectDetails(project);
-    $("[data-url]").textContent = details.url;
+    for (const panel of panels) panel.hidden = panel.dataset.panel !== project.id;
+    $("[data-url]").textContent = projectDetails(project).url;
     $("[data-num]").textContent = project.num;
-    $("[data-cat]").textContent = project.cat;
-    $("[data-name]").textContent = project.name;
-    $("[data-json]").replaceChildren(...details.json.map(part => (typeof part === "string" ? part : token(...part))));
-    $("[data-retired]").hidden = !project.retired;
-    $("[data-retired]").textContent = project.retired ? "retired" : "";
-
-    const visit = $<HTMLAnchorElement>("[data-visit]");
-    if (details.href) visit.href = details.href;
-    else visit.removeAttribute("href");
-    visit.hidden = !details.href;
-    $("[data-visit-label]").textContent = details.visitLabel;
     $("[data-position]").textContent = positionLabel(state.index, total);
-    const link = $<HTMLAnchorElement>("[data-details]");
-    link.href = details.detailsHref;
-    link.setAttribute("aria-label", details.detailsLabel);
-
     renderShots(project);
-
-    $('[data-optional="summary"]').hidden = !project.summary;
-    $("[data-summary]").textContent = project.summary ?? "";
   }
 
   // The first render isn't announced: it's the page loading, not a change.

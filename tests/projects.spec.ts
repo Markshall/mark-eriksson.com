@@ -26,18 +26,31 @@ test.describe("without JavaScript", () => {
     await expect(page.locator('[data-list] [aria-current="true"]')).toHaveText(project.name);
     await expect(page.getByRole("button", { name: /^All/ })).toHaveAttribute("aria-pressed", "true");
     await expect(page.locator("[data-count]")).toHaveText(`showing ${PROJECTS.length} of ${PROJECTS.length}`);
-    await expect(page.locator("[data-name]")).toHaveText(project.name);
-    await expect(page.locator("[data-summary]")).toHaveText(project.summary!);
-    await expect(page.locator("[data-json]")).toContainText(`"role": "${project.role}"`);
-    await expect(page.locator("[data-visit]")).toHaveAttribute("href", siteHref(project)!);
-    await expect(page.locator("[data-details]")).toHaveAttribute("href", `/projects/${project.id}/`);
+    await expect(page.locator("[data-name]:visible")).toHaveText(project.name);
+    await expect(page.locator("[data-summary]:visible")).toHaveText(project.summary!);
+    await expect(page.locator("[data-json]:visible")).toContainText(`"role": "${project.role}"`);
+    await expect(page.locator("[data-visit]:visible")).toHaveAttribute("href", siteHref(project)!);
+    await expect(page.locator("[data-details]:visible")).toHaveAttribute("href", `/projects/${project.id}/`);
     await expect(page.locator("[data-position]")).toHaveText(`1 / ${PROJECTS.length}`);
+
+    // Every project's details are in the page, with only the first shown.
+    for (const other of PROJECTS) {
+      const panel = page.locator(`.project-panel[data-panel="${other.id}"]`);
+      await expect(panel.locator("[data-name]")).toHaveText(other.name);
+      if (other.summary) await expect(panel.locator("[data-summary]")).toHaveText(other.summary);
+      await expect(page.locator(`.project-links[data-panel="${other.id}"] [data-details]`)).toHaveAttribute(
+        "href",
+        `/projects/${other.id}/`,
+      );
+    }
+    await expect(page.locator("[data-name]:visible")).toHaveCount(1);
+    await expect(page.locator("[data-details]:visible")).toHaveCount(1);
   });
 });
 
 test("opening the page doesn't rewrite the address", async ({ page }) => {
   await page.goto("/");
-  await expect(page.locator("[data-name]")).toHaveText(PROJECTS[0].name);
+  await expect(page.locator("[data-name]:visible")).toHaveText(PROJECTS[0].name);
   expect(new URL(page.url()).hash).toBe("");
 });
 
@@ -45,9 +58,9 @@ test("a project link opens that project", async ({ page }) => {
   const project = PROJECTS[3];
   await page.goto(`/#projects/${project.id}`);
 
-  await expect(page.locator("[data-name]")).toHaveText(project.name);
+  await expect(page.locator("[data-name]:visible")).toHaveText(project.name);
   await expect(page.locator('[data-list] [aria-current="true"]')).toContainText(project.name);
-  await expect(page.locator("[data-visit]")).toHaveAttribute("href", siteHref(project)!);
+  await expect(page.locator("[data-visit]:visible")).toHaveAttribute("href", siteHref(project)!);
   await expect(page.locator("#projects")).toBeInViewport();
 });
 
@@ -58,21 +71,21 @@ test("retired projects are listed last, labelled and linked to their archived co
 
   const retired = PROJECTS[firstRetired];
   await page.goto(`/#projects/${retired.id}`);
-  await expect(page.locator("[data-retired]")).toBeVisible();
-  await expect(page.locator("[data-retired]")).toHaveText("retired");
-  await expect(page.locator("[data-json]")).toContainText(`"retired": ${retired.retired!.year}`);
-  await expect(page.locator("[data-visit]")).toHaveText("View archived copy");
-  await expect(page.locator("[data-visit]")).toHaveAttribute("href", siteHref(retired)!);
-  await expect(page.locator("[data-visit]")).toHaveAttribute("href", /^https:\/\/web\.archive\.org\/web\//);
+  await expect(page.locator("[data-retired]:visible")).toBeVisible();
+  await expect(page.locator("[data-retired]:visible")).toHaveText("retired");
+  await expect(page.locator("[data-json]:visible")).toContainText(`"retired": ${retired.retired!.year}`);
+  await expect(page.locator("[data-visit]:visible")).toHaveText("View archived copy");
+  await expect(page.locator("[data-visit]:visible")).toHaveAttribute("href", siteHref(retired)!);
+  await expect(page.locator("[data-visit]:visible")).toHaveAttribute("href", /^https:\/\/web\.archive\.org\/web\//);
 
   await page.goto(`/#projects/${PROJECTS[0].id}`);
-  await expect(page.locator("[data-retired]")).toBeHidden();
-  await expect(page.locator("[data-visit]")).toHaveText("Visit site");
+  await expect(page.locator("[data-retired]:visible")).toBeHidden();
+  await expect(page.locator("[data-visit]:visible")).toHaveText("Visit site");
 });
 
 test("an unknown project link falls back to the first project", async ({ page }) => {
   await page.goto("/#projects/not-a-project");
-  await expect(page.locator("[data-name]")).toHaveText(PROJECTS[0].name);
+  await expect(page.locator("[data-name]:visible")).toHaveText(PROJECTS[0].name);
 });
 
 test("filters narrow the list and update the address", async ({ page }) => {
@@ -82,7 +95,7 @@ test("filters narrow the list and update the address", async ({ page }) => {
   await expect(page.getByRole("button", { name: /^Personal/ })).toHaveAttribute("aria-pressed", "true");
   await expect(page.locator("[data-list] li")).toHaveCount(personal.length);
   await expect(page.locator("[data-count]")).toHaveText(`showing ${personal.length} of ${PROJECTS.length}`);
-  await expect(page.locator("[data-name]")).toHaveText(personal[0].name);
+  await expect(page.locator("[data-name]:visible")).toHaveText(personal[0].name);
   await expect(page).toHaveURL(new RegExp(`#projects/${personal[0].id}$`));
 });
 
@@ -91,7 +104,7 @@ test("a link to a project outside the current filter switches back to All", asyn
   await page.getByRole("button", { name: /^Personal/ }).click();
 
   await page.evaluate(id => (location.hash = `#projects/${id}`), PROJECTS[0].id);
-  await expect(page.locator("[data-name]")).toHaveText(PROJECTS[0].name);
+  await expect(page.locator("[data-name]:visible")).toHaveText(PROJECTS[0].name);
   await expect(page.getByRole("button", { name: /^All/ })).toHaveAttribute("aria-pressed", "true");
 });
 
@@ -100,14 +113,14 @@ test("arrow keys step through projects and wrap around", async ({ page }) => {
   await page.locator("[data-list] button").first().focus();
 
   await page.keyboard.press("ArrowRight");
-  await expect(page.locator("[data-name]")).toHaveText(PROJECTS[1].name);
+  await expect(page.locator("[data-name]:visible")).toHaveText(PROJECTS[1].name);
   // Focus follows the selection, since the tabs are rebuilt.
   await expect(page.locator('[data-list] [aria-current="true"]')).toBeFocused();
   await expect(page).toHaveURL(new RegExp(`#projects/${PROJECTS[1].id}$`));
 
   await page.keyboard.press("ArrowLeft");
   await page.keyboard.press("ArrowLeft");
-  await expect(page.locator("[data-name]")).toHaveText(PROJECTS.at(-1)!.name);
+  await expect(page.locator("[data-name]:visible")).toHaveText(PROJECTS.at(-1)!.name);
 });
 
 test("the pager buttons step through projects", async ({ page }) => {
@@ -121,7 +134,7 @@ test("the pager buttons step through projects", async ({ page }) => {
 test("every project has both screenshots", async ({ page }) => {
   await page.goto("/");
   for (const [i, project] of PROJECTS.entries()) {
-    await expect(page.locator("[data-name]"), `project ${i + 1}`).toHaveText(project.name);
+    await expect(page.locator("[data-name]:visible"), `project ${i + 1}`).toHaveText(project.name);
     await expect(page.locator("[data-stage]")).toHaveClass(/\bhas-shots\b/);
     for (const view of ["desktop", "mobile"]) {
       await expect(page.locator(`[data-shot="${view}"]`)).toHaveJSProperty("complete", true);
@@ -187,7 +200,7 @@ test("a project's videos play over its screenshots", async ({ page }) => {
   // A project without a video shows just its screenshots.
   const other = PROJECTS.find(project => !project.video)!;
   await page.goto(`/#projects/${other.id}`);
-  await expect(page.locator("[data-name]")).toHaveText(other.name);
+  await expect(page.locator("[data-name]:visible")).toHaveText(other.name);
   await expect(page.locator(".shot video")).toHaveCount(0);
 });
 
@@ -201,7 +214,7 @@ test("videos don't play for visitors who prefer reduced motion", async ({ page }
 test("screen readers hear the newly selected project, but not on page load", async ({ page }) => {
   await page.goto("/");
   const announce = page.locator("[data-announce]");
-  await expect(page.locator("[data-name]")).toHaveText(PROJECTS[0].name);
+  await expect(page.locator("[data-name]:visible")).toHaveText(PROJECTS[0].name);
   await expect(announce).toHaveText("");
 
   await page.getByRole("button", { name: "Next project" }).click();
@@ -250,11 +263,11 @@ test("dragging the tab strip with a mouse scrolls it without picking a tab", asy
   await page.mouse.up();
 
   await expect.poll(scrollLeft).toBeGreaterThan(0);
-  await expect(page.locator("[data-name]")).toHaveText(PROJECTS[0].name);
+  await expect(page.locator("[data-name]:visible")).toHaveText(PROJECTS[0].name);
 
   // A plain click still picks a tab.
   await page.locator("[data-list] li").nth(2).click();
-  await expect(page.locator("[data-name]")).toHaveText(PROJECTS[2].name);
+  await expect(page.locator("[data-name]:visible")).toHaveText(PROJECTS[2].name);
 });
 
 test("hovering a screenshot scrolls it, unless the visitor prefers reduced motion", async ({ page }) => {
