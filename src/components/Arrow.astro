@@ -1,0 +1,10 @@
+---
+// An arrow icon (.arrow-icon in src/styles/icons.css), pointing right unless told otherwise.
+interface Props {
+  direction?: "left" | "up" | "up-right";
+}
+
+const { direction } = Astro.props;
+---
+
+<span class:list={["arrow-icon", direction]} aria-hidden="true"></span>

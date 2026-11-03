@@ -9,11 +9,9 @@ on:
     paths:
       - "src/**"
       - "public/**"
-      - "templates/**"
-      - "scripts/pages.ts"
       - "package.json"
       - "package-lock.json"
-      - "vite.config.ts"
+      - "astro.config.ts"
       - "tsconfig.json"
       - ".env.production"
       - "scripts/deploy.sh"

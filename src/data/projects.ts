@@ -1,7 +1,7 @@
 // The portfolio's projects. Shared by the site and scripts/screenshots.ts:
 // add a project here, then run `npm run screenshots` to capture it.
 // `year`, `stack`, `summary` and `body` are optional and hidden until filled in.
-// Each project also gets its own page at /projects/<id>/ (scripts/pages.ts).
+// Each project also gets its own page at /projects/<id>/ (src/pages/projects/[id].astro).
 // Sites that are no longer live stay listed, with `retired` set.
 export interface Project {
   /**

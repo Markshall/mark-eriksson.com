@@ -1,5 +1,5 @@
-// The hero stats and footer year. The build writes them into the HTML (the
-// `page-stats` plugin in vite.config.ts), so they're right without
+// The hero stats and footer year. The build writes them into the HTML
+// (src/pages/index.astro and the footers), so they're right without
 // JavaScript. The two that change with the date are refreshed in the browser
 // too, in case the site goes a while without a rebuild.
 import { PROJECTS } from "./projects.ts";
