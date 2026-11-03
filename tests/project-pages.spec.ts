@@ -98,7 +98,7 @@ test("the back link returns to the project in the gallery", async ({ page }) => 
   await page.goto(`/projects/${project.id}/`);
   await page.getByRole("link", { name: "~/projects" }).click();
   await expect(page).toHaveURL(new RegExp(`/#projects/${project.id}$`));
-  await expect(page.locator("[data-name]")).toHaveText(project.name);
+  await expect(page.locator("[data-name]:visible")).toHaveText(project.name);
 });
 
 test("the sitemap lists every project page", async ({ request }) => {

@@ -63,7 +63,7 @@ Absolute URLs (canonical, `og:url`, `og:image`, the sitemap) start with `VITE_SI
 `tests/` has Playwright smoke tests for the built site, run against `astro preview` (config in `playwright.config.ts`). `npm test` builds first; if `dist/` is already built, `npx playwright test` runs them alone. They cover:
 
 - **Consent:** nothing loads from Google Tag Manager until the visitor accepts, and Reject and Accept are both remembered.
-- **Project gallery:** the gallery is in the HTML with JavaScript turned off, for search engines; project links, filters, the arrow keys and pager, both screenshots for every project, dark screenshots following the theme, and the screen-reader announcement when the project changes.
+- **Project gallery:** every project's details are in the HTML with JavaScript turned off, for search engines; project links, filters, the arrow keys and pager, both screenshots for every project, dark screenshots following the theme, and the screen-reader announcement when the project changes.
 - **Project pages:** every `/projects/<id>/` page loads without errors, with its title, canonical URL, preview image, screenshots and previous/next links. Scores appear only where a project has them, and the Details button, back link and sitemap all point to the right places.
 - **Theme:** the page follows the system setting until the visitor picks a theme, then keeps their choice.
 - **Pages:** `/`, `/privacy/` and `/404.html` load without console errors, and the hero stats and footer year are right with JavaScript turned off.
@@ -150,7 +150,7 @@ The homepage is `src/pages/index.astro`. Most of it is plain HTML:
 
 The shared `<head>` (meta tags, favicons, the theme script) is in `src/layouts/Layout.astro`. Prettier formats `.astro` files with JSX whitespace rules, which Astro's HTML output follows: a line break between text and a tag isn't a space. Where a space is needed next to a link or other inline tag that starts or ends a line, write it as `{" "}`, as Prettier does.
 
-The project gallery is rendered at build time showing the first project, so search engines and visitors without JavaScript see the projects. `src/scripts/projects.ts` then takes it over, keeping the filter buttons and tabs and updating the rest. The text and links for each project come from `src/data/gallery.ts`, which both use.
+The project gallery is rendered at build time with every project's details (title, JSON, summary and links) in the HTML, each in elements marked `data-panel="<id>"`, and all but the first hidden. Search engines and visitors without JavaScript therefore get every project. `src/scripts/projects.ts` then shows the selected project's panel and updates what the projects share: the browser window's address bar, the screenshots and the pager. The text and links for each project come from `src/data/gallery.ts`.
 
 The hero stats and footer year are worked out in `src/data/stats.ts`: years since `CAREER_START`, the number of projects, and the number with category `Personal`. They're written into the built HTML, in elements with matching data attributes (`data-years`, `data-project-total`, `data-personal-total`, `data-year`), and the years and footer year are refreshed in the browser too, in case the site isn't rebuilt for a while.
 

@@ -1,10 +1,12 @@
 ---
-// The homepage project gallery (#projects). The build renders it showing the
-// first project, so search engines and visitors without JavaScript see the
-// projects; src/scripts/projects.ts then keeps its filter buttons and tabs,
-// and updates the rest as the visitor browses. The screenshots stay as
-// skeletons (data-loading) until the script loads them, as Vite only resizes
-// images imported by a script.
+// The homepage project gallery (#projects). Every project's details (title,
+// JSON, summary and links) are rendered into the HTML, each in elements
+// marked data-panel="<id>", with all but the first hidden, so search engines
+// and visitors without JavaScript get every project. src/scripts/projects.ts
+// shows the selected project's panel, and updates the browser window around
+// the screenshots, which are shared. The screenshots stay as skeletons
+// (data-loading) until the script loads them, as Vite only resizes images
+// imported by a script.
 import type { ImageMetadata } from "astro";
 import { countLabel, FILTERS, filtered, positionLabel, projectDetails } from "../data/gallery.ts";
 import { PROJECTS } from "../data/projects.ts";
@@ -13,8 +15,8 @@ import { hasScreenshots } from "../lib/site.ts";
 // Each project's favicon for its tab, saved by `npm run favicons`.
 const FAVICONS = import.meta.glob<ImageMetadata>("../assets/favicons/*.webp", { eager: true, import: "default" });
 
-const [project] = PROJECTS;
-const details = projectDetails(project);
+const [first] = PROJECTS;
+const details = projectDetails(first);
 ---
 
 <section id="projects" class="band" aria-labelledby="projects-h">
@@ -43,7 +45,7 @@ const details = projectDetails(project);
       <p class="visually-hidden" aria-live="polite" data-announce></p>
 
       <article class="project">
-        <div class:list={["stage", { "has-shots": hasScreenshots(project.id) }]} data-stage>
+        <div class:list={["stage", { "has-shots": hasScreenshots(first.id) }]} data-stage>
           <!-- A browser window with a tab for each project. The tabs sit
                above the link to the site, as they're buttons. -->
           <div class="window">
@@ -88,7 +90,7 @@ const details = projectDetails(project);
               </div>
               <div class="canvas" aria-hidden="true">
                 <span class="big-num" data-num>
-                  {project.num}
+                  {first.num}
                 </span>
               </div>
             </div>
@@ -100,47 +102,59 @@ const details = projectDetails(project);
           </div>
         </div>
 
-        <div class="project-title">
-          <p class="project-name" data-name>
-            {project.name}
-          </p>
-          <span class="pill mono" data-cat>
-            {project.cat}
-          </span>
-          <span class="pill pill-outline mono" data-retired hidden={!project.retired}>
-            {project.retired ? "retired" : ""}
-          </span>
-        </div>
+        <!-- Each project's title, JSON and summary. display: contents keeps
+             them in the .project grid's areas. -->
+        {PROJECTS.map((project, i) => {
+          const { json } = projectDetails(project);
+          return (
+            <div class="project-panel" data-panel={project.id} hidden={i > 0}>
+              <div class="project-title">
+                <p class="project-name" data-name>
+                  {project.name}
+                </p>
+                <span class="pill mono">{project.cat}</span>
+                {project.retired && (
+                  <span class="pill pill-outline mono" data-retired>
+                    retired
+                  </span>
+                )}
+              </div>
 
-        <pre
-          class="json mono"
-          data-json
-        >{details.json.map(part => (typeof part === "string" ? part : <span class={`json-${part[0]}`}>{part[1]}</span>))}</pre>
+              <pre
+                class="json mono"
+                data-json
+              >{json.map(part => (typeof part === "string" ? part : <span class={`json-${part[0]}`}>{part[1]}</span>))}</pre>
 
-        <dl class="meta" data-optional="summary" hidden={!project.summary}>
-          <div>
-            <dt class="mono">what I built</dt>
-            <dd data-summary>{project.summary}</dd>
-          </div>
-        </dl>
+              {project.summary && (
+                <dl class="meta">
+                  <div>
+                    <dt class="mono">what I built</dt>
+                    <dd data-summary>{project.summary}</dd>
+                  </div>
+                </dl>
+              )}
+            </div>
+          );
+        })}
 
         <div class="project-actions">
-          <div class="project-links">
-            <a
-              class="btn btn-light"
-              data-visit
-              href={details.href}
-              hidden={!details.href}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <span data-visit-label>{details.visitLabel}</span>
-              <span class="arrow-icon up-right" aria-hidden="true"></span>
-            </a>
-            <a class="btn btn-ghost" data-details href={details.detailsHref} aria-label={details.detailsLabel}>
-              Details
-            </a>
-          </div>
+          <!-- Each project's links, beside the shared pager. -->
+          {PROJECTS.map((project, i) => {
+            const { href, visitLabel, detailsHref, detailsLabel } = projectDetails(project);
+            return (
+              <div class="project-links" data-panel={project.id} hidden={i > 0}>
+                {href && (
+                  <a class="btn btn-light" data-visit href={href} target="_blank" rel="noopener noreferrer">
+                    {visitLabel}
+                    <span class="arrow-icon up-right" aria-hidden="true"></span>
+                  </a>
+                )}
+                <a class="btn btn-ghost" data-details href={detailsHref} aria-label={detailsLabel}>
+                  Details
+                </a>
+              </div>
+            );
+          })}
           <div class="pager">
             <button type="button" class="icon-btn" data-prev aria-label="Previous project">
               <svg

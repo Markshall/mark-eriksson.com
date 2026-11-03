@@ -1,7 +1,7 @@
 // What the homepage project gallery shows, shared by the build, which renders
-// the first project into the HTML (src/components/ProjectGallery.astro) so
-// search engines and visitors see it without JavaScript, and the browser,
-// which updates it as the visitor browses (src/scripts/projects.ts).
+// every project into the HTML (src/components/ProjectGallery.astro) so search
+// engines and visitors see them without JavaScript, and the browser, which
+// switches between them as the visitor browses (src/scripts/projects.ts).
 import { PROJECTS, siteHref } from "./projects.ts";
 
 type ListedProject = (typeof PROJECTS)[number];
