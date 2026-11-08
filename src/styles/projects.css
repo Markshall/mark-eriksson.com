@@ -144,13 +144,47 @@
   }
 }
 
+/* The tabs fade out at whichever ends have more tabs scrolled out of view
+   (projects.ts marks them), under gradients of the strip's background drawn
+   over them. Not a mask-image: Safari leaves a masked scroller blank for a
+   frame at the start of each view transition. */
+.tabs-frame {
+  position: relative;
+  display: flex;
+  flex-grow: 1;
+  min-width: 0;
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    inset-block: 0;
+    z-index: 1;
+    width: 32px;
+    pointer-events: none;
+    opacity: 0;
+  }
+
+  &::before {
+    left: 0;
+    background: linear-gradient(to right, var(--band), transparent);
+  }
+
+  &::after {
+    right: 0;
+    background: linear-gradient(to left, var(--band), transparent);
+  }
+
+  &:has(> [data-more-before])::before,
+  &:has(> [data-more-after])::after {
+    opacity: 1;
+  }
+}
+
 /* Each tab fits its name, up to a maximum, as a browser's do. Past the
    strip's width, it scrolls sideways (projects.ts maps a mouse wheel and
-   dragging onto it), fading out at whichever ends have more tabs. */
+   dragging onto it). */
 .tabs {
-  --fade-before: 0px;
-  --fade-after: 0px;
-
   position: relative;
   display: flex;
   flex-grow: 1;
@@ -161,21 +195,6 @@
   overflow-x: auto;
   overscroll-behavior-x: contain;
   scrollbar-width: none;
-  mask-image: linear-gradient(
-    to right,
-    transparent,
-    #000 var(--fade-before),
-    #000 calc(100% - var(--fade-after)),
-    transparent
-  );
-
-  &[data-more-before] {
-    --fade-before: 32px;
-  }
-
-  &[data-more-after] {
-    --fade-after: 32px;
-  }
 
   /* While it's dragged with a mouse (projects.ts). */
   &.dragging {

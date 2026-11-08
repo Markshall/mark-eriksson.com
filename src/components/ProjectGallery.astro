@@ -55,29 +55,31 @@ const details = projectDetails(first);
                 <span></span>
                 <span></span>
               </span>
-              <ol class="tabs" aria-label="Projects" data-list>
-                {PROJECTS.map((p, i) => {
-                  // The site's favicon (or the one it shares), or its number if it hasn't got one.
-                  const favicon = FAVICONS[`../assets/favicons/${p.favicon ?? p.id}.webp`];
-                  return (
-                    <li data-project={p.id}>
-                      <button
-                        type="button"
-                        title={p.name}
-                        class:list={{ retired: p.retired }}
-                        aria-current={i === 0 ? "true" : undefined}
-                      >
-                        {favicon ? (
-                          <img class="favicon" src={favicon.src} width="16" height="16" alt="" decoding="async" />
-                        ) : (
-                          <span class="num">{p.num}</span>
-                        )}
-                        <span class="name">{p.name}</span>
-                      </button>
-                    </li>
-                  );
-                })}
-              </ol>
+              <div class="tabs-frame">
+                <ol class="tabs" aria-label="Projects" data-list>
+                  {PROJECTS.map((p, i) => {
+                    // The site's favicon (or the one it shares), or its number if it hasn't got one.
+                    const favicon = FAVICONS[`../assets/favicons/${p.favicon ?? p.id}.webp`];
+                    return (
+                      <li data-project={p.id}>
+                        <button
+                          type="button"
+                          title={p.name}
+                          class:list={{ retired: p.retired }}
+                          aria-current={i === 0 ? "true" : undefined}
+                        >
+                          {favicon ? (
+                            <img class="favicon" src={favicon.src} width="16" height="16" alt="" decoding="async" />
+                          ) : (
+                            <span class="num">{p.num}</span>
+                          )}
+                          <span class="name">{p.name}</span>
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ol>
+              </div>
             </div>
             <div class="browser">
               <div class="browser-bar">
