@@ -17,16 +17,16 @@
     "favicons": "node scripts/favicons.ts"
   },
   "devDependencies": {
-    "@playwright/test": "^1.65.0",
+    "@playwright/test": "^1.65.1",
     "@types/node": "^26.6.6",
-    "astro": "^7.4.7",
+    "astro": "^7.4.12",
     "playwright-core": "^1.64.1",
-    "prettier": "3.9.10",
+    "prettier": "3.10.1",
     "prettier-plugin-astro": "^1.1.2",
     "sharp": "^0.35.5",
     "typescript": "^7.0.2",
-    "vite": "^8.3.6",
-    "vite-imagetools": "^12.0.1"
+    "vite": "^8.3.8",
+    "vite-imagetools": "^12.0.2"
   },
   "dependencies": {
     "@fontsource-variable/jetbrains-mono": "^5.3.0",
